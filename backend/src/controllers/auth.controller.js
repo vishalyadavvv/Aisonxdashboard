@@ -291,7 +291,9 @@ exports.startTrial = async (req, res) => {
     user.subscription.tier = tier.toLowerCase();
     user.subscription.status = 'trialing';
     user.subscription.expiresAt = expiresAt;
-    user.subscription.trialUsed = true; // ✅ Mark as used
+    user.subscription.trialUsed = true;
+    user.subscription.promptsUsedThisMonth = 0; // ✅ Reset scan count for trial
+    user.subscription.lastPromptReset = new Date(); // ✅ Update reset timestamp
 
     await user.save();
 

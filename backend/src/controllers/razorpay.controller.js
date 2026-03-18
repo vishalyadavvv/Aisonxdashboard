@@ -79,6 +79,8 @@ exports.verifyPayment = async (req, res) => {
     user.subscription.tier = planName.toLowerCase();
     user.subscription.status = 'active';
     user.subscription.expiresAt = expiresAt;
+    user.subscription.promptsUsedThisMonth = 0; // ✅ Reset scan count for new plan
+    user.subscription.lastPromptReset = new Date(); // ✅ Update reset timestamp
     user.subscription.razorpayOrderId = razorpay_order_id;
     user.subscription.razorpayPaymentId = razorpay_payment_id;
 

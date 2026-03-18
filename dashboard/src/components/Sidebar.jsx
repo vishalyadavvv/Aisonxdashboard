@@ -216,7 +216,6 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
                 className="mt-1 space-y-1 overflow-hidden ml-6 border-l border-white/5 pl-2"
               >
                 <NavItem to="/dashboard/settings" label="Profile Settings" isChild />
-                {user?.role !== 'admin' && <NavItem to="/dashboard/team" label="Team Members" isChild />}
               </motion.div>
             )}
           </AnimatePresence>

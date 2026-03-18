@@ -240,7 +240,11 @@ const Pricing = () => {
 
             <button 
               onClick={() => handlePlanAction(plan.name)}
-              disabled={loading || (user?.subscription?.tier === plan.name.toLowerCase() && user?.subscription?.status !== 'expired')}
+              disabled={loading || (
+                user?.subscription?.tier === plan.name.toLowerCase() && 
+                user?.subscription?.status !== 'expired' && 
+                (user?.subscription?.promptsUsedThisMonth || 0) < (plan.name.toLowerCase() === 'professional' ? 20 : (plan.name.toLowerCase() === 'growth' ? 15 : 10))
+              )}
               className={`w-full mt-10 py-4 rounded-2xl text-sm font-bold transition-all ${
                 plan.popular 
                   ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/20 hover:bg-blue-700' 
@@ -250,7 +254,11 @@ const Pricing = () => {
               {loading ? (
                 'Processing...'
               ) : user?.subscription?.tier === plan.name.toLowerCase() ? (
-                user?.subscription?.status === 'expired' ? 'Renew Plan' : 'Current Plan'
+                user?.subscription?.status === 'expired' 
+                  ? 'Renew Plan' 
+                  : ((user?.subscription?.promptsUsedThisMonth || 0) >= (plan.name.toLowerCase() === 'professional' ? 20 : (plan.name.toLowerCase() === 'growth' ? 15 : 10)) 
+                      ? 'Recharge Plan' 
+                      : 'Current Plan')
               ) : user?.subscription?.trialUsed ? (
                 `Upgrade to ${plan.name}`
               ) : (
