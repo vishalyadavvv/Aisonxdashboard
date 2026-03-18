@@ -1,0 +1,233 @@
+
+<!-- ========== CSS (Add to WordPress <head> or Customizer > Additional CSS) ========== -->
+<style>
+/* CSS Variables (include these if not already loaded from header) */
+:root {
+    --aisonx-primary: #6366f1;
+    --aisonx-primary-dark: #4f46e5;
+    --aisonx-secondary: #8b5cf6;
+    --aisonx-accent: #06b6d4;
+    --aisonx-success: #10b981;
+    --aisonx-dark: #0f172a;
+    --aisonx-dark-light: #1e293b;
+    --aisonx-gray: #64748b;
+    --aisonx-light: #f1f5f9;
+    --aisonx-white: #ffffff;
+    --aisonx-gradient-1: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%);
+    --aisonx-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    --aisonx-radius: 16px;
+    --aisonx-transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.aisonx-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    width: 100%;
+}
+
+/* Footer */
+.aisonx-footer {
+    background: #0a0f1c;
+    color: var(--aisonx-white);
+    padding: 40px 0 20px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    
+    /* Aggressive WordPress Breakout - Edge to Edge */
+    position: relative !important;
+    left: 50% !important;
+    right: auto !important;
+    width: 100vw !important;
+    margin-left: -50vw !important;
+    margin-right: -50vw !important;
+    box-sizing: border-box !important;
+}
+
+.aisonx-footer * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.aisonx-footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+.aisonx-footer-brand .aisonx-logo {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 12px;
+    display: inline-block;
+    text-decoration: none;
+    color: var(--aisonx-white);
+}
+
+.aisonx-footer-brand p {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.6;
+    margin-bottom: 20px;
+    max-width: 450px;
+}
+
+.aisonx-footer-social {
+    display: flex;
+    gap: 15px;
+}
+
+.aisonx-footer-social a {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--aisonx-white);
+    font-size: 18px;
+    transition: var(--aisonx-transition);
+    text-decoration: none;
+}
+
+.aisonx-footer-social a:hover {
+    background: var(--aisonx-gradient-1);
+    transform: translateY(-3px);
+}
+
+.aisonx-footer-col h4 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: var(--aisonx-white);
+}
+
+.aisonx-footer-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.aisonx-footer-links li {
+    margin-bottom: 12px;
+}
+
+.aisonx-footer-links a {
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    font-size: 15px;
+    transition: var(--aisonx-transition);
+}
+
+.aisonx-footer-links a:hover {
+    color: var(--aisonx-accent);
+    padding-left: 5px;
+}
+
+.aisonx-footer-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.aisonx-footer-bottom p {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.aisonx-footer-bottom-links {
+    display: flex;
+    gap: 30px;
+}
+
+.aisonx-footer-bottom-links a {
+    color: rgba(255, 255, 255, 0.5);
+    text-decoration: none;
+    font-size: 14px;
+    transition: var(--aisonx-transition);
+}
+
+.aisonx-footer-bottom-links a:hover {
+    color: var(--aisonx-white);
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .aisonx-footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .aisonx-footer-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+    .aisonx-footer-bottom {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .aisonx-container {
+        padding: 0 16px;
+    }
+}
+</style>
+
+<!-- ========== FONTS (Include if not already loaded from header) ========== -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+<!-- ========== FOOTER HTML (Add before </body> in WordPress or in footer.php) ========== -->
+
+<!-- Footer -->
+<footer class="aisonx-footer">
+    <div class="aisonx-container">
+        <div class="aisonx-footer-grid">
+            <div class="aisonx-footer-brand">
+                <a href="#" class="aisonx-logo">AISONX</a>
+                <p>Transform Your AI Visibility With Smarter SEO Insights. Get your brand discovered where decisions are made — inside AI answers.</p>
+                <div class="aisonx-footer-social">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+
+            <div class="aisonx-footer-col">
+                <h4>Company</h4>
+                <ul class="aisonx-footer-links">
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="https://aisonx.com/blog/">Blog</a></li>
+                </ul>
+            </div>
+
+            <div class="aisonx-footer-col">
+                <h4>Support</h4>
+                <ul class="aisonx-footer-links">
+                    <li><a href="#">Support</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="aisonx-footer-bottom">
+            <p>&copy; 2025 AISONX. All rights reserved.</p>
+            <div class="aisonx-footer-bottom-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Cookie Policy</a>
+            </div>
+        </div>
+    </div>
+</footer>

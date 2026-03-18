@@ -1,0 +1,361 @@
+const geminiInternal = require('./gemini.service');
+const openaiInternal = require('./openai.service');
+const groqInternal = require('./groq.service');
+const logger = require('../../utils/logger');
+
+// Live Services
+const { 
+    gptPromptAudit, 
+    gptBatchPromptAudit, 
+    gptCompetitiveBatchAudit,
+    geminiPromptAudit, 
+    geminiCompetitiveAudit,
+    gptSearchCompetitors, 
+    geminiSearchCompetitors 
+} = require('../ai_live/projectAuditor');
+const { cleanUrl } = require('../../utils/urlCleaner');
+const { robustParseJSON } = require('../../utils/jsonParser');
+
+/**
+ * PromptOrchestrator
+ * Specifically designed to measure "Rank" and "Recommendation Share" 
+ * for a brand against specific prompts in AI models.
+ */
+
+async function analyzePromptRanking(brandName, domain, promptText, market = { name: 'Global' }, modelName = 'openai', useLiveSearch = true) {
+    try {
+        let audit;
+        
+        if (useLiveSearch) {
+            if (modelName === 'openai') {
+                audit = await gptPromptAudit(brandName, domain, promptText, market);
+            } else if (modelName === 'gemini') {
+                audit = await geminiPromptAudit(brandName, domain, promptText, market);
+            }
+        }
+
+        // Fallback to internal knowledge if live search fails, is disabled, or for Groq
+        if (!audit) {
+    const prompt = `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━i did't understand i said you to all funcanlity work on live or websearach than why internal training
+TARGET BRAND: "${brandName}"
+WEBSITE: "${domain}"
+TARGET MARKET: "${market.name}"
+TARGET PROMPT: "${promptText}"
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ROLE: You are an EXPERT Search Visibility Auditor.
+TASK: Analyze the search presence of "${brandName}" (${domain}) in your model memory for a user in the ${market.name} market for the query: "${promptText}".
+
+INSTRUCTIONS:
+1. ⚠️ MARKET EXPERTISE: Identify leadership specifically based on localized training data for ${market.name}.
+2. 🚨 BREVITY: Return ONLY JSON. Snippet MUST be 1 sentence (max 15 words). NO filler.
+3. 🚨 SCORING: Provide Rank 0-10 and Score 0-100 based on localized presence.
+4. OUTPUT FORMAT (JSON):
+{
+  "prompt": "${promptText}",
+  "brandRanking": { "rank": 0-10, "score": 0-100, "isRecommended": true/false, "linkProvided": true/false, "snippet": "1-sentence info" },
+  "authoritySignals": { "sourceType": "Expert Analysis", "recallConfidence": "High|Medium|Low", "citations": [] }
+}
+`;
+            let response;
+            if (modelName === 'openai') response = await openaiInternal.fetchOpenAI(prompt, true);
+            else if (modelName === 'gemini') response = await geminiInternal.fetchGemini(prompt, true);
+            else if (modelName === 'groq') response = await groqInternal.fetchGroq(prompt, true);
+
+            if (response) {
+                audit = robustParseJSON(response);
+                if (audit && audit.authoritySignals?.citations) {
+                    audit.authoritySignals.citations = audit.authoritySignals.citations.map(cleanUrl).filter(Boolean);
+                }
+            }
+        }
+
+        return audit || {
+            prompt: promptText,
+            brand: brandName,
+            isRecommended: false,
+            linkMentioned: false,
+            recommendationRank: 0,
+            linkRank: 0,
+            visibilityLevel: 'None',
+            score: 0,
+            error: true
+        };
+    } catch (err) {
+        logger.error(`Error in Prompt Audit (${modelName}):`, err.message);
+        return {
+            prompt: promptText,
+            brand: brandName,
+            isRecommended: false,
+            linkMentioned: false,
+            recommendationRank: 0,
+            linkRank: 0,
+            visibilityLevel: 'None',
+            score: 0,
+            error: true
+        };
+    }
+}
+
+async function analyzeCustomPrompt(brandName, domain, customPromptText, engine = 'openai') {
+    const prompt = `
+ROLE: You are an AI Search Visibility Auditor.
+USER QUERY: "${customPromptText}"
+TARGET BRAND: "${brandName}"
+WEBSITE: "${domain}"
+
+TASK: Analyze your own internal response to this user query.
+1. Does "${brandName}" (or their website ${domain}) appear in your response to this query? (brandMentioned: true/false)
+2. What is the sentiment towards "${brandName}"? (Positive/Neutral/Negative)
+
+OUTPUT FORMAT (JSON ONLY):
+{
+  "brandMentioned": true/false,
+  "sentiment": "Positive|Neutral|Negative",
+  "reasoning": "1 sentence why, specifically checking for mentions of ${brandName} or ${domain}"
+}
+`;
+    try {
+        let response;
+        if (engine === 'openai') response = await openaiInternal.fetchOpenAI(prompt, true);
+        else if (engine === 'gemini') response = await geminiInternal.fetchGemini(prompt, true);
+        else if (engine === 'groq') response = await groqInternal.fetchGroq(prompt, true);
+
+        if (!response) return { brandMentioned: false, sentiment: 'Neutral', error: true };
+
+        const jsonMatch = response.match(/\{[\s\S]*\}/);
+        return JSON.parse(jsonMatch[0]);
+    } catch (err) {
+        return { brandMentioned: false, sentiment: 'Neutral', error: true };
+    }
+}
+
+async function discoverCompetitors(brandName, domain, market = { name: 'Global' }) {
+    try {
+        logger.info(`🔍 [DISCOVERY] Researching rivals for ${brandName} in ${market.name} using Multi-Engine Live Search...`);
+        
+        const [gptRivals, geminiRivals] = await Promise.all([
+            gptSearchCompetitors(brandName, domain, market),
+            geminiSearchCompetitors(brandName, domain, market)
+        ]);
+
+        // Merge and deduplicate by domain
+        const allRivals = [...(gptRivals || []), ...(geminiRivals || [])];
+        const uniqueMap = new Map();
+        
+        allRivals.forEach(r => {
+            if (r.domain && r.domain !== domain) {
+                const cleanD = r.domain.toLowerCase().replace('www.', '').trim();
+                if (!uniqueMap.has(cleanD)) {
+                    uniqueMap.set(cleanD, r);
+                }
+            }
+        });
+
+        const discovered = Array.from(uniqueMap.values()).slice(0, 5);
+        
+        if (discovered.length > 0) {
+            logger.info(`✅ [DISCOVERY] Found ${discovered.length} unique rivals via combined search`);
+            return discovered;
+        } else {
+            logger.warn(`⚠️ [DISCOVERY] No rivals found for ${brandName} via multi-engine search`);
+            return [];
+        }
+    } catch (err) {
+        logger.error(`❌ [DISCOVERY] Multi-engine error for ${brandName}:`, err.message);
+        return [];
+    }
+}
+
+/**
+ * Helper: Run an array of task functions with a concurrency limit.
+ */
+async function runWithLimit(tasks, limit = 5) {
+    const results = [];
+    const executing = new Set();
+    for (const task of tasks) {
+        const p = Promise.resolve().then(() => task());
+        results.push(p);
+        executing.add(p);
+        p.finally(() => executing.delete(p));
+        if (executing.size >= limit) {
+            await Promise.race(executing);
+        }
+    }
+    return Promise.all(results);
+}
+
+/**
+ * Scans a brand across multiple prompts and engines
+ */
+exports.performProjectScan = async (project) => {
+    const results = {
+        promptRankings: [],
+        competitorRankings: [],
+        customPromptResults: []
+    };
+    const engines = project.targetEngines && project.targetEngines.length > 0 ? project.targetEngines : ['openai', 'gemini', 'groq'];
+    const brandName = project.brandName || project.name;
+    const domain = project.domain;
+    const market = project.market || { name: 'Global', type: 'global' };
+    
+    // 0. Auto-Discover Competitors if empty
+    if (!project.competitors || project.competitors.length === 0) {
+        logger.info(`🔍 Discovery: No competitors set for ${project.name}. Running AI discovery in ${market.name}...`);
+        const discovered = await discoverCompetitors(brandName, domain, market);
+        if (discovered && discovered.length > 0) {
+            project.competitors = discovered;
+            await project.save();
+            logger.info(`✅ Discovery: Found ${discovered.length} competitors: ${discovered.map(c => c.name).join(', ')}`);
+        }
+    }
+
+    // 1. Competitive Audits — OpenAI & Gemini (The "Battle View")
+    // These calls evaluate the brand and rivals in the same search context.
+    
+    // 1.1 OpenAI Competitive Audit
+    if (engines.includes('openai')) {
+        logger.info(`🔄 [COMPETITIVE] Running OpenAI Battle View for ${project.prompts.length} prompts in ${market.name}...`);
+        const compResults = await gptCompetitiveBatchAudit(brandName, domain, project.competitors, project.prompts, market);
+        
+        if (compResults && Array.isArray(compResults)) {
+            for (const audit of (compResults || [])) {
+                if (!audit || !audit.brandRanking) continue;
+                
+                // Map Brand Result
+                results.promptRankings.push({
+                    prompt: audit.prompt || '',
+                    engine: 'openai',
+                    visibility: (audit.brandRanking.rank > 0) ? (audit.brandRanking.rank <= 3 ? 'High' : 'Moderate') : 'None',
+                    found: audit.brandRanking.isRecommended || (audit.brandRanking.rank > 0),
+                    linkFound: audit.brandRanking.linkProvided || (audit.authoritySignals?.citations?.length > 0) || false,
+                    rank: audit.brandRanking.rank || 0,
+                    linkRank: audit.brandRanking.rank || 0,
+                    score: audit.brandRanking.score || 0,
+                    snippet: audit.brandRanking.snippet || '',
+                    citations: audit.authoritySignals?.citations || [],
+                    authoritySource: audit.authoritySignals?.sourceType || 'OpenAI Search',
+                    authoritySignals: audit.authoritySignals || { sourceType: 'Comparison', citations: [] }
+                });
+
+                // Map Competitor Results
+                if (audit.competitorRankings) {
+                    for (const cr of audit.competitorRankings) {
+                        results.competitorRankings.push({
+                            competitorName: cr.name,
+                            competitorDomain: cr.domain,
+                            prompt: audit.prompt,
+                            engine: 'openai',
+                            visibility: cr.rank > 0 ? (cr.rank <= 3 ? 'High' : 'Moderate') : 'None',
+                            found: cr.found || cr.rank > 0,
+                            score: cr.score || 0,
+                            rank: cr.rank || 0,
+                            authoritySignals: audit.authoritySignals || {}
+                        });
+                    }
+                }
+            }
+            logger.info(`✅ [COMPETITIVE] OpenAI Battle View complete`);
+        }
+    }
+
+    // 1.2 Gemini Competitive Audit
+    if (engines.includes('gemini')) {
+        logger.info(`🔄 [COMPETITIVE] Running Gemini Battle View for ${project.prompts.length} prompts in ${market.name}...`);
+        const tasks = project.prompts.map(promptText => () => 
+            geminiCompetitiveAudit(brandName, domain, project.competitors, promptText, market)
+        );
+        
+        const gCompResults = await runWithLimit(tasks, 3); // Gemini search is heavy, lower limit
+        
+        for (const audit of gCompResults.filter(Boolean)) {
+             if (!audit.brandRanking) continue;
+ 
+             // Map Brand Result
+             results.promptRankings.push({
+                prompt: audit.prompt || '',
+                engine: 'gemini',
+                visibility: (audit.brandRanking.rank > 0) ? (audit.brandRanking.rank <= 3 ? 'High' : 'Moderate') : 'None',
+                found: audit.brandRanking.isRecommended || (audit.brandRanking.rank > 0),
+                linkFound: audit.brandRanking.linkProvided || (audit.authoritySignals?.citations?.length > 0) || false,
+                rank: audit.brandRanking.rank || 0,
+                linkRank: audit.brandRanking.rank || 0,
+                score: audit.brandRanking.score || 0,
+                snippet: audit.brandRanking.snippet || '',
+                citations: audit.authoritySignals?.citations || [],
+                authoritySource: audit.authoritySignals?.sourceType || 'Gemini Google Search',
+                authoritySignals: audit.authoritySignals || { sourceType: 'Comparison', citations: [] }
+            });
+
+            // Map Competitor Results
+            if (audit.competitorRankings) {
+                for (const cr of audit.competitorRankings) {
+                    results.competitorRankings.push({
+                        competitorName: cr.name,
+                        competitorDomain: cr.domain,
+                        prompt: audit.prompt,
+                        engine: 'gemini',
+                        visibility: cr.rank > 0 ? (cr.rank <= 3 ? 'High' : 'Moderate') : 'None',
+                        found: cr.found || cr.rank > 0,
+                        score: cr.score || 0,
+                        rank: cr.rank || 0,
+                        authoritySignals: audit.authoritySignals || {}
+                    });
+                }
+            }
+        }
+        logger.info(`✅ [COMPETITIVE] Gemini Battle View complete`);
+    }
+
+    // 2. Groq/Fallback Audits (Non-Search Internal Knowledge)
+    const otherEngines = engines.filter(e => e === 'groq'); // Groq doesn't support competitive search well
+    if (otherEngines.length > 0) {
+        const tasks = [];
+        for (const promptText of project.prompts) {
+            for (const engine of otherEngines) {
+                tasks.push(() => 
+                    analyzePromptRanking(brandName, domain, promptText, market, engine, false).then(audit => ({
+                        prompt: promptText,
+                        engine,
+                        visibility: audit.visibilityLevel || 'None',
+                        found: audit.brandRanking?.isRecommended || (audit.brandRanking?.rank > 0) || false,
+                        linkFound: audit.brandRanking?.linkProvided || (audit.authoritySignals?.citations?.length > 0) || false,
+                        rank: audit.brandRanking?.rank || 0,
+                        linkRank: audit.brandRanking?.rank || 0,
+                        score: audit.brandRanking?.score || 0,
+                        snippet: audit.brandRanking?.snippet || '',
+                        citations: audit.authoritySignals?.citations || [],
+                        authoritySource: audit.authoritySignals?.sourceType || 'Internal Knowledge',
+                        authoritySignals: audit.authoritySignals || { sourceType: 'Internal Knowledge', citations: [] }
+                    }))
+                );
+            }
+        }
+        logger.info(`🔄 [INTERNAL] Executing ${tasks.length} background knowledge audits for ${otherEngines.join(', ')}...`);
+        const internalAudits = await runWithLimit(tasks, 5);
+        results.promptRankings.push(...internalAudits);
+    }
+
+    // 4. Scan Custom Simulator Prompts (Parallel with Limit)
+    if (project.customPrompts && project.customPrompts.length > 0) {
+        const tasks = [];
+        for (const cp of project.customPrompts) {
+            for (const engine of engines) {
+                tasks.push(() => 
+                    analyzeCustomPrompt(brandName, domain, cp.text, engine).then(audit => ({
+                        promptText: cp.text,
+                        engine,
+                        brandMentioned: audit.brandMentioned,
+                        sentiment: audit.sentiment
+                    }))
+                );
+            }
+        }
+        logger.info(`🔄 [PARALLEL] Executing ${tasks.length} custom simulator audits (Limit: 5)...`);
+        const customResults = await runWithLimit(tasks, 5);
+        results.customPromptResults.push(...customResults);
+    }
+    
+    return results;
+};

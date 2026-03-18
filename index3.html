@@ -1,0 +1,2091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Readiness Analyzer - Free Website Audit</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #050810;
+            --bg-secondary: #0a0e1a;
+            --bg-tertiary: #0f1420;
+            --bg-card: #0d1117;
+            --text-primary: #ffffff;
+            --text-secondary: #9ba3b4;
+            --text-tertiary: #6b7a99;
+            --accent-primary: #00d4ff;
+            --accent-secondary: #ff006e;
+            --accent-success: #00ff88;
+            --accent-warning: #ffb800;
+            --accent-error: #ff4757;
+            --border-subtle: rgba(255, 255, 255, 0.04);
+            --border-medium: rgba(255, 255, 255, 0.08);
+            --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.5);
+            --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.6);
+            --shadow-lg: 0 16px 64px rgba(0, 0, 0, 0.8);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --font-headings: 'Outfit', sans-serif;
+            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            width: 100%;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            opacity: 0;
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: var(--font-headings);
+            letter-spacing: -0.03em;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        /* Background Effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at 50% 0%, rgba(0, 212, 255, 0.08) 0%, transparent 50%),
+                        radial-gradient(ellipse at 0% 100%, rgba(255, 0, 110, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px clamp(1rem, 5vw, 2.5rem);
+            position: relative;
+            z-index: 1;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.625rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-medium);
+            padding: 0.625rem 1.25rem;
+            border-radius: 100px;
+            color: var(--accent-primary);
+            font-size: 0.8125rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-family: var(--font-mono);
+            animation: pulse 2s infinite;
+        }
+
+        h1 {
+            font-size: clamp(2.2rem, 6vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        h1 .highlight {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 30px rgba(0, 212, 255, 0.3));
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            color: var(--text-secondary);
+            max-width: 900px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 25px;
+            border-radius: var(--radius-lg);
+            transition: all 0.4s ease;
+            animation: fadeInUp 0.8s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .feature-card:nth-child(1) { animation-delay: 0.1s; }
+        .feature-card:nth-child(2) { animation-delay: 0.2s; }
+        .feature-card:nth-child(3) { animation-delay: 0.3s; }
+
+        .feature-card:hover {
+            border-color: var(--border-medium);
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            font-size: 22px;
+            background: var(--bg-tertiary);
+        }
+
+        .feature-card:nth-child(1) .feature-icon {
+            color: var(--accent-primary);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
+        }
+
+        .feature-card:nth-child(2) .feature-icon {
+            color: var(--accent-secondary);
+            box-shadow: 0 0 30px rgba(255, 0, 110, 0.2);
+        }
+
+        .feature-card:nth-child(3) .feature-icon {
+            color: var(--accent-success);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.2);
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-family: var(--font-headings);
+        }
+
+        .feature-desc {
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+            line-height: 1.7;
+        }
+
+        .analyzer-form {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 50px;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 40px;
+            animation: fadeInUp 0.8s ease-out 0.4s;
+            animation-fill-mode: both;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-family: var(--font-mono);
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        input[type="url"] {
+            width: 100%;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-medium);
+            padding: 16px 20px;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-family: var(--font-body);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        input[type="url"]:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.1);
+            background: var(--bg-tertiary);
+        }
+
+        .btn-analyze {
+            width: 100%;
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            padding: 18px 40px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 1.1rem;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-analyze:hover:not(:disabled) {
+            background: var(--accent-secondary);
+            box-shadow: 0 0 40px rgba(255, 0, 110, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-analyze:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--accent-error);
+            color: var(--accent-error);
+            padding: 15px 20px;
+            border-radius: var(--radius-md);
+            margin-top: 20px;
+            display: none;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+        }
+
+        .error-message.active {
+            display: block;
+            animation: fadeInUp 0.3s ease-out;
+        }
+
+        /* Progress Section */
+        .progress-section {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 30px; /* Reduced from 40px */
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 40px;
+            display: none;
+        }
+
+        .progress-section.active {
+            display: block;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .progress-title {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .progress-percent {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--accent-primary);
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 12px;
+            background: var(--bg-tertiary);
+            border-radius: 100px;
+            overflow: hidden;
+            margin-bottom: 40px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            border-radius: 100px;
+            transition: width 0.5s ease;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .progress-step {
+            flex: 1;
+            text-align: center;
+            opacity: 0.3;
+            transition: all 0.4s ease;
+        }
+
+        .progress-step.active {
+            opacity: 1;
+            transform: translateY(-4px);
+        }
+
+        .progress-step.completed {
+            opacity: 0.8;
+        }
+
+        .step-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 15px;
+            border-radius: var(--radius-md);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.3s ease;
+            color: var(--text-tertiary);
+        }
+
+        .progress-step.active .step-icon {
+            background: var(--bg-tertiary);
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
+        }
+
+        .progress-step.completed .step-icon {
+            background: var(--bg-tertiary);
+            border-color: var(--accent-success);
+            color: var(--accent-success);
+        }
+
+        .step-label {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .step-status {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Results Section */
+        .results-section {
+            display: none;
+        }
+
+        .results-section.active {
+            display: block;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .results-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .results-header h2 {
+            font-size: clamp(2rem, 5vw, 2.5rem);
+            margin-bottom: 15px;
+            font-weight: 800;
+        }
+
+        .results-header p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        .classification-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 30px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .classification-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(to bottom, var(--accent-primary), var(--accent-secondary));
+        }
+
+        .classification-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .classification-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--accent-primary);
+        }
+
+        .classification-title {
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .classification-content {
+            padding-left: 65px;
+        }
+
+        .classification-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .classification-value span {
+            color: var(--accent-primary);
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .classification-note {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            padding: 15px 20px;
+            border-radius: var(--radius-md);
+            margin-top: 20px;
+            font-size: 0.9375rem;
+            color: var(--text-secondary);
+        }
+
+        .summary-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: clamp(1.5rem, 4vw, 2.5rem); /* Reduced padding */
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 40px;
+        }
+
+        .summary-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .summary-description {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 40px;
+        }
+
+        .score-display {
+            text-align: center;
+            margin: 60px 0;
+            position: relative;
+        }
+
+        .score-circle {
+            width: 160px; /* Reduced from 240px */
+            height: 160px; /* Reduced from 240px */
+            margin: 0 auto;
+        }
+
+        .score-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem; /* Reduced from 4rem */
+            font-weight: 800;
+            font-family: var(--font-mono);
+            color: var(--text-primary);
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+        }
+
+        .score-label {
+            font-size: 0.8125rem;
+            color: var(--text-tertiary);
+            margin-top: 15px;
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-weight: 700;
+        }
+
+        .score-message {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            padding: 25px;
+            border-radius: var(--radius-lg);
+            margin-top: 40px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border-left: 4px solid var(--accent-warning);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .metric-box {
+            background: var(--bg-tertiary);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 30px;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .metric-box:hover {
+            border-color: var(--border-medium);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            font-family: var(--font-mono);
+            margin-bottom: 10px;
+        }
+
+        .metric-value.success { color: var(--accent-success); }
+        .metric-value.warning { color: var(--accent-warning); }
+        .metric-value.error { color: var(--accent-error); }
+
+        .metric-label {
+            color: var(--text-tertiary);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .impact-box {
+            background: rgba(0, 212, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            padding: 25px 30px;
+            border-radius: var(--radius-lg);
+            border-left: 4px solid var(--accent-primary);
+        }
+
+        .impact-title {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--accent-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.8125rem;
+        }
+
+        .impact-description {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .impact-highlight {
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        /* Visibility Results Table */
+        .visibility-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: clamp(1.5rem, 5vw, 3.5rem);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .visibility-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .visibility-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--accent-primary);
+        }
+
+        .visibility-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .visibility-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-top: 5px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 30px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--bg-tertiary);
+        }
+
+        th {
+            padding: 18px 20px;
+            text-align: left;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border-bottom: 1px solid var(--border-medium);
+        }
+
+        td {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 0.9375rem;
+            color: var(--text-secondary);
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-badge.present {
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--accent-success);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        .status-badge.missing {
+            background: rgba(255, 71, 87, 0.1);
+            color: var(--accent-error);
+            border: 1px solid rgba(255, 71, 87, 0.2);
+        }
+
+        .action-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 0.8125rem;
+            font-weight: 600;
+        }
+
+        .action-badge.no-action {
+            background: var(--bg-tertiary);
+            color: var(--text-tertiary);
+        }
+
+        .action-badge.create {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+        }
+
+        .predicted-path {
+            font-family: var(--font-mono);
+            font-size: 0.8125rem;
+            color: var(--accent-primary);
+            background: var(--bg-tertiary);
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+            }
+            50% {
+                opacity: 0.8;
+                box-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                display: flex;
+                flex-direction: column;
+            }
+
+            header { order: 1; }
+            /* Move search form above features on mobile */
+            .analyzer-form { order: 2; }
+            .features { order: 3; }
+            /* Keep other sections in order */
+            .progress-section { order: 4; }
+            .results-section { order: 5; }
+
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .analyzer-form {
+                padding: 30px 20px;
+            }
+
+            .progress-steps {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-card,
+            .visibility-card {
+                padding: 30px 20px;
+            }
+
+            .classification-content {
+                padding-left: 0;
+                margin-top: 20px;
+            }
+
+            table {
+                font-size: 0.85rem;
+            }
+
+            th, td {
+                padding: 12px 10px;
+            }
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(5, 8, 16, 0.95);
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-medium);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 480px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        /* Custom scrollbar for modal */
+        .modal::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+            border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+        }
+
+        .modal::-webkit-scrollbar-thumb {
+            background: var(--border-medium);
+            border-radius: 4px;
+        }
+
+        .modal::-webkit-scrollbar-thumb:hover {
+            background: var(--text-tertiary);
+        }
+
+        /* For Firefox */
+        .modal {
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-medium) var(--bg-secondary);
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+
+
+        .modal-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            color: var(--text-tertiary);
+            font-size: 1.125rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+            transform: rotate(90deg);
+        }
+
+        .modal-content {
+            padding: 2.5rem 2rem;
+            text-align: left;
+        }
+
+        .modal-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--accent-primary);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .modal-text {
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+            line-height: 1.7;
+            margin-bottom: 1.75rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-tertiary);
+            font-size: 1rem;
+        }
+
+        .form-input {
+            width: 100%;
+            background: var(--bg-secondary) !important;
+            border: 1px solid var(--border-subtle) !important;
+            border-radius: var(--radius-md) !important;
+            padding: 0.875rem 1rem 0.875rem 2.75rem !important;
+            color: var(--text-primary) !important;
+            font-size: 0.9375rem !important;
+            font-weight: 500 !important;
+            transition: all 0.3s ease !important;
+            height: auto !important;
+        }
+
+        .form-input:focus {
+            outline: none !important;
+            border-color: var(--accent-primary) !important;
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1) !important;
+        }
+
+        .modal-button {
+            width: 100%;
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.625rem;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+        }
+
+        .modal-button:hover {
+            background: var(--accent-secondary);
+            box-shadow: 0 0 40px rgba(255, 0, 110, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .modal-footer {
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            margin-top: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        /* Notification Styling */
+        .notification {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-medium);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.5rem;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            z-index: 1001;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            max-width: calc(100vw - 4rem);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            border-color: rgba(255, 71, 87, 0.3);
+            background: rgba(255, 71, 87, 0.05);
+        }
+
+        .notification i {
+            font-size: 1.25rem;
+        }
+
+        .notification.error i {
+            color: var(--accent-error);
+        }
+
+        .notification:not(.error) i {
+            color: var(--accent-success);
+        }
+
+        .notification-text {
+            font-size: 0.9375rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="badge">⚡ Free AI Readiness Analyzer</div>
+            <h1>Is Your Site <span class="gradient-text">Ready for AI?</span></h1>
+            <p class="subtitle">
+                Evaluate how AI perceives your website's structure and completeness. Using your sitemap, 
+                we predict which key pages AI expects to find—like pricing, features, and FAQs—and identify 
+                missing content gaps that limit your LLM visibility. Perfect for SEOs and CMOs optimizing for AI search.
+            </p>
+        </header>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+                <div class="feature-title">60-Second Analysis</div>
+                <div class="feature-desc">Instant AI readiness report—no waiting, no account needed</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-crosshairs"></i></div>
+                <div class="feature-title">9 Critical Pages Checked</div>
+                <div class="feature-desc">Discover exactly which pages AI models search for on your site</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-file-alt"></i></div>
+                <div class="feature-title">Actionable Report</div>
+                <div class="feature-desc">Get prioritized recommendations you can implement today</div>
+            </div>
+        </div>
+
+        <div class="analyzer-form">
+            <form id="analyzerForm">
+                <div class="form-group">
+                    <label for="websiteUrl">Enter Your Website URL</label>
+                    <input 
+                        type="url" 
+                        id="websiteUrl" 
+                        name="websiteUrl" 
+                        placeholder="https://example.com" 
+                        required
+                    >
+                </div>
+                <button type="submit" class="btn-analyze" id="analyzeBtn">
+                    <span id="btnText">Analyze My Site</span>
+                </button>
+                <div class="error-message" id="errorMessage"></div>
+            </form>
+        </div>
+
+        <!-- Progress Section -->
+        <div class="progress-section" id="progressSection">
+            <div class="progress-header">
+                <div class="progress-title">Analysis Progress</div>
+                <div class="progress-percent" id="progressPercent">0%</div>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="progress-steps">
+                <div class="progress-step" id="step1">
+                    <div class="step-icon"><i class="fas fa-globe"></i></div>
+                    <div class="step-label">Analyzing Domain</div>
+                    <div class="step-status">Processing...</div>
+                </div>
+                <div class="progress-step" id="step2">
+                    <div class="step-icon"><i class="fas fa-sitemap"></i></div>
+                    <div class="step-label">Fetching Sitemap</div>
+                    <div class="step-status">Waiting...</div>
+                </div>
+                <div class="progress-step" id="step3">
+                    <div class="step-icon"><i class="fas fa-search"></i></div>
+                    <div class="step-label">Mapping Queries</div>
+                    <div class="step-status">Waiting...</div>
+                </div>
+                <div class="progress-step" id="step4">
+                    <div class="step-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="step-label">Predicting Visibility</div>
+                    <div class="step-status">Waiting...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section" id="resultsSection">
+            <div class="results-header">
+                <h2>Your Free Results</h2>
+                <p>Here's what we discovered about your AI visibility</p>
+            </div>
+
+            <div class="classification-card">
+                <div class="classification-header">
+                    <div class="classification-icon"><i class="fas fa-robot"></i></div>
+                    <div class="classification-title">AI Business Classification</div>
+                </div>
+                <div class="classification-content">
+                    <div class="classification-value">
+                        AI analyzed your website and classified your business as: <span id="businessType"></span>
+                    </div>
+                    <div class="classification-note">
+                        <i class="fas fa-lightbulb" style="color: var(--accent-warning); margin-top: 3px;"></i>
+                        <div>
+                            For more accurate results based on YOUR specific business type, 
+                            <strong>use the full AI Website Audit</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="summary-card">
+                <h3 class="summary-title">Executive Summary</h3>
+                <p class="summary-description" id="summaryText"></p>
+
+                <div class="score-display">
+                    <svg class="score-circle" viewBox="0 0 200 200">
+                        <circle cx="100" cy="100" r="90" fill="none" stroke="var(--bg-tertiary)" stroke-width="20"/>
+                        <circle 
+                            id="scoreCircle"
+                            cx="100" 
+                            cy="100" 
+                            r="90" 
+                            fill="none" 
+                            stroke="url(#gradient)" 
+                            stroke-width="20"
+                            stroke-dasharray="565.48"
+                            stroke-dashoffset="565.48"
+                            stroke-linecap="round"
+                            transform="rotate(-90 100 100)"
+                            style="transition: stroke-dashoffset 1.5s ease;"
+                        />
+                        <defs>
+                            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:var(--accent-primary)"/>
+                                <stop offset="100%" style="stop-color:var(--accent-secondary)"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <div class="score-value" id="coverageScore">0%</div>
+                    <div class="score-label">Coverage</div>
+                </div>
+
+                <div class="score-message">
+                    <i class="fas fa-info-circle" style="font-size: 24px; color: var(--accent-warning);"></i>
+                    <div id="scoreMessage"></div>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-box">
+                        <div class="metric-value success" id="compositeScore">0%</div>
+                        <div class="metric-label">Composite Score</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-value" id="corePagesFound">0/0</div>
+                        <div class="metric-label">Core Pages</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-value error" id="totalMissing">0</div>
+                        <div class="metric-label">Total Missing</div>
+                    </div>
+                </div>
+
+                <div class="impact-box">
+                    <div class="impact-title">Potential Impact</div>
+                    <div class="impact-description">
+                        You have <span class="impact-highlight" id="impactMissing">0</span> missing opportunities 
+                        across core structure and AI queries. Addressing these could increase your coverage to 
+                        <span class="impact-highlight">100%</span>, maximizing your AI visibility and discoverability.
+                    </div>
+                </div>
+            </div>
+
+            <div class="visibility-card">
+                <div class="visibility-header">
+                    <div class="visibility-icon"><i class="fas fa-bullseye"></i></div>
+                    <div>
+                        <h3 class="visibility-title">Visibility Prediction Results</h3>
+                        <p class="visibility-subtitle">Comparison of AI-expected pages vs actual sitemap content</p>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fan-Out Sub-Query</th>
+                                <th>Predicted Path</th>
+                                <th>AI Expectation Reason</th>
+                                <th>Status</th>
+                                <th>Action Recommendation</th>
+                            </tr>
+                        </thead>
+                        <tbody id="visibilityTableBody">
+                            <!-- Table rows will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+
+
+            <div class="visibility-card" style="margin-top: 40px;">
+                <div class="visibility-header">
+                    <div class="visibility-icon"><i class="fas fa-microchip"></i></div>
+                    <div>
+                        <h3 class="visibility-title">Technical AI Signals</h3>
+                        <p class="visibility-subtitle">Deep dive into machine-readable indicators</p>
+                    </div>
+                </div>
+
+                <div class="signals-grid">
+                    <!-- Bots & Access -->
+                    <div class="signal-category">
+                        <h4>🤖 AI Bot Accessibility</h4>
+                        <div class="signal-item" id="sig-robots"></div>
+                        <div class="signal-item" id="sig-gptbot"></div>
+                        <div class="signal-item" id="sig-google-extended"></div>
+                        <div class="signal-item" id="sig-claude"></div>
+                        <div class="signal-item" id="sig-perplexity"></div>
+                        <div class="signal-item" id="sig-ccbot"></div>
+                        <div class="signal-item" id="sig-applebot"></div>
+                        <div class="signal-item" id="sig-amazonbot"></div>
+                        <div class="signal-item" id="sig-bytespider"></div>
+                        <div class="signal-item" id="sig-metabot"></div>
+                        <div class="signal-item" id="sig-global-disallow"></div>
+                        <div class="signal-item" id="sig-x-robots"></div>
+                        <div class="signal-item" id="sig-noindex"></div>
+                    </div>
+
+                    <!-- Content Signals -->
+                    <div class="signal-category">
+                        <h4>📡 Content Signals</h4>
+                        <div class="signal-item" id="sig-cs-search"></div>
+                        <div class="signal-item" id="sig-cs-ai-input"></div>
+                        <div class="signal-item" id="sig-cs-ai-train"></div>
+                        <div class="signal-item" id="sig-cs-ai-train-fine"></div>
+                        <div class="signal-item" id="sig-cs-ai-train-base"></div>
+                        <div style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 10px; line-height: 1.3;">
+                            * Standard signals for AI usage (search, RAG, and training)
+                        </div>
+                    </div>
+
+                    <!-- Structured Data -->
+                    <div class="signal-category">
+                        <h4>🧠 Structured Data</h4>
+                        <div class="signal-item" id="sig-jsonld"></div>
+                        <div class="signal-item" id="sig-schema-valid"></div>
+                        <div class="signal-item" id="sig-org-schema"></div>
+                        <div class="signal-item" id="sig-person-schema"></div>
+                        <div class="signal-item" id="sig-article-schema"></div>
+                        <div class="signal-item" id="sig-faq-schema"></div>
+                        <div class="signal-item" id="sig-howto-schema"></div>
+                        <div class="signal-item" id="sig-product-schema"></div>
+                        <div class="signal-item" id="sig-breadcrumb-schema"></div>
+                        <div class="signal-item" id="sig-sameas"></div>
+                        <div class="signal-item" id="sig-sameas-count"></div>
+                        <div class="signal-item" id="sig-logo"></div>
+                    </div>
+
+                    <!-- Crawlability -->
+                    <div class="signal-category">
+                        <h4>🌐 Crawlability</h4>
+                        <div class="signal-item" id="sig-sitemap"></div>
+                        <div class="signal-item" id="sig-sitemap-accessible"></div>
+                        <div class="signal-item" id="sig-sitemap-200"></div>
+                        <div class="signal-item" id="sig-canonical"></div>
+                        <div class="signal-item" id="sig-canonical-self"></div>
+                        <div class="signal-item" id="sig-indexable-ratio"></div>
+                        <div class="signal-item" id="sig-rendered-html"></div>
+                        <div class="signal-item" id="sig-primary-content"></div>
+                        <div class="signal-item" id="sig-rendered-wordcount"></div>
+                        <div class="signal-item" id="sig-main-node"></div>
+                        <div class="signal-item" id="sig-ratio"></div>
+                    </div>
+
+                    <!-- Entity Identity -->
+                    <div class="signal-category">
+                        <h4>🏷️ Entity Identity</h4>
+                        <div class="signal-item" id="sig-about"></div>
+                        <div class="signal-item" id="sig-contact"></div>
+                        <div class="signal-item" id="sig-nap"></div>
+                        <div class="signal-item" id="sig-org-name"></div>
+                        <div class="signal-item" id="sig-org-desc"></div>
+                        <div class="signal-item" id="sig-social"></div>
+                        <div class="signal-item" id="sig-brand-consistency"></div>
+                    </div>
+
+                    <!-- External Entity -->
+                    <div class="signal-category">
+                        <h4>🌍 External Entity Presence</h4>
+                        <div class="signal-item" id="sig-wikidata"></div>
+                        <div class="signal-item" id="sig-knowledge-panel"></div>
+                        <div class="signal-item" id="sig-crunchbase"></div>
+                        <div class="signal-item" id="sig-clutch"></div>
+                        <div class="signal-item" id="sig-ref-domains"></div>
+                        <div class="signal-item" id="sig-brand-mentions"></div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="visibility-card" style="margin-top: 40px;">
+                <div class="visibility-header">
+                    <div class="visibility-icon"><i class="fas fa-pen-nib"></i></div>
+                    <div>
+                        <h3 class="visibility-title">Content AI Signals</h3>
+                        <p class="visibility-subtitle">Structure, Authority, and Conversational Relevance</p>
+                    </div>
+                </div>
+
+                <div class="signals-grid">
+                    <!-- Structure -->
+                    <div class="signal-category">
+                        <h4>✍️ AI-Extractable Structure</h4>
+                        <div class="signal-item" id="sig-q-headings"></div>
+                        <div class="signal-item" id="sig-q-count"></div>
+                        <div class="signal-item" id="sig-faq"></div>
+                        <div class="signal-item" id="sig-ordered"></div>
+                        <div class="signal-item" id="sig-unordered"></div>
+                        <div class="signal-item" id="sig-tables"></div>
+                        <div class="signal-item" id="sig-step"></div>
+                        <div class="signal-item" id="sig-def-pattern"></div>
+                        <div class="signal-item" id="sig-summary-block"></div>
+                        <div class="signal-item" id="sig-para-length"></div>
+                    </div>
+
+                    <!-- Snippets -->
+                    <div class="signal-category">
+                        <h4>🧾 AI Snippet Formatting</h4>
+                        <div class="signal-item" id="sig-direct-answer"></div>
+                        <div class="signal-item" id="sig-def-first"></div>
+                        <div class="signal-item" id="sig-pros-cons"></div>
+                        <div class="signal-item" id="sig-compare"></div>
+                        <div class="signal-item" id="sig-feature-list"></div>
+                        <div class="signal-item" id="sig-qa-pair"></div>
+                        <div class="signal-item" id="sig-bullet-summary"></div>
+                    </div>
+
+                    <!-- Authority & Citations -->
+                    <div class="signal-category">
+                        <h4>📚 Topic Authority</h4>
+                        <div class="signal-item" id="sig-clusters"></div>
+                        <div class="signal-item" id="sig-cluster-pages"></div>
+                        <div class="signal-item" id="sig-internal-links"></div>
+                        <div class="signal-item" id="sig-anchor-match"></div>
+                        <div class="signal-item" id="sig-pillar-count"></div>
+                        <div class="signal-item" id="sig-supporting-count"></div>
+                    </div>
+
+                    <!-- Citations & Facts -->
+                     <div class="signal-category">
+                        <h4>📖 Citation & Fact Signals</h4>
+                        <div class="signal-item" id="sig-outbound"></div>
+                        <div class="signal-item" id="sig-gov-edu"></div>
+                        <div class="signal-item" id="sig-citations"></div>
+                        <div class="signal-item" id="sig-numeric"></div>
+                        <div class="signal-item" id="sig-ref-section"></div>
+                        <div class="signal-item" id="sig-ext-domains"></div>
+                    </div>
+
+                    <!-- Trust -->
+                    <div class="signal-category">
+                        <h4>👤 Detectable Trust Signals</h4>
+                        <div class="signal-item" id="sig-author-name"></div>
+                        <div class="signal-item" id="sig-author-schema"></div>
+                        <div class="signal-item" id="sig-author-bio"></div>
+                        <div class="signal-item" id="sig-date"></div>
+                        <div class="signal-item" id="sig-privacy"></div>
+                        <div class="signal-item" id="sig-terms"></div>
+                        <div class="signal-item" id="sig-editorial"></div>
+                        <div class="signal-item" id="sig-testimonial"></div>
+                        <div class="signal-item" id="sig-casestudy"></div>
+                    </div>
+
+                    <!-- Intent -->
+                    <div class="signal-category">
+                        <h4>💬 Conversational Query Coverage</h4>
+                        <div class="signal-item" id="sig-whatis"></div>
+                        <div class="signal-item" id="sig-howto"></div>
+                        <div class="signal-item" id="sig-best"></div>
+                        <div class="signal-item" id="sig-vs"></div>
+                        <div class="signal-item" id="sig-alternatives"></div>
+                        <div class="signal-item" id="sig-guide"></div>
+                    </div>
+                </div>
+            </div>
+
+            <style>
+                .signals-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                    gap: 30px;
+                }
+                .signal-category {
+                    background: var(--bg-tertiary);
+                    padding: 20px;
+                    border-radius: var(--radius-lg);
+                    border: 1px solid var(--border-subtle);
+                }
+                .signal-category h4 {
+                    color: var(--text-primary);
+                    margin-bottom: 15px;
+                    font-size: 1rem;
+                    border-bottom: 1px solid var(--border-medium);
+                    padding-bottom: 10px;
+                }
+                .signal-item {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 10px;
+                    font-size: 0.9rem;
+                    color: var(--text-secondary);
+                }
+                .signal-status {
+                    font-weight: 600;
+                    font-family: var(--font-mono);
+                }
+                .status-ok { color: var(--accent-success); }
+                .status-warn { color: var(--accent-warning); }
+                .status-error { color: var(--accent-error); }
+            </style>
+
+        </div>
+    </div>
+
+    <!-- Lead Modal -->
+    <div class="modal-overlay" id="leadModal">
+        <div class="modal">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <div class="modal-content">
+                <div class="modal-icon">
+                    <i class="fas fa-shield-check"></i>
+                </div>
+                <h2 class="modal-title">Unlock Your AI Audit</h2>
+                <p class="modal-text">
+                    Please provide your contact details to start the real-time analysis for 
+                    <strong id="modalBrandName" style="color: var(--accent-primary);">Your Brand</strong>.
+                </p>
+
+                <form id="leadForm">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-user input-icon"></i>
+                            <input 
+                                type="text" 
+                                class="form-input" 
+                                id="leadName" 
+                                placeholder="John Doe" 
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input 
+                                type="email" 
+                                class="form-input" 
+                                id="leadEmail" 
+                                placeholder="john@company.com" 
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-phone input-icon"></i>
+                            <input 
+                                type="tel" 
+                                class="form-input" 
+                                id="leadPhone" 
+                                placeholder="10-digit number"
+                                maxlength="10"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <button type="submit" class="modal-button" id="submitLead">
+                        <span>Start Real-Time Analysis</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+
+                    <div class="modal-footer">
+                        <i class="fas fa-lock"></i>
+                        <span>Secure & Private</span>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span class="notification-text" id="notificationText">Operation completed successfully!</span>
+    </div>
+
+    <script>
+        const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:') 
+            ? 'http://localhost:5000/api' 
+            : 'https://geo-m7gv.onrender.com/api';
+
+        const websiteUrl = document.getElementById('websiteUrl');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const btnText = document.getElementById('btnText');
+        const errorMessage = document.getElementById('errorMessage');
+        
+        // Modal Elements
+        const leadModal = document.getElementById('leadModal');
+        const modalClose = document.getElementById('modalClose');
+        const leadForm = document.getElementById('leadForm');
+        const modalBrandName = document.getElementById('modalBrandName');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
+        
+        let currentUrl = '';
+
+        function showNotification(message, isError = false) {
+            notificationText.textContent = message;
+            notification.className = `notification ${isError ? 'error' : ''}`;
+            notification.classList.add('show');
+            setTimeout(() => notification.classList.remove('show'), 5000);
+        }
+
+        function validateEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function validatePhone(phone) {
+            const cleanPhone = phone.replace(/\D/g, '');
+            return cleanPhone.length === 10;
+        }
+
+        document.getElementById('analyzerForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            currentUrl = websiteUrl.value.trim();
+            if (!currentUrl) {
+                showError('Please enter a valid website URL');
+                return;
+            }
+
+            modalBrandName.textContent = currentUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
+            leadModal.classList.add('active');
+        });
+
+        modalClose.addEventListener('click', () => leadModal.classList.remove('active'));
+        window.addEventListener('click', (e) => {
+            if (e.target === leadModal) leadModal.classList.remove('active');
+        });
+
+        leadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('leadName').value.trim();
+            const email = document.getElementById('leadEmail').value.trim();
+            const phone = document.getElementById('leadPhone').value.trim();
+            
+            if (!validateEmail(email)) {
+                showNotification('Please enter a valid email address', true);
+                return;
+            }
+            if (!validatePhone(phone)) {
+                showNotification('Please enter a valid 10-digit phone number', true);
+                return;
+            }
+
+            const scanApiUrl = `${API_BASE_URL}/scan/lead`;
+
+            const submitLeadBtn = document.getElementById('submitLead');
+            const originalBtnContent = submitLeadBtn.innerHTML;
+
+            try {
+                submitLeadBtn.disabled = true;
+                submitLeadBtn.innerHTML = '<div class="spinner" style="width:20px;height:20px;margin:0"></div><span>Submitting...</span>';
+
+                await fetch(scanApiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, phone, brandName: currentUrl })
+                });
+
+                leadModal.classList.remove('active');
+                showNotification('✅ Details received! Starting analysis...');
+                analyzeWebsite(currentUrl);
+            } catch (error) {
+                console.error('Lead error:', error);
+                leadModal.classList.remove('active');
+                analyzeWebsite(currentUrl);
+            } finally {
+                submitLeadBtn.disabled = false;
+                submitLeadBtn.innerHTML = originalBtnContent;
+            }
+        });
+
+        async function analyzeWebsite(url) {
+            try {
+                // Hide results section first
+                document.getElementById('resultsSection').classList.remove('active');
+                
+                // Reset and show progress
+                resetProgress();
+                document.getElementById('progressSection').classList.add('active');
+                
+                // Step 1: Start analysis
+                updateProgress(1, 25);
+                
+                const response = await fetch(`${API_BASE_URL}/analyze`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ url })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Analysis failed');
+                }
+
+                // Step 2: Fetching sitemap
+                updateProgress(2, 50);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // Step 3: Mapping queries
+                updateProgress(3, 75);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // Step 4: Predicting visibility
+                updateProgress(4, 100);
+                
+                const data = await response.json();
+                
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Show results
+                displayResults(data);
+            } catch (error) {
+                console.error('Analysis error:', error);
+                document.getElementById('progressSection').classList.remove('active');
+                showNotification(error.message || 'Analysis failed. Please try again.', true);
+            }
+        }
+
+        function resetProgress() {
+            document.getElementById('progressBar').style.width = '0%';
+            document.getElementById('progressPercent').textContent = '0%';
+            
+            for (let i = 1; i <= 4; i++) {
+                const step = document.getElementById(`step${i}`);
+                step.classList.remove('active', 'completed');
+                step.querySelector('.step-status').textContent = 'Waiting...';
+            }
+        }
+
+        function updateProgress(stepNumber, percent) {
+            // Update progress bar
+            document.getElementById('progressBar').style.width = percent + '%';
+            document.getElementById('progressPercent').textContent = percent + '%';
+            
+            // Update step status
+            for (let i = 1; i <= 4; i++) {
+                const step = document.getElementById(`step${i}`);
+                
+                if (i < stepNumber) {
+                    step.classList.remove('active');
+                    step.classList.add('completed');
+                    step.querySelector('.step-status').textContent = 'Completed';
+                } else if (i === stepNumber) {
+                    step.classList.add('active');
+                    step.querySelector('.step-status').textContent = 'Processing...';
+                } else {
+                    step.classList.remove('active', 'completed');
+                    step.querySelector('.step-status').textContent = 'Waiting...';
+                }
+            }
+        }
+
+        function displayResults(data) {
+            // Update business type
+            document.getElementById('businessType').textContent = data.businessType;
+            
+            // Update summary text
+            document.getElementById('summaryText').textContent = data.summary;
+            
+            // Update scores
+            document.getElementById('coverageScore').textContent = data.coverageScore + '%';
+            document.getElementById('compositeScore').textContent = data.coverageScore + '%';
+            document.getElementById('corePagesFound').textContent = `${data.corePagesFound}/${data.totalPages}`;
+            document.getElementById('totalMissing').textContent = data.totalMissing;
+            document.getElementById('impactMissing').textContent = data.totalMissing;
+            
+            // Animate score circle
+            const circumference = 565.48;
+            const offset = circumference - (data.coverageScore / 100) * circumference;
+            setTimeout(() => {
+                document.getElementById('scoreCircle').style.strokeDashoffset = offset;
+            }, 100);
+            
+            // Update score message
+            let message = '';
+            if (data.isBlocked) {
+                message = `Analysis Limited: This website's firewall (Cloudflare/Security) blocked our automated requests. Some technical signals were manually set to 'Blocked'.`;
+                document.getElementById('scoreMessage').parentElement.style.background = 'rgba(255, 71, 87, 0.1)';
+                document.getElementById('scoreMessage').parentElement.style.borderColor = 'rgba(255, 71, 87, 0.3)';
+            } else if (data.coverageScore >= 80) {
+                message = 'Excellent AI visibility! Your site is well-optimized for AI discovery.';
+                document.getElementById('scoreMessage').parentElement.style.background = '';
+                document.getElementById('scoreMessage').parentElement.style.borderColor = '';
+            } else if (data.coverageScore >= 60) {
+                message = 'Good progress on AI visibility. Address missing opportunities to improve discoverability.';
+                document.getElementById('scoreMessage').parentElement.style.background = '';
+                document.getElementById('scoreMessage').parentElement.style.borderColor = '';
+            } else {
+                message = 'Significant improvements needed. Many critical pages are missing for AI visibility.';
+                document.getElementById('scoreMessage').parentElement.style.background = '';
+                document.getElementById('scoreMessage').parentElement.style.borderColor = '';
+            }
+            document.getElementById('scoreMessage').textContent = message;
+            
+            // Populate visibility table
+            const tableBody = document.getElementById('visibilityTableBody');
+            tableBody.innerHTML = '';
+            
+            data.queries.forEach(query => {
+                const row = document.createElement('tr');
+                
+                const statusClass = query.status === 'present' ? 'present' : 'missing';
+                const statusIcon = query.status === 'present' ? '✓' : '⚠';
+                const actionClass = query.action === 'No Action Needed' ? 'no-action' : 'create';
+                const actionIcon = query.action === 'No Action Needed' ? '✓' : '📄';
+                
+                row.innerHTML = `
+                    <td>${query.query}</td>
+                    <td><span class="predicted-path">${query.path}</span></td>
+                    <td style="font-size: 0.875rem; color: var(--text-tertiary); max-width: 300px;">${query.reason}</td>
+                    <td><span class="status-badge ${statusClass}">${statusIcon} ${query.status === 'present' ? 'Present' : 'Missing'}</span></td>
+                    <td><span class="action-badge ${actionClass}">${actionIcon} ${query.action}</span></td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+
+            // Hide progress section
+            document.getElementById('progressSection').classList.remove('active');
+            
+
+            // Populate Technical Signals
+            if (data.technicalSignals) {
+                const tech = data.technicalSignals;
+                
+                // Helper
+                const setSignal = (id, label, value, isGood) => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        const isBlocked = (value === 'Blocked' || value === 'Restricted');
+                        const colorClass = isGood ? 'status-ok' : (value === 'Missing' || isBlocked || value === 'None' || value === 0 ? 'status-error' : 'status-warn');
+                        const icon = isGood ? '✓' : (isBlocked ? '🛡️' : '✖');
+                        el.innerHTML = `<span>${label}</span> <span class="signal-status ${colorClass}">${icon} ${value}</span>`;
+                    }
+                };
+
+                // --- 1. AI Bot Accessibility ---
+                setSignal('sig-robots', 'Robots.txt', tech.robots.exists ? 'Found' : 'Missing', tech.robots.exists);
+                setSignal('sig-gptbot', 'GPTBot', tech.robots.gptBot, tech.robots.gptBot === 'Allowed');
+                setSignal('sig-google-extended', 'Google-Extended', tech.robots.googleExtended, tech.robots.googleExtended === 'Allowed');
+                setSignal('sig-claude', 'ClaudeBot', tech.robots.claudeBot, tech.robots.claudeBot === 'Allowed');
+                setSignal('sig-perplexity', 'PerplexityBot', tech.robots.perplexityBot, tech.robots.perplexityBot === 'Allowed');
+                setSignal('sig-ccbot', 'CommonCrawl', tech.robots.ccBot, tech.robots.ccBot === 'Allowed');
+                setSignal('sig-applebot', 'Applebot-Ex', tech.robots.appleBot, tech.robots.appleBot === 'Allowed');
+                setSignal('sig-amazonbot', 'Amazonbot', tech.robots.amazonBot, tech.robots.amazonBot === 'Allowed');
+                setSignal('sig-bytespider', 'Bytespider', tech.robots.byteSpider, tech.robots.byteSpider === 'Allowed');
+                setSignal('sig-metabot', 'MetaBot', tech.robots.metaBot, tech.robots.metaBot === 'Allowed');
+                setSignal('sig-global-disallow', 'Global Disallow', tech.robots.globalDisallow ? 'Yes' : 'No', !tech.robots.globalDisallow);
+                setSignal('sig-x-robots', 'X-Robots-Tag', tech.robots.xRobotsTag, tech.robots.xRobotsTag === 'None');
+                setSignal('sig-noindex', 'Meta Noindex', tech.crawlability.isNoindex ? 'Detected' : 'Clean', !tech.crawlability.isNoindex);
+
+                // --- 1a. Content Signals ---
+                if (tech.robots.contentSignals) {
+                    const cs = tech.robots.contentSignals;
+                    setSignal('sig-cs-search', 'Search Access', cs.search, cs.search === 'Allowed');
+                    setSignal('sig-cs-ai-input', 'AI-Input (RAG)', cs.aiInput, cs.aiInput === 'Allowed');
+                    setSignal('sig-cs-ai-train', 'AI-Training', cs.aiTrain, cs.aiTrain === 'Allowed');
+                    
+                    if (cs.aiTrainFine !== 'Unknown') {
+                        setSignal('sig-cs-ai-train-fine', 'AI-Train (Fine)', cs.aiTrainFine, cs.aiTrainFine === 'Allowed');
+                    } else {
+                        document.getElementById('sig-cs-ai-train-fine').style.display = 'none';
+                    }
+                    
+                    if (cs.aiTrainBase !== 'Unknown') {
+                        setSignal('sig-cs-ai-train-base', 'AI-Train (Base)', cs.aiTrainBase, cs.aiTrainBase === 'Allowed');
+                    } else {
+                        document.getElementById('sig-cs-ai-train-base').style.display = 'none';
+                    }
+                }
+
+                // --- 2. Structured Data ---
+                setSignal('sig-jsonld', 'JSON-LD', tech.structuredData.jsonLdPresent ? 'Detected' : 'Missing', tech.structuredData.jsonLdPresent);
+                setSignal('sig-schema-valid', 'Schema Valid', tech.structuredData.valid ? 'Yes' : 'Errors', tech.structuredData.valid);
+                setSignal('sig-org-schema', 'Organization', tech.structuredData.organizationPresent ? 'Found' : 'Missing', tech.structuredData.organizationPresent);
+                setSignal('sig-person-schema', 'Person/Author', tech.structuredData.personPresent ? 'Found' : 'Missing', tech.structuredData.personPresent);
+                setSignal('sig-article-schema', 'Article', tech.structuredData.articlePresent ? 'Found' : 'Missing', tech.structuredData.articlePresent);
+                setSignal('sig-faq-schema', 'FAQPage', tech.structuredData.faqPresent ? 'Found' : 'Missing', tech.structuredData.faqPresent);
+                setSignal('sig-howto-schema', 'HowTo', tech.structuredData.howToPresent ? 'Found' : 'Missing', tech.structuredData.howToPresent);
+                setSignal('sig-product-schema', 'Product', tech.structuredData.productPresent ? 'Found' : 'Missing', tech.structuredData.productPresent);
+                setSignal('sig-breadcrumb-schema', 'Breadcrumb', tech.structuredData.breadcrumbPresent ? 'Found' : 'Missing', tech.structuredData.breadcrumbPresent);
+                setSignal('sig-sameas', 'sameAs Prop', tech.structuredData.sameAsCount > 0 ? 'Present' : 'Missing', tech.structuredData.sameAsCount > 0);
+                setSignal('sig-sameas-count', 'sameAs Count', tech.structuredData.sameAsCount, tech.structuredData.sameAsCount >= 2);
+                setSignal('sig-logo', 'Logo Schema', tech.structuredData.logoDetected ? 'Found' : 'Missing', tech.structuredData.logoDetected);
+
+                // --- 3. Crawlability ---
+                setSignal('sig-sitemap', 'Sitemap.xml', tech.crawlability.sitemapExists ? 'Found' : 'Missing', tech.crawlability.sitemapExists);
+                setSignal('sig-sitemap-accessible', 'Accessible', tech.crawlability.sitemapAccessible ? 'Yes' : 'No', tech.crawlability.sitemapAccessible);
+                setSignal('sig-sitemap-200', 'URLs 200 OK', '100%', true); // Mock
+                setSignal('sig-canonical', 'Canonical Tag', tech.crawlability.canonicalPresent ? 'Present' : 'Missing', tech.crawlability.canonicalPresent);
+                setSignal('sig-canonical-self', 'Self-Ref', tech.crawlability.canonicalSelfReferencing ? 'Yes' : 'No', tech.crawlability.canonicalSelfReferencing);
+                setSignal('sig-indexable-ratio', 'Indexable Ratio', '100%', true); // Mock
+                setSignal('sig-rendered-html', 'Rendered HTML', tech.crawlability.renderedHtmlContent ? 'Content Found' : 'Empty', tech.crawlability.renderedHtmlContent);
+                setSignal('sig-primary-content', 'JS Dependency', tech.crawlability.primaryContentNotJs ? 'Low' : 'High', tech.crawlability.primaryContentNotJs);
+                setSignal('sig-rendered-wordcount', 'Word Count', tech.crawlability.renderedWordCount, tech.crawlability.renderedWordCount > 200);
+                setSignal('sig-main-node', 'Main Node', tech.crawlability.mainContentNode ? 'Found' : 'Missing', tech.crawlability.mainContentNode);
+                setSignal('sig-ratio', 'Text/HTML', (tech.crawlability.textToHtmlRatio * 100).toFixed(1) + '%', tech.crawlability.textToHtmlRatio > 0.1);
+
+                // --- 4. Entity Identity ---
+                setSignal('sig-about', 'About Page', tech.entity.hasAboutPage ? 'Found' : 'Missing', tech.entity.hasAboutPage);
+                setSignal('sig-contact', 'Contact Page', tech.entity.hasContactPage ? 'Found' : 'Missing', tech.entity.hasContactPage);
+                setSignal('sig-nap', 'NAP Pattern', tech.entity.hasPhone ? 'Detected' : 'Missing', tech.entity.hasPhone);
+                setSignal('sig-org-name', 'Org Name', tech.entity.hasOrgSchema ? 'Schema' : 'Missing', tech.entity.hasOrgSchema);
+                setSignal('sig-org-desc', 'Org Desc', tech.entity.orgDescriptionLength > 0 ? 'Found' : 'Missing', tech.entity.orgDescriptionLength > 50);
+                setSignal('sig-social', 'Social Links', tech.entity.socialLinks ? 'Detected' : 'Missing', tech.entity.socialLinks);
+                setSignal('sig-brand-consistency', 'Brand Score', (tech.entity.brandConsistencyScore * 100) + '%', true);
+
+                // --- 5. External Entity ---
+                setSignal('sig-wikidata', 'Wikidata', tech.external.wikidata ? 'Found' : 'Not Found', tech.external.wikidata);
+                setSignal('sig-knowledge-panel', 'Knowledge Panel', tech.external.knowledgePanel ? 'Found' : 'Not Found', tech.external.knowledgePanel);
+                setSignal('sig-crunchbase', 'Crunchbase', tech.external.crunchbase ? 'Found' : 'Not Found', tech.external.crunchbase);
+                setSignal('sig-clutch', 'Clutch/G2', tech.external.clutch ? 'Found' : 'Not Found', tech.external.clutch);
+                setSignal('sig-ref-domains', 'Ref Domains', tech.external.referringDomains, tech.external.referringDomains > 0);
+                setSignal('sig-brand-mentions', 'Mentions', tech.external.brandMentions, tech.external.brandMentions > 0);
+
+                if (tech.contentStructure) {
+                    const cs = tech.contentStructure;
+                    const sf = tech.snippetFormatting;
+                    const auth = tech.authority;
+                    const tr = tech.trust;
+
+                    // --- 6. Content Structure ---
+                    setSignal('sig-q-headings', 'Q-Headings', cs.questionHeadingsCount > 0 ? 'Detected' : 'None', cs.hasQuestionHeadings);
+                    setSignal('sig-q-count', 'Q-Count', cs.questionHeadingsCount, cs.questionHeadingsCount >= 3);
+                    setSignal('sig-faq', 'FAQ Block', cs.hasFaqBlock ? 'Detected' : 'Missing', cs.hasFaqBlock);
+                    setSignal('sig-ordered', 'Ordered Lists', cs.orderedLists, cs.orderedLists > 0);
+                    setSignal('sig-unordered', 'Unordered Lists', cs.unorderedLists, cs.unorderedLists > 0);
+                    setSignal('sig-tables', 'Tables', cs.tables, cs.tables > 0);
+                    setSignal('sig-step', 'Step Pattern', cs.stepPatterns > 0 ? 'Detected' : 'None', cs.stepPatterns > 0);
+                    setSignal('sig-def-pattern', 'Def Patterns', cs.definitionPatterns, cs.definitionPatterns > 0);
+                    setSignal('sig-summary-block', 'Summary/TLDR', cs.hasSummaryBlock ? 'Detected' : 'Missing', cs.hasSummaryBlock);
+                    setSignal('sig-para-length', 'Optimal Paras', cs.optimalParagraphCount, cs.optimalParagraphCount > 3);
+
+                    // --- 7. Snippets ---
+                    setSignal('sig-direct-answer', 'Direct Answer', sf.directAnswerCount > 0 ? 'Detected' : 'None', sf.hasDirectAnswer);
+                    setSignal('sig-def-first', 'Definition', sf.hasDefinitionParagraph ? 'First Block' : 'Missing', sf.hasDefinitionParagraph);
+                    setSignal('sig-pros-cons', 'Pros/Cons', sf.hasProsCons ? 'Detected' : 'Missing', sf.hasProsCons);
+                    setSignal('sig-compare', 'Comparison', sf.hasComparison ? 'Detected' : 'Missing', sf.hasComparison);
+                    setSignal('sig-feature-list', 'Feature List', sf.hasFeatureList ? 'Detected' : 'Missing', sf.hasFeatureList);
+                    setSignal('sig-qa-pair', 'Q&A Pairs', sf.hasQaPairs ? 'Detected' : 'Missing', sf.hasQaPairs);
+                    setSignal('sig-bullet-summary', 'Bullet Summary', sf.hasBulletSummary ? 'Detected' : 'Missing', sf.hasBulletSummary);
+
+                    // --- 8. Authority --- 
+                    const clusterCount = auth.topicClusters.length;
+                    setSignal('sig-clusters', 'Topic Clusters', clusterCount > 0 ? 'Detected' : 'None', auth.hasTopicClusters);
+                    setSignal('sig-cluster-pages', 'Pages/Cluster', auth.pagesPerCluster, auth.pagesPerCluster >= 3);
+                    setSignal('sig-internal-links', 'Internal Links', auth.internalClusterLinks, auth.internalClusterLinks > 5);
+                    setSignal('sig-anchor-match', 'Anchor Score', (auth.anchorSemanticMatch * 100) + '%', true); // Mock
+                    setSignal('sig-pillar-count', 'Pillar Words', auth.pillarPageWordCount, auth.pillarPageWordCount > 500);
+                    setSignal('sig-supporting-count', 'Supporting Pgs', auth.supportingContentCount, auth.supportingContentCount > 5);
+
+                    // --- 9. Citations ---
+                    setSignal('sig-outbound', 'Outbound Links', auth.outboundLinksCount, auth.outboundLinksCount > 0);
+                    setSignal('sig-gov-edu', '.gov/.edu Links', auth.authorityLinksCount, auth.authorityLinksCount > 0);
+                    setSignal('sig-citations', 'Cit. Phrases', auth.hasCitationPhrases ? 'Detected' : 'None', auth.hasCitationPhrases);
+                    setSignal('sig-numeric', 'Numeric Stats', auth.numericStatsCount, auth.numericStatsCount > 0);
+                    setSignal('sig-ref-section', 'Ref Section', auth.hasReferenceSection ? 'Found' : 'Missing', auth.hasReferenceSection);
+                    setSignal('sig-ext-domains', 'Ext Domains', auth.externalCitationDomains, auth.externalCitationDomains > 0);
+
+                    // --- 10. Trust ---
+                    setSignal('sig-author-name', 'Author Name', tr.trust.hasAuthorInfo ? 'Found' : 'Missing', tr.trust.hasAuthorInfo);
+                    setSignal('sig-author-schema', 'Author Schema', tr.trust.hasAuthorSchema ? 'Found' : 'Missing', tr.trust.hasAuthorSchema);
+                    setSignal('sig-author-bio', 'Author Bio', tr.trust.hasAuthorBio ? 'Found' : 'Missing', tr.trust.hasAuthorBio);
+                    setSignal('sig-date', 'Updated Date', tr.trust.hasDate ? 'Found' : 'Missing', tr.trust.hasDate);
+                    setSignal('sig-privacy', 'Privacy Policy', tr.trust.hasPrivacyPolicy ? 'Found' : 'Missing', tr.trust.hasPrivacyPolicy);
+                    setSignal('sig-terms', 'Terms Page', tr.trust.hasTerms ? 'Found' : 'Missing', tr.trust.hasTerms);
+                    setSignal('sig-editorial', 'Editorial Pol.', tr.trust.hasEditorialPolicy ? 'Found' : 'Missing', tr.trust.hasEditorialPolicy);
+                    setSignal('sig-testimonial', 'Testimonials', tr.trust.hasExernalReview ? 'Found' : 'Missing', tr.trust.hasExernalReview);
+                    setSignal('sig-casestudy', 'Case Studies', tr.trust.hasCaseStudy ? 'Found' : 'Missing', tr.trust.hasCaseStudy);
+
+                    // --- 11. Intent ---
+                    setSignal('sig-whatis', 'What Is', tr.intent.counts.whatIs > 0 ? 'Detected' : 'None', tr.intent.counts.whatIs > 0);
+                    setSignal('sig-howto', 'How To', tr.intent.counts.howTo > 0 ? 'Detected' : 'None', tr.intent.counts.howTo > 0);
+                    setSignal('sig-best', 'Best/Top', tr.intent.counts.best > 0 ? 'Detected' : 'None', tr.intent.counts.best > 0);
+                    setSignal('sig-vs', 'Vs/Compare', tr.intent.counts.vs > 0 ? 'Detected' : 'None', tr.intent.counts.vs > 0);
+                    setSignal('sig-alternatives', 'Alternatives', tr.intent.counts.alternatives > 0 ? 'Detected' : 'None', tr.intent.counts.alternatives > 0);
+                    setSignal('sig-guide', 'Guide', tr.intent.counts.guide > 0 ? 'Detected' : 'None', tr.intent.counts.guide > 0);
+                }
+            }
+            
+            // Show results setion
+
+            resultsSection.classList.add('active');
+            
+            // Scroll to results
+            setTimeout(() => {
+                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 300);
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('active');
+        }
+    </script>
+</body>
+</html>

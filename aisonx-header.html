@@ -1,0 +1,550 @@
+
+
+<!-- ========== CSS (Add to WordPress <head> or Customizer > Additional CSS) ========== -->
+<style>
+/* Aggressive WordPress Reset - Kill all white gaps */
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Force breakout of any theme containers */
+.aisonx-nav,
+.aisonx-mobile-nav {
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+}
+
+body .aisonx-nav {
+    margin-top: 0 !important;
+    top: 0 !important;
+}
+
+/* CSS Variables */
+:root {
+    --aisonx-primary: #6366f1;
+    --aisonx-primary-dark: #4f46e5;
+    --aisonx-secondary: #8b5cf6;
+    --aisonx-accent: #06b6d4;
+    --aisonx-success: #10b981;
+    --aisonx-warning: #f59e0b;
+    --aisonx-danger: #ef4444;
+    --aisonx-dark: #0f172a;
+    --aisonx-dark-light: #1e293b;
+    --aisonx-gray: #64748b;
+    --aisonx-light: #f1f5f9;
+    --aisonx-white: #ffffff;
+    --aisonx-gradient-1: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%);
+    --aisonx-gradient-2: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    --aisonx-gradient-3: linear-gradient(135deg, #06b6d4 0%, #10b981 100%);
+    --aisonx-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    --aisonx-shadow-sm: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    --aisonx-radius: 16px;
+    --aisonx-radius-sm: 8px;
+    --aisonx-transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Navigation */
+.aisonx-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1001;
+    padding: 15px 0;
+    transition: var(--aisonx-transition);
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.aisonx-nav-scrolled {
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(20px);
+    box-shadow: var(--aisonx-shadow-sm);
+    padding: 15px 0;
+}
+
+.aisonx-nav-scrolled .aisonx-mobile-toggle span {
+    background: var(--aisonx-white);
+}
+
+.aisonx-nav-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.aisonx-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    width: 100%;
+}
+
+.aisonx-logo {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    text-decoration: none;
+    color: var(--aisonx-white);
+}
+
+.aisonx-nav-links {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.aisonx-nav-links a {
+    text-decoration: none;
+    color: var(--aisonx-white);
+    font-weight: 500;
+    font-size: 15px;
+    transition: var(--aisonx-transition);
+    position: relative;
+}
+
+.aisonx-nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--aisonx-gradient-1);
+    transition: var(--aisonx-transition);
+}
+
+.aisonx-nav-links a:hover::after {
+    width: 100%;
+}
+
+.aisonx-nav-links a:hover {
+    color: var(--aisonx-accent);
+}
+
+.aisonx-nav-cta {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.aisonx-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 28px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 15px;
+    text-decoration: none;
+    transition: var(--aisonx-transition);
+    cursor: pointer;
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.aisonx-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: var(--aisonx-transition);
+}
+
+.aisonx-btn:hover::before {
+    left: 100%;
+}
+
+.aisonx-btn-primary {
+    background: var(--aisonx-gradient-1);
+    color: var(--aisonx-white);
+    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+}
+
+.aisonx-btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(99, 102, 241, 0.5);
+}
+
+.aisonx-mobile-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 10px;
+}
+
+.aisonx-mobile-toggle span {
+    width: 25px;
+    height: 3px;
+    background: var(--aisonx-white);
+    border-radius: 3px;
+    transition: var(--aisonx-transition);
+}
+
+/* Dropdown Styles */
+.aisonx-nav-links li {
+    position: relative;
+}
+
+.aisonx-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(20px);
+    min-width: 220px;
+    border-radius: var(--aisonx-radius-sm);
+    padding: 15px 0;
+    box-shadow: var(--aisonx-shadow);
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--aisonx-transition);
+    z-index: 1000;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    list-style: none;
+    margin: 0;
+}
+
+.aisonx-nav-links li:hover .aisonx-dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.aisonx-dropdown-menu li {
+    width: 100%;
+    padding: 0;
+}
+
+.aisonx-dropdown-menu a {
+    display: block;
+    padding: 10px 25px;
+    color: rgba(255, 255, 255, 0.8) !important;
+    font-size: 14px;
+    font-weight: 500;
+    transition: var(--aisonx-transition);
+    white-space: nowrap;
+    text-align: left;
+}
+
+.aisonx-dropdown-menu a::after {
+    display: none;
+}
+
+.aisonx-dropdown-menu a:hover {
+    background: rgba(99, 102, 241, 0.2);
+    color: var(--aisonx-white) !important;
+    padding-left: 30px;
+}
+
+.aisonx-dropdown-trigger i {
+    font-size: 10px;
+    margin-left: 5px;
+    transition: var(--aisonx-transition);
+}
+
+.aisonx-nav-links li:hover .aisonx-dropdown-trigger i {
+    transform: rotate(180deg);
+}
+
+.aisonx-nav-highlight {
+    background: var(--aisonx-gradient-1);
+    color: var(--aisonx-white) !important;
+    padding: 10px 15px !important;
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700 !important;
+    transition: var(--aisonx-transition);
+}
+
+.aisonx-nav-highlight:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+}
+
+.aisonx-nav-highlight::after {
+    display: none !important;
+}
+
+/* Mobile Navigation */
+.aisonx-mobile-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(15px);
+    z-index: 2000;
+    padding: 80px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-20px);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    pointer-events: none;
+}
+
+.aisonx-mobile-nav.aisonx-active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.aisonx-mobile-nav a {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--aisonx-dark);
+    text-decoration: none;
+    transition: var(--aisonx-transition);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.aisonx-mobile-nav.aisonx-active a {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.aisonx-mobile-nav.aisonx-active a:nth-of-type(1) { transition-delay: 0.1s; }
+.aisonx-mobile-nav.aisonx-active a:nth-of-type(2) { transition-delay: 0.15s; }
+.aisonx-mobile-nav.aisonx-active a:nth-of-type(3) { transition-delay: 0.2s; }
+.aisonx-mobile-nav.aisonx-active a:nth-of-type(4) { transition-delay: 0.25s; }
+.aisonx-mobile-nav.aisonx-active a:nth-of-type(5) { transition-delay: 0.3s; }
+.aisonx-mobile-nav.aisonx-active a:nth-of-type(6) { transition-delay: 0.35s; }
+.aisonx-mobile-nav.aisonx-active a:nth-of-type(7) { transition-delay: 0.4s; }
+
+.aisonx-mobile-nav a:hover {
+    color: var(--aisonx-primary);
+}
+
+.aisonx-mobile-close {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    font-size: 30px;
+    cursor: pointer;
+    color: var(--aisonx-dark);
+}
+
+/* Mobile Dropdown */
+.aisonx-mobile-dropdown {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-left: 20px;
+    border-left: 2px solid var(--aisonx-primary);
+}
+
+.aisonx-mobile-dropdown a {
+    font-size: 16px !important;
+    opacity: 0.8 !important;
+    text-align: left !important;
+}
+
+/* WordPress active menu item highlight */
+.current-menu-item > a,
+.current_page_item > a {
+    color: yellow;
+    font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .aisonx-nav-links {
+        display: none;
+    }
+    .aisonx-mobile-toggle {
+        display: flex;
+    }
+}
+
+@media (max-width: 768px) {
+    .aisonx-nav-cta {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .aisonx-container {
+        padding: 0 16px;
+    }
+}
+</style>
+
+<!-- ========== FONTS (Add to WordPress <head>) ========== -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+<!-- ========== HEADER HTML (Add after <body> tag in WordPress) ========== -->
+
+<!-- Navigation -->
+<nav class="aisonx-nav" id="aisonxNav">
+    <div class="aisonx-container">
+        <div class="aisonx-nav-inner">
+            <a href="#" class="aisonx-logo">AISONX</a>
+            <ul class="aisonx-nav-links">
+                <li><a href="https://aisonx.com/#features">Features</a></li>
+                <li><a href="https://aisonx.com/#why">Why AI Visibility</a></li>
+                <li><a href="https://aisonx.com/#solutions">Solutions</a></li>
+                <li><a href="https://aisonx.com/#industries">Industries</a></li>
+                <li>
+                    <a href="https://aisonx.com/packages/"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                        Packages
+                    </a>
+                </li>
+                <li class="aisonx-has-dropdown">
+                    <a href="javascript:void(0)" class="aisonx-dropdown-trigger aisonx-nav-highlight">
+                        Check Your AI Visibility <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <ul class="aisonx-dropdown-menu">
+                        <li><a href="http://aisonx.com/aisonx-check-brand-visibility/" target="_blank">Check LLM Entity Visibility</a></li>
+                        <li><a href="http://aisonx.com/ai-web-search" target="_blank">Check LLM Live Visibility</a></li>
+                        <li><a href="http://aisonx.com/ai-audit-tool/" target="_blank">AI Visibility Audit Tool</a></li>
+                        <li><a href="http://aisonx.com/ai-domain-analyzer/" target="_blank">AI Domain Analyser</a></li>
+                        <li><a href="http://aisonx.com/google-knowledge-graph-explorer/" target="_blank">Brand Authority Score</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <div class="aisonx-nav-cta">
+                <a href="https://aisonx.com/contact-us/"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="aisonx-btn aisonx-btn-primary">
+                    Contact Us
+                </a>
+            </div>
+            <div class="aisonx-mobile-toggle" id="aisonxMobileToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Mobile Navigation -->
+<div class="aisonx-mobile-nav" id="aisonxMobileNav">
+    <div class="aisonx-mobile-close" id="aisonxMobileClose">
+        <i class="fas fa-times"></i>
+    </div>
+    <a href="https://aisonx.com/#features">Features</a>
+    <a href="https://aisonx.com/#why">Why AI Visibility</a>
+    <a href="https://aisonx.com/#solutions">Solutions</a>
+    <a href="https://aisonx.com/#industries">Industries</a>
+    
+    <a href="https://aisonx.com/packages/"
+       target="_blank"
+       rel="noopener noreferrer">
+        Packages
+    </a>
+    
+    <div class="aisonx-mobile-dropdown-container">
+        <span style="font-size: 18px; font-weight: 600; color: var(--aisonx-dark); display: block; margin-bottom: 10px;">Check Your AI Visibility</span>
+        <div class="aisonx-mobile-dropdown">
+            <a href="http://aisonx.com/aisonx-check-brand-visibility/" target="_blank">Check LLM Entity Visibility</a>
+            <a href="http://aisonx.com/ai-web-search" target="_blank">Check LLM Live Visibility</a>
+            <a href="http://aisonx.com/ai-audit-tool/" target="_blank">AI Visibility Audit Tool</a>
+            <a href="http://aisonx.com/ai-domain-analyzer/" target="_blank">AI Domain Analyser</a>
+            <a href="http://aisonx.com/google-knowledge-graph-explorer/" target="_blank">Brand Authority Score</a>
+        </div>
+    </div>
+    
+    <a href="https://aisonx.com/contact-us/"
+       target="_blank"
+       rel="noopener noreferrer"
+       class="aisonx-btn aisonx-btn-primary">
+        Contact Us
+    </a>
+</div>
+
+
+<!-- ========== HEADER JavaScript (Add before </body> in WordPress) ========== -->
+<script>
+(function() {
+    'use strict';
+    document.addEventListener('DOMContentLoaded', function() {
+        // Navigation scroll effect
+        const nav = document.getElementById('aisonxNav');
+        if (nav) {
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 50) {
+                    nav.classList.add('aisonx-nav-scrolled');
+                } else {
+                    nav.classList.remove('aisonx-nav-scrolled');
+                }
+            });
+        }
+
+        // Mobile navigation toggle
+        const mobileToggle = document.getElementById('aisonxMobileToggle');
+        const mobileNav = document.getElementById('aisonxMobileNav');
+        const mobileClose = document.getElementById('aisonxMobileClose');
+
+        if (mobileToggle && mobileNav && mobileClose) {
+            mobileToggle.addEventListener('click', function() {
+                mobileNav.classList.add('aisonx-active');
+            });
+
+            mobileClose.addEventListener('click', function() {
+                mobileNav.classList.remove('aisonx-active');
+            });
+
+            // Close mobile nav on link click
+            const mobileLinks = mobileNav.querySelectorAll('a');
+            mobileLinks.forEach(function(link) {
+                link.addEventListener('click', function() {
+                    mobileNav.classList.remove('aisonx-active');
+                });
+            });
+        }
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+            anchor.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href !== '#') {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        const navHeight = nav ? nav.offsetHeight : 0;
+                        const targetPosition = target.offsetTop - navHeight;
+                        window.scrollTo({
+                            top: targetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                }
+            });
+        });
+    });
+})();
+</script>
