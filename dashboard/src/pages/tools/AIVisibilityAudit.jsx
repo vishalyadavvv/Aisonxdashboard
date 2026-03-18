@@ -185,7 +185,7 @@ const AIVisibilityAudit = () => {
 
     try {
       // Use the native fetch for SSE support
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/scan`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://aisonxdashboard.onrender.com/api'}/scan`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

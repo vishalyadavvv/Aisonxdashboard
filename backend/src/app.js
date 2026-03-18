@@ -21,6 +21,8 @@ const app = express();
 // CORS CONFIG
 const allowedOrigins = [
   'https://brandvisibility.aisonx.com',
+  'https://aisonxdashboard.onrender.com',
+  'https://aisonxdashboard.netlify.app',
   'http://localhost:5173',
   'https://aisonx.com',
   'http://aisonx.com',
@@ -38,8 +40,9 @@ app.use(cors({
     if (!origin) return callback(null, true);
     
     const isLocalhost = origin.includes('localhost') || origin.includes('127.0.0.1');
+    const isAllowedCustom = process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL;
 
-    if (allowedOrigins.indexOf(origin) !== -1 || (isLocalhost && process.env.NODE_ENV !== 'production')) {
+    if (allowedOrigins.indexOf(origin) !== -1 || (isLocalhost && process.env.NODE_ENV !== 'production') || isAllowedCustom) {
       callback(null, true);
     } else {
       logger.warn(`Blocked by CORS: ${origin}`);

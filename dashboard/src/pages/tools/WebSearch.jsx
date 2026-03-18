@@ -65,7 +65,7 @@ const WebSearch = () => {
     const toastId = toast.loading('Connecting to live web nodes...', { icon: '🌐' });
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/websearch/scan`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://aisonxdashboard.onrender.com/api'}/websearch/scan`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

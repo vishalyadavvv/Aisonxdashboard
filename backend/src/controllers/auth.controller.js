@@ -322,7 +322,8 @@ exports.forgotPassword = async (req, res) => {
     await user.save({ validateBeforeSave: false });
 
     try {
-      const resetURL = `http://localhost:5173/reset-password/${resetToken}`;
+      const frontendURL = process.env.FRONTEND_URL || 'https://brandvisibility.aisonx.com';
+      const resetURL = `${frontendURL}/reset-password/${resetToken}`;
       const message = `Forgot your password? Submit a new password and confirm it by clicking this link: \n${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
 
       await sendEmail({
