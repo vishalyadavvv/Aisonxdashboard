@@ -418,10 +418,10 @@ const AIVisibilityAudit = () => {
           )}
         </AnimatePresence>
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-gray-400 mb-6">
+        <div className="flex items-center gap-2 text-sm text-gray-400 mb-6 pt-6">
           <Link to="/dashboard" className="hover:text-gray-600 transition-colors">Dashboard</Link>
           <span>›</span>
-          <span className="text-gray-400">Audit Tools</span>
+          <span className="text-gray-400">AI Module</span>
           <span>›</span>
           <span className="text-gray-600 font-medium">AI Visibility Audit</span>
         </div>
@@ -634,10 +634,10 @@ const AIVisibilityAudit = () => {
     return (
       <div className="max-w-6xl mx-auto" id="report-content">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-gray-400 mb-6" data-html2canvas-ignore>
+        <div className="flex items-center gap-2 text-sm text-gray-400 mb-6 pt-6" data-html2canvas-ignore>
           <Link to="/dashboard" className="hover:text-gray-600 transition-colors">Dashboard</Link>
           <span>›</span>
-          <span className="text-gray-400">Audit Tools</span>
+          <span className="text-gray-400">AI Module</span>
           {!projectId && (
             <>
               <span>›</span>

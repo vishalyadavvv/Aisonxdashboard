@@ -358,6 +358,16 @@ const AIReadiness = () => {
 
     return (
       <div className="max-w-6xl mx-auto" id="report-content">
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 text-sm text-gray-400 mb-6 pt-6" data-html2canvas-ignore>
+          <Link to="/dashboard" className="hover:text-gray-600 transition-colors">Dashboard</Link>
+          <span>›</span>
+          <span className="text-gray-400">AI Module</span>
+          <span>›</span>
+          <button onClick={() => setView('home')} className="text-gray-400 hover:text-gray-600 transition-colors font-medium">Technical Readiness</button>
+          <span>›</span>
+          <span className="text-gray-600 font-medium tracking-tight">Report</span>
+        </div>
         <AnimatePresence>
           {isLimitReached && (
             <motion.div
@@ -391,7 +401,7 @@ const AIReadiness = () => {
         <div className="flex items-center gap-2 text-sm text-gray-400 mb-6" data-html2canvas-ignore>
           <Link to="/dashboard" className="hover:text-gray-600 transition-colors">Dashboard</Link>
           <span>›</span>
-          <span className="text-gray-400">Audit Tools</span>
+          <span className="text-gray-400">AI Module</span>
           <span>›</span>
           <button onClick={goBack} className="hover:text-gray-600 transition-colors">AI Visibility Predictor</button>
           <span>›</span>
@@ -1048,12 +1058,12 @@ const AIReadiness = () => {
   return (
     <div className="max-w-6xl mx-auto">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-gray-400 mb-6">
+      <div className="flex items-center gap-2 text-sm text-gray-400 mb-6 pt-6">
         <Link to="/dashboard" className="hover:text-gray-600 transition-colors">Dashboard</Link>
         <span>›</span>
-        <span className="text-gray-400">Audit Tools</span>
+        <span className="text-gray-400">AI Module</span>
         <span>›</span>
-        <span className="text-gray-600 font-medium">AI Visibility Predictor</span>
+        <span className="text-gray-600 font-medium">Technical Readiness</span>
       </div>
 
       {/* Hero Section */}

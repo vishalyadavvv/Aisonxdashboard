@@ -12,6 +12,7 @@ import AIVisibilityAudit from './pages/tools/AIVisibilityAudit';
 import DomainProfiler from './pages/tools/DomainProfiler';
 import AIReadiness from './pages/tools/AIReadiness';
 import WebSearch from './pages/tools/WebSearch';
+import BrandAudit from './pages/tools/BrandAudit';
 import Projects from './pages/Projects';
 import ProjectDetail from './pages/ProjectDetail';
 import Rankings from './pages/Rankings';
@@ -60,6 +61,7 @@ function App() {
               <Route path="/dashboard/profiler" element={<DomainProfiler />} />
               <Route path="/dashboard/readiness" element={<AIReadiness />} />
               <Route path="/dashboard/search" element={<WebSearch />} />
+              <Route path="/dashboard/brand-audit" element={<BrandAudit />} />
               <Route path="/dashboard/projects" element={<Projects />} />
               
               {/* Project-Specific Routes with Data Loading */}
@@ -69,6 +71,7 @@ function App() {
                 <Route path="profiler" element={<DomainProfiler />} />
                 <Route path="readiness" element={<AIReadiness />} />
                 <Route path="search" element={<WebSearch />} />
+                <Route path="brand-audit" element={<BrandAudit />} />
                 <Route path="rankings" element={<Rankings />} />
               </Route>
               <Route path="/dashboard/inquiries" element={<Inquiries />} />

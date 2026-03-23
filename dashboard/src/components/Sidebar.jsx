@@ -42,7 +42,7 @@ const RailItem = ({ to, icon: Icon, label, badge, active }) => (
   <Link
     to={to}
     className={cn(
-      "group relative flex flex-col items-center justify-center w-full py-4 transition-all duration-300",
+      "group relative flex flex-col items-start w-full py-4 pl-5 transition-all duration-300",
       active ? "text-white" : "text-gray-500 hover:text-gray-300"
     )}
   >
@@ -67,11 +67,11 @@ const ContextItem = ({ to, icon: Icon, label, badge, isChild, end }) => (
     to={to}
     end={end}
     className={({ isActive }) => cn(
-      "flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 group text-[13px] font-medium",
+      "flex items-center justify-between px-2 py-3 rounded-xl transition-all duration-300 group text-[13px] font-medium",
       isActive 
         ? "bg-blue-600/10 text-white border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.05)]" 
-        : "text-slate-400 hover:text-white hover:bg-white/5",
-      isChild && "pl-11 py-2 border-l border-white/5 ml-4 rounded-l-none"
+        : "text-slate-200 hover:text-white hover:bg-white/5",
+      isChild && "pl-8 py-2 border-l border-white/5 ml-2 rounded-l-none"
     )}
   >
     {({ isActive }) => (
@@ -92,7 +92,7 @@ const ContextItem = ({ to, icon: Icon, label, badge, isChild, end }) => (
 
 const SidebarSection = ({ title, children }) => (
   <div className="mb-4 last:mb-0">
-    <h3 className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-[0.15em] mb-2">
+    <h3 className="px-2 text-[10px] font-bold text-slate-500 uppercase tracking-[0.15em] mb-2">
       {title}
     </h3>
     <div className="space-y-1">
@@ -107,11 +107,11 @@ const NavItem = ({ to, icon: Icon, label, badge, hasDropdown, isChild, end }) =>
       to={to}
       end={end}
       className={({ isActive }) => cn(
-        "flex items-center justify-between px-4 py-2.5 rounded-xl transition-all duration-300 group text-sm font-medium",
+        "flex items-center justify-between px-2 py-2.5 rounded-xl transition-all duration-300 group text-sm font-medium",
         isActive 
           ? "bg-white/10 text-white border border-white/10" 
           : "text-white/70 hover:bg-white/5 hover:text-white",
-        isChild && "pl-12 py-1.5"
+        isChild && "pl-8 py-1.5"
       )}
     >
       {({ isActive }) => (
@@ -166,9 +166,9 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
         ['/orders', '/inquiries', '/settings', '/pricing', '/help'].some(p => path.includes(p))) {
       return 'projects';
     }
-    if (path.includes('/audit') || path.includes('/profiler')) return 'audit';
-    if (path.includes('/search')) return 'search';
-    if (path.includes('/readiness')) return 'readiness';
+    if (path.includes('/audit') || path.includes('/profiler') || path.includes('/search') || path.includes('/readiness') || path.includes('/brand-audit')) {
+      return 'ai_module';
+    }
     return 'projects';
   };
 
@@ -189,8 +189,8 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
         isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
       )}>
         {/* Primary Rail */}
-        <aside className="w-[72px] h-full bg-[#0a0e1a] border-r border-white/5 flex flex-col items-center py-8 overflow-y-auto no-scrollbar">
-          <Link to="/dashboard" className="mb-10 flex flex-col items-center gap-2 group">
+        <aside className="w-[72px] h-full bg-[#0a0e1a] border-r border-white/5 flex flex-col items-stretch py-8 overflow-y-auto no-scrollbar">
+          <Link to="/dashboard" className="mb-10 flex flex-col items-start pl-5 gap-2 group">
             <div className="w-11 h-11 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-all">
                <Sparkles className="w-6 h-6 text-white" />
             </div>
@@ -203,24 +203,19 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
               label="Projects" 
               active={category === 'projects'}
             />
+
+            {/* AI MODULE DIVIDER */}
+            <div className="w-full h-px bg-white/5 my-4 max-w-[40px] ml-5" />
+            <div className="w-full flex justify-start pl-5 mb-1">
+              <span className="text-[7px] text-blue-500/80 font-black uppercase tracking-[0.1em] select-none text-left">AI MODULE</span>
+            </div>
+
             <RailItem 
               to="/dashboard/audit" 
-              icon={ShieldCheck} 
-              label="AI Audit" 
-              active={category === 'audit'}
-            />
-            <RailItem 
-              to="/dashboard/search" 
-              icon={Globe} 
-              label="Search Lab" 
-              active={category === 'search'}
+              icon={Brain} 
+              label="AI Module" 
+              active={category === 'ai_module'}
               badge
-            />
-            <RailItem 
-              to="/dashboard/readiness" 
-              icon={Zap} 
-              label="GEO Strategy" 
-              active={category === 'readiness'}
             />
           </div>
 
@@ -257,8 +252,8 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
                 transition={{ duration: 0.2 }}
               >
           {/* Section Header */}
-          <h2 className="text-lg font-bold text-slate-400 mb-8 text-[11px] uppercase tracking-[0.2em] px-1 opacity-60">
-            {category === 'projects' ? 'Platform' : category === 'audit' ? 'AI Audit' : category === 'search' ? 'Search Lab' : 'GEO Strategy'}
+          <h2 className="text-lg font-bold text-slate-400 mb-8 text-[10px] uppercase tracking-[0.2em] px-0 opacity-60">
+            {category === 'projects' ? 'Platform' : 'AI Module'}
           </h2>
           
           {/* Dynamic Content: Projects Category */}
@@ -316,9 +311,9 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
                   </SidebarSection>
 
                   <SidebarSection title="AI MODULES">
-                    <div className="px-4 py-2 flex items-center gap-3 text-white/70">
+                    <div className="px-2 py-2 flex items-center gap-3 text-white/70">
                       <ShieldCheck className="w-4 h-4" />
-                      <span className="text-[13px] font-bold">Audit Tools</span>
+                      <span className="text-[13px] font-bold">AI Module Tools</span>
                       <ChevronDown className="w-3 h-3 ml-auto" />
                     </div>
                     <div className="space-y-1">
@@ -326,6 +321,7 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
                       <ContextItem to={`/dashboard/projects/${projectId}/profiler`} label="Domain Profiler" isChild />
                       <ContextItem to={`/dashboard/projects/${projectId}/readiness`} label="Readiness Analyzer" isChild />
                       <ContextItem to={`/dashboard/projects/${projectId}/search`} label="Web Visibility" isChild />
+                      <ContextItem to={`/dashboard/projects/${projectId}/brand-audit`} label="Brand Audit" isChild />
                     </div>
                   </SidebarSection>
 
@@ -364,30 +360,20 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
             </div>
           )}
 
-          {/* Dynamic Content: AI Audit Tools (Manual) */}
-          {category === 'audit' && !isProjectContext && (
-            <div className="space-y-2">
-              <SidebarSection title="Independent Audits">
+          {/* Dynamic Content: AI Module (Global) */}
+          {category === 'ai_module' && !isProjectContext && (
+            <div className="space-y-6">
+              <SidebarSection title="AI AUDITS">
                 <ContextItem to="/dashboard/audit" icon={ShieldCheck} label="AI Visibility Audit" />
                 <ContextItem to="/dashboard/profiler" icon={Search} label="Brand Identity Profiler" />
               </SidebarSection>
-
-            </div>
-          )}
-
-          {/* Dynamic Content: Search Lab (Manual) */}
-          {category === 'search' && !isProjectContext && (
-            <div className="space-y-2">
-              <SidebarSection title="Global Pulse">
+              
+              <SidebarSection title="SEARCH LAB">
                 <ContextItem to="/dashboard/search" icon={Globe} label="Authority & Mentions" />
+                <ContextItem to="/dashboard/brand-audit" icon={Search} label="Brand Audit" />
               </SidebarSection>
-            </div>
-          )}
 
-          {/* Dynamic Content: GEO Strategy (Manual) */}
-          {category === 'readiness' && !isProjectContext && (
-            <div className="space-y-2">
-              <SidebarSection title="Strategic Alignment">
+              <SidebarSection title="GEO STRATEGY">
                 <ContextItem to="/dashboard/readiness" icon={Zap} label="Technical Readiness" />
               </SidebarSection>
             </div>

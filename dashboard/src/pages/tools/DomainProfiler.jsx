@@ -180,7 +180,7 @@ const DomainProfiler = () => {
             </>
           ) : (
             <>
-              <span className="text-gray-400">Audit Tools</span>
+              <span className="text-gray-400">AI Module</span>
               <span>›</span>
             </>
           )}
@@ -451,12 +451,12 @@ const DomainProfiler = () => {
   return (
     <div className="max-w-6xl mx-auto">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-gray-400 mb-6">
+      <div className="flex items-center gap-2 text-sm text-gray-400 mb-6 pt-6">
         <Link to="/dashboard" className="hover:text-gray-600 transition-colors">Dashboard</Link>
         <span>›</span>
-        <span className="text-gray-400">Audit Tools</span>
+        <span className="text-gray-400">AI Module</span>
         <span>›</span>
-        <span className="text-gray-600 font-medium">Domain Audit</span>
+        <span className="text-gray-600 font-medium">Domain Profiler</span>
       </div>
 
       {/* Hero Section */}
