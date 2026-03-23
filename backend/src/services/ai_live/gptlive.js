@@ -101,6 +101,11 @@ Requirements:
 3. CHECKLIST: Provide 5 actionable brand recommendations for AI optimization.
 4. Citations: Extract EVERY unique URL found in the research data, especially those from [LIVE_RESEARCH_GEMINI] and [LIVE_RESEARCH_CHATGPT].
 🚨 DO NOT use "#" or "..." for URLs. DO NOT filter out Gemini sources. Include ALL valid links.
+5. SCORING GUIDE: 
+   - If official website + multiple citations found: Score 85-100 (High).
+   - If official website found with minor mentions: Score 65-84 (Moderate).
+   - If only mentions found (no official site): Score 40-64 (Low).
+   - If NO verifiable live data found: Score 0-15 (Very Low).
 Schema: {interpretation:string, visibilityLevel:string, visibilityScore:number, sentiment:string, domainType:string, brandType:string, coreOffering:string, prompts:string[], checklist:string[], citations:[{domain:string, url:string, context:string}], aiVisibilityAssessment:{overallLevel:string, interpretation:string, criteria:[{name:string, assessment:"Strong"|"Moderate"|"Low", evidence:string}]}}`;
 
     logger.info(`🧠 ChatGPT Profile: Synthesizing profile for "${brand}" using live context (${liveResearchContext?.length || 0} chars)...`);

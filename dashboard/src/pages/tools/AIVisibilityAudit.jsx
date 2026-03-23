@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../../api/axios';
-import { ShieldCheck, MessageSquare, Tag, Terminal, CheckCircle2, AlertCircle, ArrowLeft, Sparkles, ChevronDown, ChevronUp, Globe, FileText, Target, Eye, Zap, Search, FileDown, AlertTriangle } from 'lucide-react';
+import { ShieldCheck, MessageSquare, Tag, Terminal, CheckCircle2, AlertCircle, ArrowLeft, Sparkles, ChevronDown, ChevronUp, Globe, FileText, Target, Eye, Zap, Search, FileDown, AlertTriangle, Loader2, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useProject } from '../../context/ProjectContext';
 import { downloadPDF } from '../../utils/downloadPDF';
+import { fixAIUrl } from '../../utils/linkFixer';
 
 
 // ── Visibility Assessment Table ───────────────────────────
@@ -91,8 +93,12 @@ const VisibilityAssessmentTable = ({ data }) => {
 };
 
 const AIVisibilityAudit = () => {
+  const { projectId } = useParams();
   const { user, updateUser } = useAuth();
+  const { project: contextProject, history: contextHistory, loading: projectLoading } = useProject();
+  
   const [results, setResults] = useState(null);
+  const [url, setUrl] = useState('');
   const [modelResults, setModelResults] = useState({});
   const [activeModel, setActiveModel] = useState(null);
   const [progress, setProgress] = useState('');
@@ -101,30 +107,55 @@ const AIVisibilityAudit = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [reports, setReports] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [syncLoading, setSyncLoading] = useState(!!projectId);
   const eventSourceRef = useRef(null);
+
+  const project = contextProject;
+  const setProject = () => {};
+  const setProjectMode = () => {};
 
   const promptsUsed = user?.subscription?.promptsUsedThisMonth || 0;
   const totalPrompts = user?.subscription?.tier === 'professional' ? 20 : (user?.subscription?.tier === 'growth' ? 15 : 10);
   const remaining = totalPrompts - promptsUsed;
   const isLimitReached = remaining <= 0 || user?.subscription?.status === 'expired';
   const percentage = (promptsUsed / totalPrompts) * 100;
-
+  
   useEffect(() => {
-    const fetchReports = async () => {
-      try {
-        const res = await api.get('/scan/reports'); // Exclusive audit reports
-        setReports(res.data);
-      } catch (err) {
-        console.error('Failed to fetch reports:', err);
+    if (projectId) {
+      if (contextHistory.length > 0) {
+        const latest = contextHistory[0];
+        if (latest.visibilityAudit) {
+          const data = latest.visibilityAudit;
+          setResults({ ...data, createdAt: latest.createdAt });
+          
+          const mk = {};
+          if (data.openai) mk['ChatGPT'] = data.openai;
+          if (data.gemini) mk['Gemini'] = data.gemini;
+          if (data.groq) mk['Groq'] = data.groq;
+          
+          setModelResults(mk);
+          const firstAvailable = Object.keys(mk)[0];
+          if (firstAvailable) setActiveModel(firstAvailable);
+        } else {
+          // Fallback for older snapshots or cases where audit data is still processing
+          setResults(null);
+        }
       }
-    };
-    fetchReports();
+      setSyncLoading(false);
+    } else if (!projectId) {
+      const fetchReports = async () => {
+        try {
+          const res = await api.get('/scan/reports');
+          setReports(res.data);
+        } catch (err) {}
+      };
+      fetchReports();
+    }
     return () => { if (eventSourceRef.current) eventSourceRef.current.close(); };
-  }, []);
+  }, [projectId, contextHistory]);
 
   const getScoreColor = (score) => {
     if (score >= 80) return '#22c55e';
-    if (score >= 50) return '#f59e0b';
     return '#ef4444';
   };
 
@@ -185,7 +216,7 @@ const AIVisibilityAudit = () => {
 
     try {
       // Use the native fetch for SSE support
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://aisonxdashboard.onrender.com/api'}/scan`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/scan`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -293,7 +324,19 @@ const AIVisibilityAudit = () => {
 
   const renderFormattedContent = (content) => {
     if (!content) return null;
-    let text = typeof content === 'string' ? content : (content.content || content.summary || '');
+    
+    // Prioritize summary and interpretation for engine cards
+    let text = typeof content === 'string' ? content : (content.summary || content.interpretation || content.content || '');
+    
+    // If it's a "Not Found" case, ensure we show the honest admission
+    if (!text || text.length < 5) {
+      if (content.entityRecognition?.found === false || 
+          content.brandStatus?.includes('Not Found') ||
+          content.visibilityLevel === 'Unknown') {
+        text = `Entity "${content.brandName || 'this brand'}" was not identified within the native training knowledge base.`;
+      }
+    }
+
     if (!text) return null;
 
     // Clean up markdown artifacts and format as points
@@ -326,6 +369,20 @@ const AIVisibilityAudit = () => {
       </div>
     );
   };
+
+  // ─── SYNC LOADING VIEW ──────────────────────────────────────
+  if (projectId && (syncLoading || projectLoading) && !results) {
+    return (
+      <div className="flex flex-col items-center justify-center py-40">
+        <div className="w-16 h-16 bg-blue-500/10 rounded-3xl flex items-center justify-center mb-6 relative">
+          <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
+          <div className="absolute inset-0 bg-blue-500/20 rounded-3xl animate-ping opacity-20" />
+        </div>
+        <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter mb-2 text-center">Synchronizing Intelligence</h2>
+        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] text-center">Syncing live nodes for your project...</p>
+      </div>
+    );
+  }
 
   // ─── HOME VIEW ─────────────────────────────────────────────
   if (!results) {
@@ -371,67 +428,116 @@ const AIVisibilityAudit = () => {
 
         {/* Dark Header */}
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-[#1a202c] text-white p-8 rounded-2xl mb-8"
+          transition={{ duration: 0.3 }}
+          className="bg-[#1a202c] text-white p-6 rounded-2xl mb-8"
         >
-          <div className="flex items-start justify-between mb-6">
+          <div className="flex items-start justify-between mb-4">
             <div>
-              <h1 className="text-2xl font-bold mb-1">AI Visibility Audit</h1>
-              <p className="text-gray-400 text-sm">Conduct a deep-scan across major LLMs to understand how your brand is perceived and cited.</p>
+              <h1 className="text-2xl font-bold mb-1">{projectId ? `Project Scan: ${project?.name}` : 'AI Visibility Audit'}</h1>
+              <p className="text-gray-400 text-sm">{projectId ? `Automated visibility analysis for ${project?.brandName}` : 'Conduct a deep-scan across major LLMs to understand how your brand is perceived and cited.'}</p>
             </div>
             
-            {/* Circular Progress */}
-            <div className="text-center shrink-0 group">
-              <div className="relative w-24 h-24">
-                <svg className="w-24 h-24 -rotate-90" viewBox="0 0 100 100">
-                  <defs>
-                    <linearGradient id="promptGaugeGradient" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%" stopColor="#60a5fa" />
-                      <stop offset="100%" stopColor="#2563eb" />
-                    </linearGradient>
-                  </defs>
-                  <circle cx="50" cy="50" r="42" fill="none" stroke="#2d3748" strokeWidth="6" />
-                  <circle cx="50" cy="50" r="42" fill="none" stroke="url(#promptGaugeGradient)" strokeWidth="8"
-                    strokeDasharray={`${2 * Math.PI * 42}`}
-                    strokeDashoffset={`${2 * Math.PI * 42 * (1 - (percentage || 0) / 100)}`}
-                    strokeLinecap="round" 
-                    className="transition-all duration-1000 ease-in-out" 
-                    style={{ filter: 'drop-shadow(0 0 6px rgba(59, 130, 246, 0.4))' }}
-                  />
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-2xl font-black text-blue-400 leading-none">{promptsUsed}</span>
-                  <span className="text-[9px] text-gray-500 font-bold uppercase tracking-tighter mt-1">of {totalPrompts}</span>
+            {!projectId && (
+              <div className="text-center shrink-0 group">
+                <div className="relative w-24 h-24">
+                  <svg className="w-24 h-24 -rotate-90" viewBox="0 0 100 100">
+                    <defs>
+                      <linearGradient id="promptGaugeGradient" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stopColor="#60a5fa" />
+                        <stop offset="100%" stopColor="#2563eb" />
+                      </linearGradient>
+                    </defs>
+                    <circle cx="50" cy="50" r="42" fill="none" stroke="#2d3748" strokeWidth="6" />
+                    <circle cx="50" cy="50" r="42" fill="none" stroke="url(#promptGaugeGradient)" strokeWidth="8"
+                      strokeDasharray={`${2 * Math.PI * 42}`}
+                      strokeDashoffset={`${2 * Math.PI * 42 * (1 - (percentage || 0) / 100)}`}
+                      strokeLinecap="round" 
+                      className="transition-all duration-1000 ease-in-out" 
+                      style={{ filter: 'drop-shadow(0 0 6px rgba(59, 130, 246, 0.4))' }}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-2xl font-black text-blue-400 leading-none">{promptsUsed}</span>
+                    <span className="text-[9px] text-gray-500 font-bold uppercase tracking-tighter mt-1">of {totalPrompts}</span>
+                  </div>
                 </div>
+                <span className="inline-block mt-3 text-[10px] font-black uppercase tracking-widest bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full border border-blue-500/20">
+                  {remaining} REMAINING
+                </span>
               </div>
-              <span className="inline-block mt-3 text-[10px] font-black uppercase tracking-widest bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full border border-blue-500/20">
-                {remaining} REMAINING
-              </span>
-            </div>
+            )}
           </div>
 
-          {/* Search Input */}
-          <form onSubmit={handleAnalyze} className="flex gap-3">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Enter brand name or domain..."
-              disabled={isAnalyzing}
-              className="flex-1 bg-[#2d3748] border border-white/10 rounded-xl py-3.5 px-5 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/30 transition-all disabled:opacity-50"
-            />
-            <button
-              type="submit"
-              disabled={isAnalyzing || !input}
-              className="bg-white text-[#1a202c] hover:bg-gray-100 px-6 py-3.5 rounded-xl font-semibold transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Sparkles className="w-4 h-4" />
-              {isAnalyzing ? 'Analyzing...' : 'Run Audit'}
-            </button>
-          </form>
+          {!projectId ? (
+            <form onSubmit={handleAnalyze} className="relative group max-w-4xl">
+              <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-gray-500 group-hover:text-blue-400 transition-colors" />
+              </div>
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Enter your brand name or website URL..."
+                className="block w-full pl-14 pr-40 py-5 bg-[#2d3748] border-2 border-transparent focus:border-blue-500 text-white placeholder-gray-500 rounded-2xl leading-5 focus:outline-none transition-all text-lg font-medium shadow-2xl"
+              />
+              <div className="absolute inset-y-2.5 right-2.5">
+                <button
+                  type="submit"
+                  disabled={isAnalyzing || !input || isLimitReached}
+                  className={`inline-flex items-center px-8 py-3.5 border border-transparent text-sm font-black rounded-xl text-slate-900 bg-white hover:bg-gray-100 focus:outline-none transition-all shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  {isAnalyzing ? (
+                    <>
+                      <Loader2 className="animate-spin -ml-1 mr-3 h-4 w-4" />
+                      Auditing...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="-ml-1 mr-2 h-4 w-4" />
+                      Run Audit
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          ) : (
+            <div className={`bg-blue-500/10 border border-blue-500/30 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 ${!syncLoading && 'bg-slate-50 border-slate-200'}`}>
+              <div className="flex items-center gap-4">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${syncLoading ? 'bg-blue-500/20' : 'bg-slate-200'}`}>
+                  {syncLoading ? (
+                    <RefreshCw className="w-5 h-5 text-blue-400 animate-spin" />
+                  ) : (
+                    <AlertCircle className="w-5 h-5 text-slate-400" />
+                  )}
+                </div>
+                <div>
+                  <h4 className={`text-sm font-black uppercase tracking-widest ${syncLoading ? 'text-blue-100' : 'text-slate-400'}`}>
+                    {syncLoading ? 'Synchronizing Intelligence' : 'No Data Available'}
+                  </h4>
+                  <p className={`text-xs font-medium tracking-tight ${syncLoading ? 'text-blue-300' : 'text-slate-500'}`}>
+                    {syncLoading 
+                      ? `Syncing live nodes for ${project?.brandName || 'project'}...`
+                      : `No AI visibility audit data has been found for ${project?.brandName} yet. Trigger a scan from your project dashboard.`}
+                  </p>
+                </div>
+              </div>
+              {syncLoading ? (
+                <div className="px-4 py-2 bg-blue-500/20 rounded-lg text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] animate-pulse">
+                   Syncing...
+                </div>
+              ) : (
+                <div className="flex flex-col items-end gap-1">
+                  <span className="px-4 py-1.5 bg-slate-900/10 text-slate-500 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-200">
+                    Awaiting Project Sync
+                  </span>
+                  <p className="text-[9px] text-slate-400 font-bold">Trigger scan from dashboard</p>
+                </div>
+              )}
+             </div>
+          )}
 
-          {/* Progress Bar (Visible while analyzing) */}
           {isAnalyzing && (
             <div className="mt-6">
               <div className="flex items-center justify-between mb-2">
@@ -449,79 +555,77 @@ const AIVisibilityAudit = () => {
           )}
         </motion.div>
 
-        {/* Previous Reports (Placeholder/Reusing patterns) */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-white border border-gray-200/60 rounded-2xl p-8 shadow-sm"
-        >
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-bold text-[#1E293B]">
-              Recent Audits {reports.length > 0 && `(${reports.length})`}
-            </h3>
-            {reports.length > 0 && (
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search audits..."
-                  className="bg-[#F8F9FB] border border-gray-200 rounded-xl py-2 pl-9 pr-4 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 w-64"
-                />
+        {!projectId && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm"
+          >
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-xl font-black text-slate-900 tracking-tight">Recent Audits</h2>
+              {reports.length > 0 && (
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search audits..."
+                    className="bg-[#F8F9FB] border border-gray-200 rounded-xl py-2 pl-9 pr-4 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 w-64"
+                  />
+                </div>
+              )}
+            </div>
+            
+            {reports.length === 0 ? (
+              <div className="py-12 text-center">
+                <ShieldCheck className="w-12 h-12 text-gray-200 mx-auto mb-4" />
+                <p className="text-gray-400 text-sm font-medium">No previous audits found. Start your first analysis above.</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto text-left">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-100">
+                      <th className="py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Entity</th>
+                      <th className="py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Type</th>
+                      <th className="py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Date</th>
+                      <th className="py-3 px-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {reports.map((r, i) => (
+                      <tr key={i} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                        <td className="py-4 px-4 text-sm font-bold text-[#1E293B]">
+                          {r.brandName || r.domain || 'Unknown Entity'}
+                        </td>
+                        <td className="py-4 px-4">
+                          <span className="px-2.5 py-1 rounded-lg text-[10px] font-black tracking-tighter" style={{ 
+                            backgroundColor: `${getScoreColor(r.results?.score || r.coverageScore || 0)}20`, 
+                            color: getScoreColor(r.results?.score || r.coverageScore || 0) 
+                          }}>
+                            {r.results?.score || r.coverageScore || 0}% AUDITED
+                          </span>
+                        </td>
+                        <td className="py-4 px-4 text-sm text-gray-400">{new Date(r.createdAt).toLocaleDateString()}</td>
+                        <td className="py-4 px-4 text-right">
+                          <button onClick={() => setResults(r)} className="text-blue-600 hover:text-blue-800 font-bold text-xs uppercase tracking-widest">View Results</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
-          </div>
-          
-          {reports.length === 0 ? (
-            <div className="py-12 text-center">
-              <ShieldCheck className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-              <p className="text-gray-400 text-sm font-medium">No previous audits found. Start your first analysis above.</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto text-left">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-gray-100">
-                    <th className="py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Entity</th>
-                    <th className="py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Type</th>
-                    <th className="py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Date</th>
-                    <th className="py-3 px-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {reports.map((r, i) => (
-                    <tr key={i} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-                      <td className="py-4 px-4 text-sm font-bold text-[#1E293B]">
-                        {r.brandName || r.domain || 'Unknown Entity'}
-                      </td>
-                      <td className="py-4 px-4">
-                        <span className="px-2.5 py-1 rounded-lg text-[10px] font-black tracking-tighter" style={{ 
-                          backgroundColor: `${getScoreColor(r.results?.score || r.coverageScore || 0)}20`, 
-                          color: getScoreColor(r.results?.score || r.coverageScore || 0) 
-                        }}>
-                          {r.results?.score || r.coverageScore || 0}% AUDITED
-                        </span>
-                      </td>
-                      <td className="py-4 px-4 text-sm text-gray-400">{formatDate(r.createdAt)}</td>
-                      <td className="py-4 px-4 text-right">
-                        <button onClick={() => viewReport(r)} className="text-blue-600 hover:text-blue-800 font-bold text-xs uppercase tracking-widest">View Results</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </motion.div>
+          </motion.div>
+        )}
       </div>
     );
   }
 
   // ─── RESULTS VIEW ──────────────────────────────────────────
   if (results) {
-    const score = results.score || results.coverageScore || 0;
+    const score = results.overallScore || results.score || results.averageScore || results.coverageScore || 0;
     const scoreColor = getScoreColor(score);
     const ds = results.domainSynthesis || results; // domain synthesis data
     const circumference = 2 * Math.PI * 50;
@@ -534,16 +638,21 @@ const AIVisibilityAudit = () => {
           <Link to="/dashboard" className="hover:text-gray-600 transition-colors">Dashboard</Link>
           <span>›</span>
           <span className="text-gray-400">Audit Tools</span>
-          <span>›</span>
-          <button onClick={() => setResults(null)} className="hover:text-gray-600 transition-colors">AI Visibility Audit</button>
+          {!projectId && (
+            <>
+              <span>›</span>
+              <button onClick={() => setResults(null)} className="hover:text-gray-600 transition-colors">AI Visibility Audit</button>
+            </>
+          )}
           <span>›</span>
           <span className="text-gray-600 font-medium">Report</span>
         </div>
 
         {/* Report Header */}
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
           className="bg-[#1a202c] text-white p-8 rounded-2xl mb-8 relative overflow-hidden"
         >
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px] -mr-32 -mt-32" />
@@ -565,12 +674,14 @@ const AIVisibilityAudit = () => {
                 >
                   <FileDown className="w-4 h-4" /> Export PDF Report
                 </button>
-                <button 
-                  onClick={() => setResults(null)}
-                  className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-6 py-3 rounded-xl text-sm font-semibold transition-all border border-white/5 active:scale-95"
-                >
-                  <ArrowLeft className="w-4 h-4" /> New Audit
-                </button>
+                {!projectId && (
+                  <button 
+                    onClick={() => setResults(null)}
+                    className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-6 py-3 rounded-xl text-sm font-semibold transition-all border border-white/5 active:scale-95"
+                  >
+                    <ArrowLeft className="w-4 h-4" /> New Audit
+                  </button>
+                )}
               </div>
             </div>
 
@@ -702,7 +813,9 @@ const AIVisibilityAudit = () => {
                   </div>
                   <div className="p-4 bg-white border border-gray-100 rounded-xl shadow-sm">
                     <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Sentiment</div>
-                    <div className="text-xs font-bold text-[#1E293B]">{ds.sentiment || results.profile?.sentiment || 'Unknown'}</div>
+                    <div className={`text-[10px] w-fit font-black uppercase tracking-widest px-2 py-0.5 rounded ${((ds.sentiment || results.profile?.sentiment || '').toLowerCase().includes('positive')) ? 'bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100' : ((ds.sentiment || results.profile?.sentiment || '').toLowerCase().includes('negative')) ? 'bg-rose-50 text-rose-600 ring-1 ring-rose-100' : 'bg-amber-50 text-amber-600 ring-1 ring-amber-100'}`}>
+                      {ds.sentiment || results.profile?.sentiment || 'Neutral'}
+                    </div>
                   </div>
                   <div className="p-4 bg-white border border-gray-100 rounded-xl shadow-sm col-span-2">
                     <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Core Offering</div>

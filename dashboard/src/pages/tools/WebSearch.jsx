@@ -1,23 +1,39 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../../api/axios';
-import { Search, Loader2, Globe, Sparkles, AlertCircle, ArrowLeft, Terminal, FileText, ExternalLink, Target, Eye, Tag, CheckCircle2, FileDown, AlertTriangle, ChevronDown } from 'lucide-react';
+import { Search, Loader2, Globe, Sparkles, AlertCircle, ArrowLeft, Terminal, FileText, ExternalLink, Target, Eye, Tag, CheckCircle2, FileDown, AlertTriangle, ChevronDown, RefreshCw,Filter } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useProject } from '../../context/ProjectContext';
 import { downloadPDF } from '../../utils/downloadPDF';
 
 const WebSearch = () => {
+  const { projectId } = useParams();
   const { user, updateUser } = useAuth();
+  const { project: contextProject, history: contextHistory, loading: projectLoading } = useProject();
+
+  const [input, setInput] = useState('');
   const [results, setResults] = useState(null);
   const [modelResults, setModelResults] = useState({});
-  const [progress, setProgress] = useState('');
-  const [input, setInput] = useState('');
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [activeModel, setActiveModel] = useState(null);
+  const [syncLoading, setSyncLoading] = useState(!!projectId);
+  const eventSourceRef = useRef(null);
+
   const [reports, setReports] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeModel, setActiveModel] = useState(null);
-  const eventSourceRef = useRef(null);
+
+  const filteredReports = reports.filter(r => 
+    (r.brandName || r.domain || '').toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // These are now derived from ProjectContext or are dummy functions
+  const project = contextProject;
+  const setProject = () => {}; 
+  const setProjectMode = () => {}; 
+
+  const [progress, setProgress] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const getScoreColor = (score) => {
     if (score >= 80) return '#22c55e';
@@ -32,17 +48,46 @@ const WebSearch = () => {
   const percentage = (scansUsed / totalScans) * 100;
 
   useEffect(() => {
-    const fetchReports = async () => {
-      try {
-        const res = await api.get('/websearch/reports'); // Exclusive websearch reports
-        setReports(res.data);
-      } catch (err) {
-        console.error('Failed to fetch reports:', err);
+    if (projectId) {
+      if (contextHistory.length > 0) {
+        const latest = contextHistory[0];
+        if (latest.webMentions) {
+          const raw = latest.webMentions.rawResults || {};
+          const profile = latest.webMentions.profile || {};
+          const fullResults = {
+            ...raw,
+            profile: profile,
+            score: latest.webMentions.score || profile.visibilityScore || 0
+          };
+          setResults(fullResults);
+          const mk = {
+            ChatGPT: raw.chatgpt || raw.openai || raw.ChatGPT,
+            Gemini: raw.gemini || raw.Gemini,
+            Groq: raw.groq || raw.Groq
+          };
+          const filteredMk = {};
+          Object.entries(mk).forEach(([k, v]) => {
+            if (v) filteredMk[k] = v;
+          });
+          setModelResults(filteredMk);
+          const firstAvailable = Object.keys(filteredMk)[0];
+          if (firstAvailable) setActiveModel(firstAvailable);
+        }
       }
-    };
-    fetchReports();
+      setSyncLoading(false);
+    } else if (!projectId) {
+      const fetchReports = async () => {
+        try {
+          const res = await api.get('/websearch/reports');
+          setReports(res.data);
+        } catch (err) {
+          console.error('Failed to fetch reports:', err);
+        }
+      };
+      fetchReports();
+    }
     return () => { if (eventSourceRef.current) eventSourceRef.current.close(); };
-  }, []);
+  }, [projectId, contextHistory]);
 
   const handleAnalyze = async (e) => {
     if (e) e.preventDefault();
@@ -65,7 +110,7 @@ const WebSearch = () => {
     const toastId = toast.loading('Connecting to live web nodes...', { icon: '🌐' });
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://aisonxdashboard.onrender.com/api'}/websearch/scan`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/websearch/scan`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -170,6 +215,20 @@ const WebSearch = () => {
 
   const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
+  // ─── SYNC LOADING VIEW ──────────────────────────────────────
+  if (projectId && (syncLoading || projectLoading) && !results) {
+    return (
+      <div className="flex flex-col items-center justify-center py-40">
+        <div className="w-16 h-16 bg-blue-500/10 rounded-3xl flex items-center justify-center mb-6 relative">
+          <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
+          <div className="absolute inset-0 bg-blue-500/20 rounded-3xl animate-ping opacity-20" />
+        </div>
+        <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter mb-2 text-center">Synchronizing Intelligence</h2>
+        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] text-center">Syncing live nodes for your project...</p>
+      </div>
+    );
+  }
+
   // ─── HOME VIEW ─────────────────────────────────────────────
   if (!results) {
     return (
@@ -203,98 +262,114 @@ const WebSearch = () => {
             </motion.div>
           )}
         </AnimatePresence>
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-gray-400 mb-6">
-          <Link to="/dashboard" className="hover:text-gray-600 transition-colors">Dashboard</Link>
-          <span>›</span>
-          <span className="text-gray-400">Audit Tools</span>
-          <span>›</span>
-          <span className="text-gray-600 font-medium">Live Web Visibility</span>
-        </div>
-
-        {/* Dark Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-[#1a202c] text-white p-8 rounded-2xl mb-8"
-        >
-          <div className="flex items-start justify-between mb-6">
-            <div>
-              <h1 className="text-2xl font-bold mb-1">Live Web Visibility</h1>
-              <p className="text-gray-400 text-sm">Probe the live web to find mentions, citations, and reviews that influence AI training datasets.</p>
+      {/* Hero Section */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.98, y: 4 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="bg-[#1a202c] rounded-3xl p-6 text-white shadow-2xl relative overflow-hidden mb-8"
+      >
+        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px] -mr-48 -mt-48" />
+        
+        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex-1">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-400 text-[10px] font-black uppercase tracking-widest mb-3">
+              <Sparkles className="w-3 h-3" /> Live Brand Intelligence
             </div>
-            
-            {/* Circular Progress */}
-            <div className="text-center shrink-0">
-              <div className="relative w-20 h-20">
-                <svg className="w-20 h-20 -rotate-90" viewBox="0 0 80 80">
-                  <circle cx="40" cy="40" r="34" fill="none" stroke="#2d3748" strokeWidth="6" />
-                  <circle cx="40" cy="40" r="34" fill="none" stroke="#2563eb" strokeWidth="6"
-                    strokeDasharray={`${2 * Math.PI * 34}`}
-                    strokeDashoffset={`${2 * Math.PI * 34 * (1 - percentage / 100)}`}
-                    strokeLinecap="round" className="transition-all duration-700" />
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-xl font-bold text-blue-400">{scansUsed}</span>
-                  <span className="text-[10px] text-gray-400">of {totalScans} used</span>
-                </div>
-              </div>
-              <span className="inline-block mt-2 text-[10px] font-semibold bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full">
-                {remaining} scans remaining
-              </span>
-            </div>
+            <h1 className="text-2xl font-black mb-2 tracking-tight leading-none">
+              {projectId ? `Project Scan: ${project?.name}` : 'Web Search Audit'}
+            </h1>
+            <p className="text-gray-400 text-sm font-medium leading-relaxed max-w-2xl">
+              {projectId ? `Crawling live LLM nodes for real-time visibility and mentions of ${project?.brandName}.` : 'Conduct a deep-scan across major LLMs to understand how your brand is perceived and cited.'}
+            </p>
           </div>
 
-          {/* Search Input */}
-          <form onSubmit={handleAnalyze} className="flex gap-3">
+          {!projectId && (
+            <div className="shrink-0 text-center">
+              <div className="relative w-28 h-28">
+                <svg className="w-28 h-28 -rotate-90" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="45" fill="none" stroke="#2d3748" strokeWidth="6" />
+                  <circle cx="50" cy="50" r="45" fill="none" stroke="#3b82f6" strokeWidth="8"
+                    strokeDasharray={`${2 * Math.PI * 45}`}
+                    strokeDashoffset={`${2 * Math.PI * 45 * (1 - (percentage || 0) / 100)}`}
+                    strokeLinecap="round" className="transition-all duration-1000" />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-3xl font-black text-blue-400 leading-none">{scansUsed}</span>
+                  <span className="text-[10px] text-gray-500 font-bold uppercase mt-1">OF {totalScans}</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {!projectId ? (
+          <form onSubmit={handleAnalyze} className="mt-5 relative group max-w-4xl">
+            <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
+              <Globe className="h-5 w-5 text-gray-400 group-hover:text-blue-400 transition-colors" />
+            </div>
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Enter brand name for live search..."
-              disabled={isAnalyzing}
-              className="flex-1 bg-[#2d3748] border border-white/10 rounded-xl py-3.5 px-5 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/30 transition-all disabled:opacity-50"
+              placeholder="Enter Brand Name (e.g., Treecampus)..."
+              className="block w-full pl-14 pr-40 py-5 bg-[#2d3748] border-2 border-transparent focus:border-blue-500 text-white placeholder-gray-500 rounded-2xl leading-5 focus:outline-none transition-all text-lg font-medium shadow-2xl"
             />
-            <button
-              type="submit"
-              disabled={isAnalyzing || !input}
-              className="bg-white text-[#1a202c] hover:bg-gray-100 px-6 py-3.5 rounded-xl font-semibold transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Sparkles className="w-4 h-4" />
-              {isAnalyzing ? 'Searching...' : 'Analyze Presence'}
-            </button>
+            <div className="absolute inset-y-2.5 right-2.5">
+              <button
+                type="submit"
+                disabled={isAnalyzing || !input || isLimitReached}
+                className="inline-flex items-center px-8 py-3.5 border border-transparent text-sm font-black rounded-xl text-slate-900 bg-white hover:bg-gray-100 focus:outline-none transition-all shadow-lg active:scale-95 disabled:opacity-50"
+              >
+                {isAnalyzing ? 'Searching...' : 'Search Brand'}
+              </button>
+            </div>
           </form>
-
-          {/* Progress Indication */}
-          {isAnalyzing && (
-            <div className="mt-6">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-blue-400">{progress}</span>
-                <span className="text-[10px] text-gray-500 uppercase font-black">Scanning Live Node</span>
+          ) : (
+            <div className={`mt-5 bg-blue-500/10 border border-blue-500/30 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 ${!syncLoading && 'bg-slate-50 border-slate-200'}`}>
+              <div className="flex items-center gap-4">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${syncLoading ? 'bg-blue-500/20' : 'bg-slate-200'}`}>
+                  {syncLoading ? (
+                    <RefreshCw className="w-5 h-5 text-blue-400 animate-spin" />
+                  ) : (
+                    <Search className="w-5 h-5 text-slate-400" />
+                  )}
+                </div>
+                <div>
+                  <h4 className={`text-sm font-black uppercase tracking-widest ${syncLoading ? 'text-blue-100' : 'text-slate-400'}`}>
+                    {syncLoading ? 'Synchronizing Intelligence' : 'No Web Mentions Data'}
+                  </h4>
+                  <p className={`text-xs font-medium tracking-tight ${syncLoading ? 'text-blue-300' : 'text-slate-500'}`}>
+                    {syncLoading 
+                      ? `Syncing live nodes for ${project?.brandName || 'project'}...`
+                      : `No live brand mentions data has been found for ${project?.brandName} yet.`}
+                  </p>
+                </div>
               </div>
-              <div className="w-full bg-[#2d3748] h-1.5 rounded-full overflow-hidden">
-                <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: "100%" }}
-                  transition={{ duration: 30, ease: "linear" }}
-                  className="h-full bg-blue-500 shadow-[0_0_10px_rgba(37,99,235,0.4)]"
-                />
-              </div>
+              {syncLoading ? (
+                <div className="px-4 py-2 bg-blue-500/20 rounded-lg text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] animate-pulse">
+                   Syncing...
+                </div>
+              ) : (
+                <div className="flex flex-col items-end gap-1">
+                  <span className="px-4 py-1.5 bg-slate-900/10 text-slate-500 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-200">
+                    Awaiting Project Sync
+                  </span>
+                  <p className="text-[9px] text-slate-400 font-bold">Trigger scan from dashboard</p>
+                </div>
+              )}
             </div>
           )}
-        </motion.div>
+      </motion.div>
 
-        {/* Previous Analysis Table */}
+      {!projectId && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
           className="bg-white border border-gray-200/60 rounded-2xl p-8 shadow-sm"
         >
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-bold text-[#1E293B]">
-              Recent Web Scans {reports.length > 0 && `(${reports.length})`}
-            </h3>
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-xl font-black text-slate-900 tracking-tight">Recent Scans</h2>
             {reports.length > 0 && (
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -310,9 +385,9 @@ const WebSearch = () => {
           </div>
           
           {reports.length === 0 ? (
-            <div className="py-12 text-center">
-              <Globe className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-              <p className="text-gray-400 text-sm font-medium">No previous scans found. Start your first search above.</p>
+            <div className="py-12 text-center bg-slate-50 border border-dashed border-slate-200 rounded-2xl">
+              <Globe className="w-8 h-8 text-slate-300 mx-auto mb-3" />
+              <p className="text-sm text-slate-400 font-medium uppercase tracking-widest">No previous scans found</p>
             </div>
           ) : (
             <div className="overflow-x-auto text-left">
@@ -326,7 +401,7 @@ const WebSearch = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {reports.map((r, i) => (
+                  {filteredReports.map((r, i) => (
                     <tr key={i} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
                       <td className="py-4 px-4 text-sm font-bold text-[#1E293B]">
                         {r.brandName || r.domain || 'Unknown Entity'}
@@ -350,6 +425,7 @@ const WebSearch = () => {
             </div>
           )}
         </motion.div>
+      )}
       </div>
     );
   }
@@ -645,7 +721,9 @@ const WebSearch = () => {
                   </div>
                   <div className="p-4 bg-white border border-gray-100 rounded-xl shadow-sm">
                     <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Brand Sentiment</div>
-                    <div className="text-xs font-bold text-[#1E293B]">{profile.sentiment || 'Neutral'}</div>
+                    <div className={`text-[10px] w-fit font-black uppercase tracking-widest px-2 py-0.5 rounded ${(profile.sentiment || '').toLowerCase().includes('positive') ? 'bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100' : (profile.sentiment || '').toLowerCase().includes('negative') ? 'bg-rose-50 text-rose-600 ring-1 ring-rose-100' : 'bg-amber-50 text-amber-600 ring-1 ring-amber-100'}`}>
+                      {profile.sentiment || 'Neutral'}
+                    </div>
                   </div>
                   <div className="p-4 bg-white border border-gray-100 rounded-xl shadow-sm col-span-2">
                     <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Core Offering</div>

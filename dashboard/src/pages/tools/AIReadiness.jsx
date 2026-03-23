@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Globe, Sparkles, ArrowLeft, Search, ExternalLink, FileText, AlertTriangle, CheckCircle2, Loader2, Users, Target, Eye, Zap, FileDown, ChevronDown, ChevronUp } from 'lucide-react';
+import { Globe, Sparkles, ArrowLeft, Search, ExternalLink, FileText, AlertTriangle, CheckCircle2, Loader2, Users, Target, Eye, Zap, FileDown, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react';
 import api from '../../api/axios';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useProject } from '../../context/ProjectContext';
 import toast from 'react-hot-toast';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { downloadPDF } from '../../utils/downloadPDF';
 
 const STEPS = [
@@ -123,14 +124,21 @@ const ContentOptItem = ({ title, desc, hasIt, impact }) => {
 };
 
 const AIReadiness = () => {
+  const { projectId } = useParams();
   const { user, updateUser } = useAuth();
+  const { project: contextProject, history: contextHistory, loading: projectLoading } = useProject();
+
   const [url, setUrl] = useState('');
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
   const [results, setResults] = useState(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [reports, setReports] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [view, setView] = useState('home'); // 'home' | 'analyzing' | 'report'
+  const [syncLoading, setSyncLoading] = useState(!!projectId);
+
+  const project = contextProject;
+  const setProject = () => {}; // Placeholder, as project is now from context
+  const setProjectMode = () => {}; // Placeholder, as projectMode is derived from projectId
 
   const scansUsed = user?.subscription?.promptsUsedThisMonth || 0;
   const totalScans = user?.subscription?.tier === 'professional' ? 20 : (user?.subscription?.tier === 'growth' ? 15 : 10);
@@ -139,16 +147,30 @@ const AIReadiness = () => {
   const percentage = (scansUsed / totalScans) * 100;
 
   useEffect(() => {
-    const fetchReports = async () => {
-      try {
-        const res = await api.get('/readiness/reports');
-        setReports(res.data);
-      } catch (err) {
-        console.error('Failed to fetch reports:', err);
+    if (projectId) {
+      if (contextProject) {
+        setUrl(contextProject.domain || '');
       }
-    };
-    fetchReports();
-  }, []);
+      if (contextHistory.length > 0) {
+        const latest = contextHistory[0];
+        if (latest.aiReadiness) {
+          setResults(latest.aiReadiness);
+          setView('report');
+        }
+      }
+      setSyncLoading(false);
+    } else {
+      const fetchReports = async () => {
+        try {
+          const res = await api.get('/readiness/reports');
+          setReports(res.data);
+        } catch (err) {
+          console.error('Failed to fetch reports:', err);
+        }
+      };
+      fetchReports();
+    }
+  }, [projectId, contextProject, contextHistory]);
 
   // Step progress simulation during analysis
   useEffect(() => {
@@ -378,8 +400,9 @@ const AIReadiness = () => {
 
         {/* Report Header */}
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
           className="bg-[#1a202c] text-white p-8 rounded-2xl mb-8"
         >
           <div className="flex items-start justify-between">
@@ -1007,6 +1030,20 @@ const AIReadiness = () => {
     );
   }
 
+  // ─── SYNC LOADING VIEW ──────────────────────────────────────
+  if (projectId && (syncLoading || projectLoading) && !results) {
+    return (
+      <div className="flex flex-col items-center justify-center py-40">
+        <div className="w-16 h-16 bg-blue-500/10 rounded-3xl flex items-center justify-center mb-6 relative">
+          <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
+          <div className="absolute inset-0 bg-blue-500/20 rounded-3xl animate-ping opacity-20" />
+        </div>
+        <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter mb-2 text-center">Synchronizing Intelligence</h2>
+        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] text-center">Syncing live nodes for your project...</p>
+      </div>
+    );
+  }
+
   // ─── HOME VIEW ─────────────────────────────────────────────
   return (
     <div className="max-w-6xl mx-auto">
@@ -1019,127 +1056,149 @@ const AIReadiness = () => {
         <span className="text-gray-600 font-medium">AI Visibility Predictor</span>
       </div>
 
-      {/* Dark Header */}
+      {/* Hero Section */}
       <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-[#1a202c] text-white p-8 rounded-2xl mb-8"
+         initial={{ opacity: 0, y: -20 }}
+         animate={{ opacity: 1, y: 0 }}
+         className="bg-[#1a202c] rounded-3xl p-6 text-white shadow-2xl relative overflow-hidden mb-8"
       >
-        <div className="flex items-start justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold mb-1">AI Visibility Predictor</h1>
-            <p className="text-gray-400 text-sm">Analyze your website's AI readiness in 60 seconds. Discover which critical pages AI expects to find.</p>
-          </div>
-          {/* Circular Progress */}
-          <div className="text-center shrink-0">
-            <div className="relative w-20 h-20">
-              <svg className="w-20 h-20 -rotate-90" viewBox="0 0 80 80">
-                <circle cx="40" cy="40" r="34" fill="none" stroke="#2d3748" strokeWidth="6" />
-                <circle cx="40" cy="40" r="34" fill="none" stroke="#48bb78" strokeWidth="6"
-                  strokeDasharray={`${2 * Math.PI * 34}`}
-                  strokeDashoffset={`${2 * Math.PI * 34 * (1 - percentage / 100)}`}
-                  strokeLinecap="round" className="transition-all duration-700" />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-xl font-bold text-green-400">{scansUsed}</span>
-                <span className="text-[10px] text-gray-400">of {totalScans} used</span>
+         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px] -mr-48 -mt-48" />
+         
+         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex-1">
+               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-400 text-[10px] font-black uppercase tracking-widest mb-3">
+                  <Zap className="w-3 h-3" /> Technical AI Readiness
+               </div>
+               <h1 className="text-2xl font-black mb-2 tracking-tight leading-none">
+                  {projectId ? `Project Scan: ${project?.name}` : 'AI Readiness Audit'}
+               </h1>
+               <p className="text-gray-400 text-sm font-medium leading-relaxed max-w-2xl">
+                  {projectId ? `Automated technical extraction and semantic gap analysis for ${project?.domain}.` : 'Analyze your technical foundation, schema health, and content structure for AI system compatibility.'}
+               </p>
+            </div>
+
+            {!projectId && (
+              <div className="shrink-0 text-center">
+                 <div className="relative w-28 h-28">
+                    <svg className="w-28 h-28 -rotate-90" viewBox="0 0 100 100">
+                       <circle cx="50" cy="50" r="45" fill="none" stroke="#2d3748" strokeWidth="6" />
+                       <circle cx="50" cy="50" r="45" fill="none" stroke="#3b82f6" strokeWidth="8"
+                         strokeDasharray={`${2 * Math.PI * 45}`}
+                         strokeDashoffset={`${2 * Math.PI * 45 * (1 - (percentage || 0) / 100)}`}
+                         strokeLinecap="round" className="transition-all duration-1000" />
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                       <span className="text-3xl font-black text-blue-400 leading-none">{scansUsed}</span>
+                       <span className="text-[10px] text-gray-500 font-bold uppercase mt-1">OF {totalScans}</span>
+                    </div>
+                 </div>
               </div>
-            </div>
-            <span className="inline-block mt-2 text-[10px] font-semibold bg-green-500/20 text-green-400 px-3 py-1 rounded-full">
-              {remaining} scans remaining
-            </span>
-          </div>
-        </div>
+            )}
+         </div>
 
-        {/* Run Audit Button */}
-        <form onSubmit={handleAnalyze} className="flex gap-3">
-          <input
-            type="text"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="https://example.com"
-            disabled={isAnalyzing}
-            className="flex-1 bg-[#2d3748] border border-white/10 rounded-xl py-3.5 px-5 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/30 transition-all disabled:opacity-50"
-          />
-          <button
-            type="submit"
-            disabled={isAnalyzing || !url}
-            className="bg-white text-[#1a202c] hover:bg-gray-100 px-6 py-3.5 rounded-xl font-semibold transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Sparkles className="w-4 h-4" />
-            Run New Audit
-          </button>
-        </form>
+         {!projectId ? (
+            <form onSubmit={handleAnalyze} className="mt-5 relative group max-w-4xl">
+               <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
+                  <Search className="h-5 w-5 text-gray-400 group-hover:text-blue-400 transition-colors" />
+               </div>
+               <input
+                  type="text"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  placeholder="Enter website URL (e.g., example.com)..."
+                  className="block w-full pl-14 pr-40 py-5 bg-[#2d3748] border-2 border-transparent focus:border-blue-500 text-white placeholder-gray-500 rounded-2xl leading-5 focus:outline-none transition-all text-lg font-medium shadow-2xl"
+               />
+               <div className="absolute inset-y-2.5 right-2.5">
+                  <button
+                     type="submit"
+                     disabled={isAnalyzing || !url || isLimitReached}
+                     className="inline-flex items-center px-8 py-3.5 border border-transparent text-sm font-black rounded-xl text-slate-900 bg-white hover:bg-gray-100 focus:outline-none transition-all shadow-lg active:scale-95 disabled:opacity-50"
+                  >
+                     {isAnalyzing ? 'Analyzing...' : 'Run Audit'}
+                  </button>
+               </div>
+            </form>
+         ) : (
+            <div className="mt-5 bg-blue-500/10 border border-blue-500/30 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                   <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center border border-blue-500/20">
+                      <RefreshCw className="w-6 h-6 text-blue-400 animate-spin" />
+                   </div>
+                   <div>
+                      <h4 className="text-sm font-black text-blue-100 uppercase tracking-widest">
+                        {syncLoading ? 'Synchronizing Intelligence' : 'Technical Scrutiny Pending'}
+                      </h4>
+                      <p className="text-xs text-blue-300 font-medium tracking-tight">
+                        {syncLoading 
+                          ? `Syncing live nodes for ${project?.domain || 'project'}...`
+                          : `GeoSync is dissecting ${project?.domain} for schema and structural patterns.`}
+                      </p>
+                   </div>
+                </div>
+                <div className="px-4 py-2 bg-blue-500/20 rounded-lg text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] animate-pulse border border-blue-500/10">
+                   {syncLoading ? 'Syncing...' : 'Parsing Nodes...'}
+                </div>
+             </div>
+         )}
       </motion.div>
 
-      {/* Previous Reports */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="bg-white border border-gray-200/60 rounded-2xl p-8"
-      >
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-bold text-[#1E293B]">
-            Previous Reports {reports.length > 0 && `(${reports.length})`}
-          </h3>
-          {reports.length > 0 && (
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by domain or type..."
-                className="bg-[#F8F9FB] border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/30 transition-all w-64"
-              />
-            </div>
-          )}
-        </div>
-
-        {reports.length === 0 ? (
-          <p className="text-green-600 text-sm font-medium">No reports yet. Run your first audit above!</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-100">
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Domain</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Business Type</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Score</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Pages Found</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Date</th>
-                  <th className="text-right py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredReports.map((report) => (
-                  <tr key={report._id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
-                    <td className="py-4 px-4">
-                      <span className="text-blue-600 text-sm font-medium">{report.url || report.domain}</span>
-                    </td>
-                    <td className="py-4 px-4 text-sm text-gray-600">{report.businessType || '—'}</td>
-                    <td className="py-4 px-4 text-sm font-semibold" style={{ color: getScoreColor(report.coverageScore) }}>
-                      {report.coverageScore}%
-                    </td>
-                    <td className="py-4 px-4 text-sm text-gray-600">{report.corePagesFound}/{report.totalPages}</td>
-                    <td className="py-4 px-4 text-sm text-gray-500">{formatDate(report.createdAt)}</td>
-                    <td className="py-4 px-4 text-right">
-                      <button
-                        onClick={() => viewReport(report)}
-                        className="text-gray-400 hover:text-blue-600 transition-colors p-1"
-                        title="View Report"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </motion.div>
+      {!projectId && (
+         <motion.div
+           initial={{ opacity: 0, y: 10 }}
+           animate={{ opacity: 1, y: 0 }}
+           className="bg-white border border-gray-200/60 rounded-2xl p-8"
+         >
+           <div className="flex items-center justify-between mb-8">
+             <h2 className="text-xl font-black text-slate-900 tracking-tight">Recent Audits</h2>
+             {reports.length > 0 && (
+               <div className="relative">
+                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                 <input
+                   type="text"
+                   value={searchQuery}
+                   onChange={(e) => setSearchQuery(e.target.value)}
+                   placeholder="Search audits..."
+                   className="bg-[#F8F9FB] border border-gray-200 rounded-xl py-2 pl-9 pr-4 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 w-64"
+                 />
+               </div>
+             )}
+           </div>
+           
+           {reports.length === 0 ? (
+             <div className="py-12 text-center bg-slate-50 border border-dashed border-slate-200 rounded-2xl">
+               <Globe className="w-8 h-8 text-slate-300 mx-auto mb-3" />
+               <p className="text-sm text-slate-400 font-medium uppercase tracking-widest">No previous audits found</p>
+             </div>
+           ) : (
+             <div className="overflow-x-auto text-left">
+               <table className="w-full">
+                 <thead>
+                   <tr className="border-b border-gray-100">
+                     <th className="py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Entity</th>
+                     <th className="py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Type</th>
+                     <th className="py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Date</th>
+                     <th className="py-3 px-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Action</th>
+                   </tr>
+                 </thead>
+                 <tbody>
+                   {filteredReports.map((r, i) => (
+                     <tr key={i} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                       <td className="py-4 px-4 text-sm font-bold text-[#1E293B]">
+                         {r.domain}
+                       </td>
+                       <td className="py-4 px-4 text-sm text-gray-600">{r.businessType || 'N/A'}</td>
+                       <td className="py-4 px-4 text-sm text-gray-400">{new Date(r.createdAt).toLocaleDateString()}</td>
+                       <td className="py-4 px-4 text-right">
+                         <button onClick={() => viewReport(r)} className="text-blue-600 hover:text-blue-800 font-bold text-xs uppercase tracking-widest">View Results</button>
+                       </td>
+                     </tr>
+                   ))}
+                 </tbody>
+               </table>
+             </div>
+           )}
+         </motion.div>
+      )}
     </div>
   );
 };

@@ -1,20 +1,30 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Globe, Sparkles, ArrowLeft, FileText, ExternalLink, Search, TrendingUp, Tag, Target, Terminal, FileDown, AlertTriangle, CheckCircle2, Layout, Zap, Eye} from 'lucide-react';
+import { Globe, Sparkles, ArrowLeft, FileText, ExternalLink, Search, TrendingUp, Tag, Target, Terminal, FileDown, AlertTriangle, CheckCircle2, Layout, Zap, Eye, RefreshCw} from 'lucide-react';
 import api from '../../api/axios';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useProject } from '../../context/ProjectContext';
 import toast from 'react-hot-toast';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { downloadPDF } from '../../utils/downloadPDF';
 
 const DomainProfiler = () => {
+  const { projectId } = useParams();
   const { user, updateUser } = useAuth();
+  const { project: contextProject, history: contextHistory, loading: projectLoading } = useProject();
+  
+  const [url, setUrl] = useState('');
   const [input, setInput] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [results, setResults] = useState(null);
   const [reports, setReports] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [view, setView] = useState('home'); // 'home' | 'report'
+  const [syncLoading, setSyncLoading] = useState(!!projectId);
+
+  const project = contextProject;
+  const setProject = () => {};
+  const setProjectMode = () => {};
 
   const scansUsed = user?.subscription?.promptsUsedThisMonth || 0;
   const totalScans = user?.subscription?.tier === 'professional' ? 20 : (user?.subscription?.tier === 'growth' ? 15 : 10);
@@ -22,18 +32,29 @@ const DomainProfiler = () => {
   const isLimitReached = remaining <= 0 || user?.subscription?.status === 'expired';
   const percentage = (scansUsed / totalScans) * 100;
 
-  // Fetch previous reports on mount
+  // Fetch previous reports on mount OR project data
   useEffect(() => {
-    const fetchReports = async () => {
-      try {
-        const res = await api.get('/profiler/reports');
-        setReports(res.data);
-      } catch (err) {
-        console.error('Failed to fetch reports:', err);
+    if (projectId) {
+      if (contextHistory.length > 0) {
+        const latest = contextHistory[0];
+        if (latest.domainSynthesis) {
+          setResults(latest.domainSynthesis);
+          setView('report');
+        }
       }
-    };
-    fetchReports();
-  }, []);
+      setSyncLoading(false);
+    } else if (!projectId) {
+      const fetchReports = async () => {
+        try {
+          const res = await api.get('/profiler/reports');
+          setReports(res.data);
+        } catch (err) {
+          console.error('Failed to fetch reports:', err);
+        }
+      };
+      fetchReports();
+    }
+  }, [projectId, contextHistory, results === null]);
 
   const handleAnalyze = async (e) => {
     e.preventDefault();
@@ -152,24 +173,45 @@ const DomainProfiler = () => {
         <div className="flex items-center gap-2 text-sm text-gray-400 mb-6" data-html2canvas-ignore>
           <Link to="/dashboard" className="hover:text-gray-600 transition-colors">Dashboard</Link>
           <span>›</span>
-          <span className="text-gray-400">Audit Tools</span>
-          <span>›</span>
-          <button onClick={goBack} className="hover:text-gray-600 transition-colors">Domain Audit</button>
+          {projectId ? (
+            <>
+              <Link to={`/dashboard/projects/${projectId}`} className="hover:text-gray-600 transition-colors">Project Overview</Link>
+              <span>›</span>
+            </>
+          ) : (
+            <>
+              <span className="text-gray-400">Audit Tools</span>
+              <span>›</span>
+            </>
+          )}
+          <button onClick={goBack} className="hover:text-gray-600 transition-colors">
+            {projectId ? 'Domain Assessment' : 'Domain Audit'}
+          </button>
           <span>›</span>
           <span className="text-gray-600 font-medium">Report</span>
         </div>
 
         {/* Report Header */}
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
           className="bg-[#1a202c] text-white p-8 rounded-2xl mb-8"
         >
           <div className="flex items-start justify-between">
             <div className="flex-1 pr-8">
-              <h1 className="text-2xl font-bold mb-3">Domain Intelligence Report</h1>
+              <h1 className="text-2xl font-bold mb-3 flex items-center gap-3">
+                Domain Intelligence Report
+                {projectId && (
+                  <span className="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-blue-500/30">
+                    Project Synced
+                  </span>
+                )}
+              </h1>
               <p className="text-gray-400 text-sm leading-relaxed mb-6">
-                Institutional-grade analysis for <strong>{results.domain || input}</strong>. This profile dissects brand architecture, audience alignment, and AI perceptual mapping.
+                Institutional-grade analysis for <strong>{results.domain || input}</strong>. 
+                {projectId && " This data is synchronized with your latest project-wide comprehensive scan."} 
+                Dissects brand architecture, audience alignment, and AI perceptual mapping.
               </p>
               <div className="flex items-center gap-3" data-html2canvas-ignore>
                 <button 
@@ -178,12 +220,14 @@ const DomainProfiler = () => {
                 >
                   <FileDown className="w-4 h-4" /> Export PDF Profile
                 </button>
-                <button 
-                  onClick={goBack}
-                  className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors border border-white/5"
-                >
-                  <ArrowLeft className="w-4 h-4" /> New Audit
-                </button>
+                {!projectId && (
+                  <button 
+                    onClick={goBack}
+                    className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors border border-white/5"
+                  >
+                    <ArrowLeft className="w-4 h-4" /> New Audit
+                  </button>
+                )}
               </div>
             </div>
 
@@ -389,6 +433,20 @@ const DomainProfiler = () => {
   }
 
 
+  // ─── SYNC LOADING VIEW ──────────────────────────────────────
+  if (projectId && (syncLoading || projectLoading) && !results) {
+    return (
+      <div className="flex flex-col items-center justify-center py-40">
+        <div className="w-16 h-16 bg-blue-500/10 rounded-3xl flex items-center justify-center mb-6 relative">
+          <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
+          <div className="absolute inset-0 bg-blue-500/20 rounded-3xl animate-ping opacity-20" />
+        </div>
+        <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter mb-2 text-center">Synchronizing Intelligence</h2>
+        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] text-center">Syncing live nodes for your project...</p>
+      </div>
+    );
+  }
+
   // ─── HOME VIEW (Input + Previous Reports) ──────────────────
   return (
     <div className="max-w-6xl mx-auto">
@@ -401,63 +459,144 @@ const DomainProfiler = () => {
         <span className="text-gray-600 font-medium">Domain Audit</span>
       </div>
 
-      {/* Dark Header Section */}
+      {/* Hero Section */}
       <motion.div
-        initial={{ opacity: 0, y: -10 }}
+        initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-[#1a202c] text-white p-8 rounded-2xl mb-8"
+        className="bg-[#1a202c] rounded-3xl p-6 text-white shadow-2xl relative overflow-hidden mb-8"
       >
-        <div className="flex items-start justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold mb-1">Domain Profiler</h1>
-            <p className="text-gray-400 text-sm">Analyze how AI models perceive your brand and discover visibility opportunities</p>
-          </div>
-
-          {/* Circular Progress */}
-          <div className="text-center shrink-0">
-            <div className="relative w-20 h-20">
-              <svg className="w-20 h-20 -rotate-90" viewBox="0 0 80 80">
-                <circle cx="40" cy="40" r="34" fill="none" stroke="#2d3748" strokeWidth="6" />
-                <circle
-                  cx="40" cy="40" r="34" fill="none"
-                  stroke="#48bb78" strokeWidth="6"
-                  strokeDasharray={`${2 * Math.PI * 34}`}
-                  strokeDashoffset={`${2 * Math.PI * 34 * (1 - percentage / 100)}`}
-                  strokeLinecap="round"
-                  className="transition-all duration-700"
-                />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-xl font-bold text-green-400">{scansUsed}</span>
-                <span className="text-[10px] text-gray-400">of {totalScans} used</span>
+          <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px] -mr-48 -mt-48" />
+          
+          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex-1">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-400 text-[10px] font-black uppercase tracking-widest mb-3">
+                <Globe className="w-3 h-3" /> Institutional Domain Intelligence
               </div>
+              <h1 className="text-2xl font-black mb-2 tracking-tight leading-none">
+                {projectId ? `Project Focus: ${project?.name}` : 'Domain Profiler'}
+              </h1>
+              <p className="text-gray-400 text-sm font-medium leading-relaxed max-w-2xl">
+                {projectId ? `Deep-scanning architectural fingerprint for ${project?.domain}.` : 'Analyze any domain\'s architectural fingerprint, audience alignment, and AI perceptual mapping in seconds.'}
+              </p>
             </div>
-            <span className="inline-block mt-2 text-[10px] font-semibold bg-green-500/20 text-green-400 px-3 py-1 rounded-full">
-              {remaining} scans remaining
-            </span>
-          </div>
-        </div>
 
-        {/* Search Input */}
-        <form onSubmit={handleAnalyze} className="flex gap-3">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="example.com or https://example.com"
-            disabled={isAnalyzing}
-            className="flex-1 bg-[#2d3748] border border-white/10 rounded-xl py-3.5 px-5 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/30 transition-all disabled:opacity-50"
-          />
-          <button
-            type="submit"
-            disabled={isAnalyzing || !input}
-            className="bg-white text-[#1a202c] hover:bg-gray-100 px-6 py-3.5 rounded-xl font-semibold transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            {/* Gauge */}
+            {!projectId && (
+              <div className="shrink-0 text-center">
+                <div className="relative w-28 h-28">
+                  <svg className="w-28 h-28 -rotate-90" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="#2d3748" strokeWidth="6" />
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="#3b82f6" strokeWidth="8"
+                      strokeDasharray={`${2 * Math.PI * 45}`}
+                      strokeDashoffset={`${2 * Math.PI * 45 * (1 - (percentage || 0) / 100)}`}
+                      strokeLinecap="round" className="transition-all duration-1000" />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-3xl font-black text-blue-400 leading-none">{scansUsed}</span>
+                    <span className="text-[10px] text-gray-500 font-bold uppercase mt-1">OF {totalScans}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {!projectId ? (
+            <form onSubmit={handleAnalyze} className="mt-5 relative group max-w-4xl">
+              <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-gray-400 group-hover:text-blue-400 transition-colors" />
+              </div>
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Enter domain (e.g., example.com)..."
+                className="block w-full pl-14 pr-40 py-5 bg-[#2d3748] border-2 border-transparent focus:border-blue-500 text-white placeholder-gray-500 rounded-2xl leading-5 focus:outline-none transition-all text-lg font-medium shadow-2xl"
+              />
+              <div className="absolute inset-y-2.5 right-2.5">
+                <button
+                  type="submit"
+                  disabled={isAnalyzing || !input || isLimitReached}
+                  className="inline-flex items-center px-8 py-3.5 border border-transparent text-sm font-black rounded-xl text-slate-900 bg-white hover:bg-gray-100 focus:outline-none transition-all shadow-lg active:scale-95 disabled:opacity-50"
+                >
+                  {isAnalyzing ? 'Profiling...' : 'Generate Profile'}
+                </button>
+              </div>
+            </form>
+          ) : (
+            <div className={`mt-5 bg-blue-500/10 border border-blue-500/30 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 ${!syncLoading && 'bg-slate-50 border-slate-200'}`}>
+              <div className="flex items-center gap-4">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center border border-blue-500/20 ${syncLoading ? 'bg-blue-500/20' : 'bg-slate-200'}`}>
+                  {syncLoading ? (
+                    <RefreshCw className="w-6 h-6 text-blue-400 animate-spin" />
+                  ) : (
+                    <Globe className="w-6 h-6 text-slate-400" />
+                  )}
+                </div>
+                <div>
+                  <h4 className={`text-sm font-black uppercase tracking-widest ${syncLoading ? 'text-blue-100' : 'text-slate-400'}`}>
+                    {syncLoading ? 'Synchronizing Intelligence' : 'No Domain Data'}
+                  </h4>
+                  <p className={`text-xs font-medium tracking-tight ${syncLoading ? 'text-blue-300' : 'text-slate-500'}`}>
+                    {syncLoading 
+                      ? `Syncing live nodes for ${project?.domain || 'project'}...`
+                      : `No architectural data found for ${project?.domain} yet.`}
+                  </p>
+                </div>
+              </div>
+              {syncLoading ? (
+                <div className="px-4 py-2 bg-blue-500/20 rounded-lg text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] animate-pulse">
+                   Syncing...
+                </div>
+              ) : (
+                <div className="flex flex-col items-end gap-1">
+                  <span className="px-4 py-1.5 bg-slate-900/10 text-slate-500 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-200">
+                    Awaiting Project Sync
+                  </span>
+                  <p className="text-[9px] text-slate-400 font-bold">Trigger scan from dashboard</p>
+                </div>
+              )}
+            </div>
+          )}
+        </motion.div>
+
+        {/* Recent Analysis (Hide if in project context) */}
+        {!projectId && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
-            <Sparkles className="w-4 h-4" />
-            {isAnalyzing ? 'Analyzing...' : 'Analyze'}
-          </button>
-        </form>
-      </motion.div>
+            <div className="md:col-span-2 lg:col-span-3 mb-2">
+              <h2 className="text-xl font-black text-slate-900 tracking-tight">Recent Profiles</h2>
+            </div>
+            
+            {reports.slice(0, 6).map((report, idx) => (
+              <div 
+                key={idx} 
+                onClick={() => { setResults(report); setView('report'); }}
+                className="bg-white border border-slate-200 p-6 rounded-2xl hover:border-blue-500 hover:shadow-xl transition-all cursor-pointer group"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                    <FileText className="w-5 h-5" />
+                  </div>
+                  <ExternalLink className="w-4 h-4 text-slate-300 opacity-0 group-hover:opacity-100 transition-all" />
+                </div>
+                <h3 className="font-bold text-slate-900 mb-1 truncate">{report.domain}</h3>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">
+                  {report.domainType} • {new Date(report.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+            ))}
+            
+            {reports.length === 0 && (
+              <div className="md:col-span-2 lg:col-span-3 py-12 text-center bg-slate-50 border border-dashed border-slate-200 rounded-2xl">
+                <Globe className="w-8 h-8 text-slate-300 mx-auto mb-3" />
+                <p className="text-sm text-slate-400 font-medium uppercase tracking-widest">No previous profiles found</p>
+              </div>
+            )}
+          </motion.div>
+        )}
 
       {/* Previous Reports */}
       <motion.div

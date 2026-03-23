@@ -37,7 +37,7 @@ async function analyzePromptRanking(brandName, domain, promptText, market = { na
         // Fallback to internal knowledge if live search fails, is disabled, or for Groq
         if (!audit) {
     const prompt = `
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━i did't understand i said you to all funcanlity work on live or websearach than why internal training
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 TARGET BRAND: "${brandName}"
 WEBSITE: "${domain}"
 TARGET MARKET: "${market.name}"
@@ -223,12 +223,12 @@ exports.performProjectScan = async (project) => {
             for (const audit of (compResults || [])) {
                 if (!audit || !audit.brandRanking) continue;
                 
-                // Map Brand Result
+                const isRanked = audit.brandRanking.rank > 0;
                 results.promptRankings.push({
                     prompt: audit.prompt || '',
                     engine: 'openai',
-                    visibility: (audit.brandRanking.rank > 0) ? (audit.brandRanking.rank <= 3 ? 'High' : 'Moderate') : 'None',
-                    found: audit.brandRanking.isRecommended || (audit.brandRanking.rank > 0),
+                    visibility: isRanked ? (audit.brandRanking.rank <= 3 ? 'High' : 'Moderate') : 'None',
+                    found: audit.brandRanking.isRecommended || isRanked,
                     linkFound: audit.brandRanking.linkProvided || (audit.authoritySignals?.citations?.length > 0) || false,
                     rank: audit.brandRanking.rank || 0,
                     linkRank: audit.brandRanking.rank || 0,
@@ -272,12 +272,13 @@ exports.performProjectScan = async (project) => {
         for (const audit of gCompResults.filter(Boolean)) {
              if (!audit.brandRanking) continue;
  
+             const isRanked = audit.brandRanking.rank > 0;
              // Map Brand Result
              results.promptRankings.push({
                 prompt: audit.prompt || '',
                 engine: 'gemini',
-                visibility: (audit.brandRanking.rank > 0) ? (audit.brandRanking.rank <= 3 ? 'High' : 'Moderate') : 'None',
-                found: audit.brandRanking.isRecommended || (audit.brandRanking.rank > 0),
+                visibility: isRanked ? (audit.brandRanking.rank <= 3 ? 'High' : 'Moderate') : 'None',
+                found: audit.brandRanking.isRecommended || isRanked,
                 linkFound: audit.brandRanking.linkProvided || (audit.authoritySignals?.citations?.length > 0) || false,
                 rank: audit.brandRanking.rank || 0,
                 linkRank: audit.brandRanking.rank || 0,

@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import api from '../api/axios';
 import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { downloadPDF } from '../utils/downloadPDF';
 import { markets } from '../utils/markets';
@@ -44,7 +44,17 @@ const Projects = () => {
   const [activeMenu, setActiveMenu] = useState(null);
   const [marketType, setMarketType] = useState('country'); // 'country' or 'region'
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
+
+  useEffect(() => {
+    if (searchParams.get('new') === 'true') {
+      setIsModalOpen(true);
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('new');
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [searchParams]);
 
   const tier = user?.subscription?.tier || 'starter';
   const totalScans = tier === 'professional' ? 20 : (tier === 'growth' ? 15 : 10);
@@ -117,8 +127,12 @@ const Projects = () => {
         prompts: (newProject.prompts || '').split(',').map(k => k.trim()).filter(k => k),
         competitors: (newProject.competitors || '').split(',').map(c => ({ domain: c.trim() })).filter(c => c.domain)
       };
-      await api.post('/projects', formattedProject);
-      toast.success('Project created successfully', { id: loadingToast });
+      const { data: createdProject } = await api.post('/projects', formattedProject);
+      toast.success('Project created! Redirecting to dashboard...', { id: loadingToast });
+      
+      // Navigate to dashboard immediately
+      navigate(`/dashboard/projects/${createdProject._id}`);
+
       setIsModalOpen(false);
       setNewProject({ 
         name: '', 
@@ -194,39 +208,7 @@ const Projects = () => {
         </AnimatePresence>
         
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          {stats.map((stat, i) => (
-            <motion.div 
-              key={i}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-              className="bg-white border border-gray-200/60 p-6 rounded-2xl shadow-sm relative overflow-hidden group hover:border-blue-500/20 transition-all"
-            >
-              <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50/50 rounded-full blur-[40px] -mr-12 -mt-12 group-hover:bg-blue-100/50 transition-all" />
-              <p className="text-[10px] text-[#1E293B] uppercase tracking-widest font-bold mb-3">{stat.label}</p>
-              <div className="flex flex-col gap-3">
-                <div className="flex items-baseline gap-2">
-                  <h3 className={`${stat.isTierCard ? 'text-2xl capitalize' : 'text-4xl'} font-bold tracking-tight ${stat.highlight ? 'text-blue-600' : 'text-[#1E293B]'}`}>
-                    {stat.value}
-                  </h3>
-                  {stat.total && <span className="text-gray-400 font-semibold text-sm">/ {stat.total}</span>}
-                </div>
-                {stat.details && (
-                  <div className="flex gap-4 mt-2 border-t border-gray-100 pt-3">
-                    {stat.details.map((d, idx) => (
-                      <div key={idx} className="flex flex-col">
-                        <span className="text-[9px] text-gray-400 uppercase font-semibold">{d.label}</span>
-                        <span className="text-xs font-bold text-gray-700">{d.value}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          ))}
-        </div>
+
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
@@ -447,6 +429,40 @@ const Projects = () => {
             ))}
           </div>
         )}
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10 mb-6">
+          {stats.map((stat, i) => (
+            <motion.div 
+              key={i}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              className="bg-white border border-gray-200/60 p-6 rounded-2xl shadow-sm relative overflow-hidden group hover:border-blue-500/20 transition-all"
+            >
+              <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50/50 rounded-full blur-[40px] -mr-12 -mt-12 group-hover:bg-blue-100/50 transition-all" />
+              <p className="text-[10px] text-[#1E293B] uppercase tracking-widest font-bold mb-3">{stat.label}</p>
+              <div className="flex flex-col gap-3">
+                <div className="flex items-baseline gap-2">
+                  <h3 className={`${stat.isTierCard ? 'text-2xl capitalize' : 'text-4xl'} font-bold tracking-tight ${stat.highlight ? 'text-blue-600' : 'text-[#1E293B]'}`}>
+                    {stat.value}
+                  </h3>
+                  {stat.total && <span className="text-gray-400 font-semibold text-sm">/ {stat.total}</span>}
+                </div>
+                {stat.details && (
+                  <div className="flex gap-4 mt-2 border-t border-gray-100 pt-3">
+                    {stat.details.map((d, idx) => (
+                      <div key={idx} className="flex flex-col">
+                        <span className="text-[9px] text-gray-400 uppercase font-semibold">{d.label}</span>
+                        <span className="text-xs font-bold text-gray-700">{d.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          ))}
+        </div>
 
         {/* Create Project Modal */}
         <AnimatePresence>

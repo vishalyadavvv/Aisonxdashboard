@@ -19,40 +19,22 @@ const logger = require('./utils/logger');
 const app = express();
 
 // CORS CONFIG
-const allowedOrigins = [
-  'https://brandvisibility.aisonx.com',
-  'https://aisonxdashboard.onrender.com',
-  'https://aisonxdashboard.netlify.app',
-  'http://localhost:5173',
-  'https://aisonx.com',
-  'http://aisonx.com',
-  'https://www.aisonx.com',
-  'http://www.aisonx.com',
-  'http://localhost:5501',
-  'http://127.0.0.1:5501',
-  'http://localhost:5502',
-  'http://127.0.0.1:5502'
-];
-
-app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl)
-    if (!origin) return callback(null, true);
-    
-    const isLocalhost = origin.includes('localhost') || origin.includes('127.0.0.1');
-    const isAllowedCustom = process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL;
-
-    if (allowedOrigins.indexOf(origin) !== -1 || (isLocalhost && process.env.NODE_ENV !== 'production') || isAllowedCustom) {
-      callback(null, true);
-    } else {
-      logger.warn(`Blocked by CORS: ${origin}`);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'api-key']
-}));
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, api-key');
+  
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  next();
+});
 
 // Middleware
 app.use((req, res, next) => {

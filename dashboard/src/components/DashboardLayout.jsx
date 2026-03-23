@@ -14,7 +14,7 @@ const DashboardLayout = () => {
   const isPricingPage = location.pathname === '/dashboard/pricing';
 
   return (
-    <div className="flex min-h-screen bg-[#F8F9FA] text-[#1E293B] selection:bg-blue-500/10">
+    <div className="flex h-screen overflow-hidden bg-[#F8F9FA] text-[#1E293B] selection:bg-blue-500/10">
       <Sidebar 
         logout={logout} 
         isOpen={isMobileMenuOpen} 

@@ -127,18 +127,25 @@ const websearchScanController = async (req, res) => {
     const [finalAuditResults, finalProfile] = await Promise.all([auditPromise, synthesisPromise]);
     
     // 3. Calculate Final Aggregate Score
+    // All AI models contribute equally — average across profile + individual models
     let finalScore = 0;
     const scores = [];
     
-    if (finalProfile && !finalProfile.error) scores.push(getNumericScore(finalProfile));
+    // Include the synthesized profile score (derived from all models)
+    if (finalProfile && !finalProfile.error) {
+        scores.push(getNumericScore(finalProfile));
+    }
     
-    Object.values(finalAuditResults).forEach(res => {
-        const s = getNumericScore(res);
+    // Include each individual model's score
+    Object.entries(finalAuditResults).forEach(([modelId, result]) => {
+        const s = getNumericScore(result);
         if (s > 0) scores.push(s);
+        logger.info(`📊 Web Visibility [${modelId}] score: ${s}`);
     });
     
     if (scores.length > 0) {
         finalScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+        logger.info(`✅ Web Visibility Final Score: ${finalScore} (averaged from ${scores.length} sources)`);
     } else {
         finalScore = hasAnyResults ? 15 : 0;
     }

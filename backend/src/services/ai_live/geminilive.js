@@ -290,8 +290,12 @@ STRICT REQUIREMENTS:
    - You MUST look for URLs in [Source: URL] tags and extract the full URL.
    - 🚨 DO NOT use "#" or "..." for URLs. If no URL is found, omit the citation.
    - You MUST include links from ALL research data provided, including those from OpenAI/ChatGPT search nodes.
-5. NO GUESSING: If the research data is "Minimal presence" or "failed", your profile MUST reflect that brand's invisibility. 
-6. AI VISIBILITY ASSESSMENT: Be critical. If data is sparse or only found in 1 model, the level is "Low".
+5. SCORING GUIDE: 
+   - If official website + multiple citations found: Score 85-100 (High).
+   - If official website found with minor mentions: Score 65-84 (Moderate).
+   - If only mentions found (no official site): Score 40-64 (Low).
+   - If NO verifiable live data found: Score 0-15 (Very Low).
+6. NO GUESSING: If the research data is "Minimal presence" or "failed", your profile MUST reflect that brand's invisibility. 
 
 OUTPUT FORMAT (JSON ONLY):
 {

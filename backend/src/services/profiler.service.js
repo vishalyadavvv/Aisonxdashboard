@@ -159,36 +159,14 @@ const analyzeWithGroq = async (domain, content) => {
     }
 };
 
-/**
- * Provider: OpenRouter (The Market Observer)
- */
-const analyzeWithOpenRouter = async (domain, content) => {
-    try {
-        const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
-            model: 'openrouter/freemy',
-            messages: [{ role: 'user', content: `Strategic analysis for "${domain}". Market position, audience model (B2B/B2C), and competitive landscape? Context: ${content.substring(0, 4000)}. JSON.` }]
-        }, {
-            headers: { 
-                'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
-                'HTTP-Referer': 'https://aisonx.com',
-                'X-Title': 'GEO Profiler'
-            }
-        });
-        const msg = response.data.choices[0].message.content;
-        const match = msg.match(/\{[\s\S]*\}/);
-        return match ? JSON.parse(match[0]) : null;
-    } catch (e) { 
-        logger.error(`OpenRouter Error: ${e.response?.data?.error?.message || e.message}`); 
-        return null; 
-    }
-};
+
 
 /**
  * The Master Synthesizer: Elevating Accuracy to Professional Grade
  */
 const synthesizeResults = async (domain, results, websiteContent) => {
     const valid = [];
-    const providers = ['OpenAI', 'Gemini', 'Groq', 'OpenRouter'];
+    const providers = ['OpenAI', 'Gemini', 'Groq'];
     results.forEach((r, idx) => {
         if (r.status === 'fulfilled' && r.value) valid.push({ p: providers[idx], d: r.value });
     });
@@ -277,8 +255,7 @@ const analyzeDomainMulti = async (domain, content) => {
     const results = await Promise.allSettled([
         analyzeWithOpenAI(domain, content),
         analyzeWithGemini(domain, content),
-        analyzeWithGroq(domain, content),
-        analyzeWithOpenRouter(domain, content)
+        analyzeWithGroq(domain, content)
     ]);
     return await synthesizeResults(domain, results, content);
 };

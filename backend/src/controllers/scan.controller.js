@@ -316,7 +316,7 @@ exports.startScan = async (req, res) => {
     const detectGenericResponse = (modelResult) => {
         if (!modelResult || modelResult.error) return true;
         
-        // Check if model explicitly said "Not Found"
+        // 1. Check explicit flags
         const status = (modelResult.brandStatus || '').toLowerCase();
         if (status.includes('not found')) return true;
         
@@ -324,28 +324,38 @@ exports.startScan = async (req, res) => {
         if (found === false) return true;
         
         const confidence = (modelResult.entityRecognition?.confidence || '').toLowerCase();
-        if (confidence === 'not found' || confidence === 'low') return true;
+        if (confidence === 'not found' || (confidence === 'low' && !modelResult.interpretation?.length)) return true;
         
-        // Check if interpretation is just brand-name-guessing
+        // 2. Scan text for "Honest Admission" phrases
         const interpretation = (modelResult.interpretation || '').toLowerCase();
         const summary = (modelResult.summary || '').toLowerCase();
-        const brandLower = brandName.toLowerCase();
+        const coverage = (modelResult.entityRecognition?.trainingDataCoverage || '').toLowerCase();
         
-        // Generic phrases that indicate guessing
         const genericPhrases = [
             'does not appear in my training',
             'not found in my training',
             'no specific information',
             'no verifiable',
             'was not found',
+            'not found in my training',
+            'was not found in my training',
             'do not have specific',
             'cannot confirm',
-            'no concrete'
+            'no concrete',
+            'insufficient information',
+            'no record of this brand',
+            'limited or no knowledge',
+            'not able to find',
+            'not recognized as a distinct entity'
         ];
         
         for (const phrase of genericPhrases) {
-            if (interpretation.includes(phrase) || summary.includes(phrase)) return true;
+            if (interpretation.includes(phrase) || summary.includes(phrase) || coverage.includes(phrase)) return true;
         }
+        
+        // 3. Heuristic: If summary is very short and just repeats the brand name
+        if (summary.length < 50 && summary.toLowerCase().includes(brandName.toLowerCase()) && 
+           (summary.includes('not recognized') || summary.includes('unknown'))) return true;
         
         return false;
     };
@@ -354,18 +364,38 @@ exports.startScan = async (req, res) => {
     Object.keys(visibilityResults).forEach(modelId => {
         const result = visibilityResults[modelId];
         if (detectGenericResponse(result)) {
-            logger.info(`🚫 [${modelId}] Detected generic/not-found response — scoring at 0`);
-            if (result.aiVisibilityAssessment) {
-                result.aiVisibilityAssessment.overallLevel = 'Very Low';
-                result.aiVisibilityAssessment.visibilityScore = 0;
-                if (Array.isArray(result.aiVisibilityAssessment.criteria)) {
-                    result.aiVisibilityAssessment.criteria = result.aiVisibilityAssessment.criteria.map(c => ({
-                        ...c, assessment: 'Very Low', score: 0
-                    }));
+            logger.info(`🚫 [${modelId}] Detected generic/not-found response — forcing score to 0`);
+            
+            // Ensure assessment object exists so getNumericScore can find it
+            if (!result.aiVisibilityAssessment) {
+                result.aiVisibilityAssessment = { criteria: [] };
+            }
+            
+            result.aiVisibilityAssessment.overallLevel = 'Very Low';
+            result.aiVisibilityAssessment.visibilityScore = 0;
+            result.aiVisibilityAssessment.interpretation = `Entity "${brandName}" was not found in ${modelId} training data.`;
+            
+            if (Array.isArray(result.aiVisibilityAssessment.criteria)) {
+                result.aiVisibilityAssessment.criteria = result.aiVisibilityAssessment.criteria.map(c => ({
+                    ...c, assessment: 'Very Low', score: 0, evidence: 'No training data match'
+                }));
+                // If it was empty, add at least one to ensure averaging works
+                if (result.aiVisibilityAssessment.criteria.length === 0) {
+                    result.aiVisibilityAssessment.criteria.push({ name: 'Direct training match', assessment: 'Very Low', score: 0 });
                 }
             }
         }
     });
+
+    // Also sync the master profile if it exists
+    if (profileResult && detectGenericResponse(profileResult)) {
+        profileResult.visibilityScore = 0;
+        profileResult.visibilityLevel = 'Not Found';
+        if (profileResult.aiVisibilityAssessment) {
+            profileResult.aiVisibilityAssessment.overallLevel = 'Very Low';
+            profileResult.aiVisibilityAssessment.visibilityScore = 0;
+        }
+    }
     
     // Send aggregated profile result
     sendEvent({ type: 'profile_result', data: aggregatedProfile });

@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ProjectProvider } from './context/ProjectContext';
+import ProjectLoader from './components/ProjectLoader';
 import PrivateRoute from './components/PrivateRoute';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -12,6 +14,7 @@ import AIReadiness from './pages/tools/AIReadiness';
 import WebSearch from './pages/tools/WebSearch';
 import Projects from './pages/Projects';
 import ProjectDetail from './pages/ProjectDetail';
+import Rankings from './pages/Rankings';
 import Inquiries from './pages/Inquiries';
 import Help from './pages/Help';
 import Settings from './pages/Settings';
@@ -40,8 +43,9 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <Toaster position="top-right" toastOptions={{ duration: 4000, style: { borderRadius: '12px', background: '#1E293B', color: '#fff', fontSize: '14px' } }} />
-        <Routes>
+        <ProjectProvider>
+          <Toaster position="top-right" toastOptions={{ duration: 4000, style: { borderRadius: '12px', background: '#1E293B', color: '#fff', fontSize: '14px' } }} />
+          <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -57,7 +61,16 @@ function App() {
               <Route path="/dashboard/readiness" element={<AIReadiness />} />
               <Route path="/dashboard/search" element={<WebSearch />} />
               <Route path="/dashboard/projects" element={<Projects />} />
-              <Route path="/dashboard/projects/:id" element={<ProjectDetail />} />
+              
+              {/* Project-Specific Routes with Data Loading */}
+              <Route path="/dashboard/projects/:projectId" element={<ProjectLoader />}>
+                <Route index element={<ProjectDetail />} />
+                <Route path="audit" element={<AIVisibilityAudit />} />
+                <Route path="profiler" element={<DomainProfiler />} />
+                <Route path="readiness" element={<AIReadiness />} />
+                <Route path="search" element={<WebSearch />} />
+                <Route path="rankings" element={<Rankings />} />
+              </Route>
               <Route path="/dashboard/inquiries" element={<Inquiries />} />
               <Route path="/dashboard/help" element={<Help />} />
               <Route path="/dashboard/orders" element={<Orders />} />
@@ -72,6 +85,7 @@ function App() {
           {/* Fallback */}
           <Route path="/" element={<Navigate to="/dashboard" />} />
         </Routes>
+        </ProjectProvider>
       </AuthProvider>
     </Router>
   );

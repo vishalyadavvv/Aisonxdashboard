@@ -2,7 +2,11 @@ const mongoose = require('mongoose');
 const Project = require('../models/Project');
 const Snapshot = require('../models/Snapshot');
 const promptOrchestrator = require('../services/ai_internal/promptOrchestrator');
+const aiOrchestrator = require('../services/ai_internal/aiOrchestrator');
 const techAudit = require('../services/techAudit.service');
+const profilerService = require('../services/profiler.service');
+const aiReadinessService = require('../services/aiReadiness.service');
+const { runLiveAudit, profileAIInterceptor } = require('../services/ai_live/live.orchestrator');
 const logger = require('../utils/logger');
 
 // Helper to get prompt limit by tier
@@ -19,32 +23,38 @@ const getPromptLimit = (tier) => {
 // @access  Private
 exports.createProject = async (req, res) => {
     try {
-    const { name, brandName, domain, prompts: promptsInput, targetEngines, competitors, market } = req.body;
+        const { name, brandName, domain, prompts: promptsInput, targetEngines, competitors, market } = req.body;
 
-    if (!name || !brandName || !domain) {
-      return res.status(400).json({ error: 'Name, Brand Name, and Domain are required' });
-    }
+        if (!name || !brandName || !domain) {
+            return res.status(400).json({ error: 'Name, Brand Name, and Domain are required' });
+        }
 
-    // Check Prompt Limits
-    const promptLimit = getPromptLimit(req.user.subscription?.tier);
-    const prompts = Array.isArray(promptsInput) ? promptsInput : (promptsInput ? promptsInput.split(',').map(k => k.trim()).filter(Boolean) : []);
-    
-    if (prompts.length > promptLimit) {
-        return res.status(403).json({ 
-            error: `Project prompt limit exceeded. Your ${req.user.subscription?.tier || 'Free'} plan allows only ${promptLimit} prompts per project.` 
+        // Check Prompt Limits
+        const promptLimit = getPromptLimit(req.user.subscription?.tier);
+        const prompts = Array.isArray(promptsInput) ? promptsInput : (promptsInput ? promptsInput.split(',').map(k => k.trim()).filter(Boolean) : []);
+        
+        if (prompts.length > promptLimit) {
+            return res.status(403).json({ 
+                error: `Project prompt limit exceeded. Your ${req.user.subscription?.tier || 'Free'} plan allows only ${promptLimit} prompts per project.` 
+            });
+        }
+
+        const project = await Project.create({
+            userId: req.user._id,
+            name,
+            brandName,
+            domain,
+            prompts,
+            competitors: competitors || [],
+            targetEngines: targetEngines || ['openai', 'gemini', 'groq'],
+            market: market || { name: 'Global', code: 'GLB', type: 'global' }
         });
-    }
 
-    const project = await Project.create({
-      userId: req.user._id,
-      name,
-      brandName,
-      domain,
-      prompts,
-      competitors: competitors || [],
-      targetEngines: targetEngines || ['openai', 'gemini', 'groq'],
-      market: market || { name: 'Global', code: 'GLB', type: 'global' }
-    });
+        // Trigger AI Scan in the background immediately
+        logger.info(`🚀 [AUTO-SCAN] Triggering background scan for new project: ${project.name}`);
+        internalRunProjectScan(project).catch(err => {
+            logger.error(`❌ [AUTO-SCAN] Background scan failed for ${project.name}:`, err.message);
+        });
 
         res.status(201).json(project);
     } catch (err) {
@@ -175,7 +185,7 @@ exports.getProjectHistory = async (req, res) => {
     }
 };
 
-// @desc    Run immediate project scan
+// @desc    Run immediate project scan (Comprehensive)
 // @route   POST /api/projects/:id/scan
 // @access  Private
 exports.runProjectScan = async (req, res) => {
@@ -189,54 +199,172 @@ exports.runProjectScan = async (req, res) => {
             return res.status(404).json({ error: 'Project not found' });
         }
 
-        logger.info(`🚀 Manual scan triggered for: ${project.name}`);
+        // Run scan
+        await internalRunProjectScan(project);
+        res.json({ message: 'Scan completed successfully' });
+    } catch (err) {
+        logger.error('Error running project scan:', err.message);
+        res.status(500).json({ error: 'Scan failed' });
+    }
+};
+
+// Internal helper to run comprehensive project scans (reusable)
+const internalRunProjectScan = async (project) => {
+    try {
+        logger.info(`🚀 COMPREHENSIVE scan triggered for: ${project.name}`);
         
-        // 1. Run Technical Audits
-        const [robotsJson, sitemapJson] = await Promise.all([
-            techAudit.analyzeRobots(project.domain),
-            techAudit.analyzeSitemap(project.domain)
+        // ---------------------------------------------------------
+        // PHASE 1: Technical & Content Infrastructure (Parallel)
+        // ---------------------------------------------------------
+        const [techResults, readinessResults, profilerContent] = await Promise.all([
+            // Technical check
+            Promise.all([
+                techAudit.analyzeRobots(project.domain),
+                techAudit.analyzeSitemap(project.domain)
+            ]),
+            // AI Readiness Audit
+            aiReadinessService.analyzeWebsite(project.domain),
+            // Fetch content for Profiler
+            profilerService.fetchWebsiteContent(project.domain)
         ]);
 
-        // 2. Run AI Audits (Brand + Competitors)
-        const scanResults = await promptOrchestrator.performProjectScan(project);
+        const [robotsJson, sitemapJson] = techResults;
+
+        // 2. MULTI-MODEL INTERNAL AUDIT (CRITICAL: Strictly Internal Knowledge for this tool)
+        const [scanResults, synthesisResults, liveAuditResults, auditProfile, auditModelResults] = await Promise.all([
+            // 1. Visibility Audit (Brand + Competitors — typically uses Search)
+            promptOrchestrator.performProjectScan(project),
+            // 2. Domain Profiler (Synthesis)
+            profilerService.analyzeDomainMulti(project.domain, profilerContent),
+            // 3. Web search (Live Brand Mentions)
+            runLiveAudit(project.brandName),
+            // 4. Independent Audit Profile (for Visibility Audit tool)
+            aiOrchestrator.getStructuredProfile(project.brandName),
+            // 5. Independent Model Results (for Visibility Audit tool engine cards)
+            aiOrchestrator.broadcastQuery(project.brandName)
+        ]);
+
+        // ---------------------------------------------------------
+        // PHASE 3: Web Mentions Profile (Synthesis)
+        // ---------------------------------------------------------
+        const mentionsProfile = await profileAIInterceptor(project.brandName, liveAuditResults);
+
+        // ---------------------------------------------------------
+        // PHASE 4: Score Aggregation
+        // ---------------------------------------------------------
         
-        // 3. Aggregate Authority Signals
+        // Authority Signals Calculation
         const allSignals = scanResults.promptRankings.map(r => r.authoritySignals).filter(Boolean);
         const trainingRecall = Math.round(allSignals.filter(s => s.recallConfidence === 'High' || s.recallConfidence === 'Medium').length / (allSignals.length || 1) * 100);
-        
-        // Count as "Web Grounded" if the source is not purely internal training
         const webGroundedPercent = Math.round(
             allSignals.filter(s => 
                 (s.citations && s.citations.length > 0) || 
-                (s.sourceType && !s.sourceType.includes('Internal') && (s.sourceType.includes('Search') || s.sourceType.includes('Web') || s.sourceType.includes('Google')))
+                (s.sourceType && !s.sourceType.includes('Internal'))
             ).length / (allSignals.length || 1) * 100
         );
-        
         const uniqueCitations = [...new Set(allSignals.flatMap(s => s.citations || []))].filter(Boolean).slice(0, 10);
 
-        // 4. Calculate refined GEO Health Score (0-100)
-        const visibilityScore = scanResults.promptRankings.length > 0
-            ? Math.round(scanResults.promptRankings.reduce((a, b) => a + (b.score || 0), 0) / scanResults.promptRankings.length)
-            : 0;
+        // Engine-Specific Scores (Live Search based)
+        const engineScores = { openai: 0, gemini: 0, groq: 0 };
+        const foundPrompts = new Set();
         
-        // Calculate Engine-Specific Scores
-        const engineScores = {
-            openai: 0,
-            gemini: 0,
-            groq: 0
-        };
         ['openai', 'gemini', 'groq'].forEach(engine => {
             const engineRankings = scanResults.promptRankings.filter(r => r.engine === engine);
             if (engineRankings.length > 0) {
-                engineScores[engine] = Math.round(engineRankings.reduce((a, b) => a + (b.score || 0), 0) / engineRankings.length);
+                const validRankings = engineRankings.map(r => {
+                    const isFound = r.found || r.rank > 0 || (r.snippet && r.snippet.toLowerCase().includes(project.brandName.toLowerCase()));
+                    if (isFound) foundPrompts.add(r.prompt);
+                    let score = r.score || 0;
+                    if (isFound && score < 60) score = 60;
+                    return { ...r, score, isFound };
+                });
+                engineScores[engine] = Math.round(validRankings.reduce((a, b) => a + b.score, 0) / validRankings.length);
             }
         });
 
-        const techScore = (robotsJson.found ? 50 : 0) + (sitemapJson.found ? 50 : 0);
-        const authorityScore = Math.round((trainingRecall + webGroundedPercent) / 2);
+        // 🟢 WEIGHTED VISIBILITY CALCULATION (Fix: Avoid Blind Average Dilution)
+        // We give 2x weight to prompts where the brand is actually FOUND.
+        // This rewards discovery while still acknowledging gaps.
+        let totalWeightedScore = 0;
+        let totalWeights = 0;
 
-        // Balanced Score: 40% Visibility, 30% Tech, 30% Authority
+        scanResults.promptRankings.forEach(r => {
+            const isFound = r.found || r.rank > 0 || (r.snippet && r.snippet.toLowerCase().includes(project.brandName.toLowerCase()));
+            const score = isFound ? Math.max(r.score, 60) : (r.score || 0);
+            const weight = isFound ? 2 : 1; // Double weight for "wins"
+            
+            totalWeightedScore += (score * weight);
+            totalWeights += weight;
+        });
+
+        const visibilityScore = totalWeights > 0 
+            ? Math.round(totalWeightedScore / totalWeights) 
+            : 0;
+
+        const techScore = (robotsJson.found ? 50 : 0) + (sitemapJson.found ? 50 : 0);
+        
+        // Authority logic: prioritize reach over bulk
+        const reachPercent = Math.round((foundPrompts.size / (project.prompts.length || 1)) * 100);
+        const authorityScore = Math.round((trainingRecall * 0.4) + (webGroundedPercent * 0.3) + (reachPercent * 0.3));
+
+        // Final Aggregate GEO Health Score (Project Overview)
         const overallScore = Math.round((visibilityScore * 0.4) + (techScore * 0.3) + (authorityScore * 0.3));
+
+        // ---------------------------------------------------------
+        // PHASE 5: Save Snapshot
+        // ---------------------------------------------------------
+        
+        // *** INTERNAL AUDIT PROFILE RECONCILIATION ***
+        // Detect hallucinations in the audit profile
+        const isInternalAuditFound = (model) => {
+            if (!model) return false;
+            const status = (model.brandStatus || '').toLowerCase();
+            const foundFlag = model.entityRecognition?.found;
+            return !status.includes('not found') && foundFlag !== false;
+        };
+
+        // Calculate audit-specific score (strictly internal knowledge)
+        const auditScores = [];
+        Object.keys(auditModelResults).forEach(key => {
+            const m = auditModelResults[key];
+            if (isInternalAuditFound(m)) {
+                auditScores.push(m.aiVisibilityAssessment?.visibilityScore || 15);
+            } else {
+                auditScores.push(0);
+            }
+        });
+        const internalAuditScore = auditScores.length > 0 
+            ? Math.round(auditScores.reduce((a, b) => a + b, 0) / auditScores.length)
+            : 0;
+
+        // Build Visibility Audit (Group by Engine for the primary prompt)
+        const visibilityAudit = {
+            brandName: project.brandName,
+            domain: project.domain,
+            overallScore: internalAuditScore, // Replaced with strictly internal score
+            summary: auditProfile?.summary || `Internal knowledge base exploration complete. Visibility: ${internalAuditScore}%`,
+            profile: {
+                ...auditProfile,
+                visibilityScore: internalAuditScore,
+                aiVisibilityAssessment: {
+                    ...auditProfile?.aiVisibilityAssessment,
+                    overallLevel: internalAuditScore >= 70 ? 'High' : (internalAuditScore >= 40 ? 'Moderate' : 'Low'),
+                    interpretation: auditProfile?.interpretation || `Brand awareness index computed from native LLM training data.`
+                }
+            }
+        };
+        
+        // Map individual engine cards from the dedicated internal audit results
+        ['openai', 'gemini', 'groq'].forEach(engine => {
+            const internalResult = auditModelResults[engine];
+            if (internalResult) {
+                visibilityAudit[engine] = {
+                    ...internalResult,
+                    score: internalResult.aiVisibilityAssessment?.visibilityScore || 0,
+                    found: isInternalAuditFound(internalResult)
+                };
+            }
+        });
 
         const snapshot = await Snapshot.create({
             projectId: project._id,
@@ -251,6 +379,16 @@ exports.runProjectScan = async (req, res) => {
             })),
             competitorRankings: scanResults.competitorRankings,
             customPromptResults: scanResults.customPromptResults,
+            
+            // New Tool Data
+            domainSynthesis: synthesisResults,
+            aiReadiness: readinessResults,
+            webMentions: {
+                score: mentionsProfile.visibilityScore || 0,
+                profile: mentionsProfile,
+                rawResults: liveAuditResults
+            },
+            visibilityAudit,
             authoritySignals: {
                 trainingRecall,
                 webGroundedRecency: webGroundedPercent,
@@ -259,18 +397,44 @@ exports.runProjectScan = async (req, res) => {
             technicalAudit: {
                 robotsValid: robotsJson.found,
                 sitemapFound: sitemapJson.found,
-                schemaCount: 0, 
+                schemaCount: readinessResults.technicalSignals?.structuredData?.schemaTypes?.length || 0, 
                 pageSpeedScore: 0 
             },
-            summary: `Manual scan for ${project.name} completed. Authority: Training Recall (${trainingRecall}%), Web Grounding (${webGroundedPercent}%).`
+            summary: visibilityAudit.summary
         });
 
         project.lastScanAt = new Date();
         await project.save();
-
-        res.json({ message: 'Scan completed successfully', snapshot });
+        return snapshot;
     } catch (err) {
-        logger.error('Error in manual project scan:', err.message);
-        res.status(500).json({ error: 'Scan failed' });
+        logger.error(`Error in background project scan (${project._id}):`, err.message);
+        throw err;
     }
 };
+
+// @desc    Run full comprehensive scan
+// @route   POST /api/projects/:id/sync
+// @access  Private
+exports.runProjectSync = async (req, res) => {
+    try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ error: 'Invalid project ID format' });
+        }
+        const project = await Project.findOne({ _id: req.params.id, userId: req.user._id });
+
+        if (!project) {
+            return res.status(404).json({ error: 'Project not found' });
+        }
+        
+        logger.info(`🔄 [SYNC-TRIGGER] Starting manual comprehensive scan for: ${project.name}`);
+        const snapshot = await internalRunProjectScan(project);
+        
+        res.json({ message: 'Comprehensive scan completed successfully', snapshot });
+    } catch (err) {
+        logger.error('Error in manual comprehensive scan:', err.message);
+        res.status(500).json({ error: 'Comprehensive scan failed: ' + err.message });
+    }
+};
+
+// EXPORT FOR CRON JOBS
+exports.internalRunProjectScan = internalRunProjectScan;

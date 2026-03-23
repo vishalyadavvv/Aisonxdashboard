@@ -61,13 +61,17 @@ const SnapshotSchema = new mongoose.Schema({
     sentiment: { type: String },
     fullResponse: { type: String }
   }],
-  technicalAudit: {
-    robotsValid: Boolean,
-    sitemapFound: Boolean,
-    schemaCount: Number,
-    pageSpeedScore: Number
-  },
-  summary: String,
+    technicalAudit: {
+      robotsValid: Boolean,
+      sitemapFound: Boolean,
+      schemaCount: Number,
+      pageSpeedScore: Number
+    },
+    domainSynthesis: { type: Object },
+    aiReadiness: { type: Object },
+    webMentions: { type: Object },
+    visibilityAudit: { type: Object },
+    summary: String,
   createdAt: {
     type: Date,
     default: Date.now
