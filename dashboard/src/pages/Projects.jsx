@@ -174,6 +174,13 @@ const Projects = () => {
     return 'text-slate-300';
   };
 
+  const projectLimit = 
+    tier === 'professional' ? 20 : 
+    tier === 'growth' ? 5 : 
+    tier === 'starter' ? 2 : 1; // none or missing tier = 1 (Free Trial)
+    
+  const isProjectLimitReached = projects.length >= projectLimit;
+
   return (
     <div className="min-h-screen bg-gray-50" id="projects-dashboard">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8">
@@ -207,8 +214,6 @@ const Projects = () => {
           )}
         </AnimatePresence>
         
-
-
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
@@ -216,14 +221,21 @@ const Projects = () => {
             <p className="text-sm text-slate-500 font-medium mt-1">Manage and monitor your brand visibility projects</p>
           </div>
           
-          <button 
-            onClick={() => setIsModalOpen(true)}
-            disabled={isExpired}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Plus className="w-4 h-4" />
-            {isExpired ? 'Upgrade to Create' : 'New Project'}
-          </button>
+          <div className="flex flex-col items-end">
+            <button 
+              onClick={() => setIsModalOpen(true)}
+              disabled={isExpired || isProjectLimitReached}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-bold rounded-lg hover:bg-blue-700 transition-all disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed shadow-md hover:shadow-lg active:scale-95"
+            >
+              <Plus className="w-4 h-4" />
+              {isExpired ? 'Upgrade to Create' : (isProjectLimitReached ? 'Limit Reached' : 'New Project')}
+            </button>
+            {isProjectLimitReached && !isExpired && (
+                <p className="text-[9px] text-amber-600 font-black uppercase mt-1 tracking-widest">
+                  {tier.toUpperCase()} PLAN LIMIT: {projectLimit} PROJECTS
+                </p>
+            )}
+          </div>
         </div>
 
         {/* Search Bar */}
@@ -278,51 +290,50 @@ const Projects = () => {
                 <div className="p-5">
                   {/* Header */}
                   <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center group-hover:bg-slate-200 transition-colors">
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center shrink-0">
                         <Globe className="w-5 h-5 text-slate-600" />
                       </div>
-                      <div>
-                        <h3 className="font-semibold text-slate-900 text-lg group-hover:text-blue-600 transition-colors">{project.name}</h3>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-semibold text-slate-900 text-base group-hover:text-blue-600 transition-colors truncate">{project.name}</h3>
                         <div className="flex items-center gap-2 mt-0.5">
-                          <div className="flex items-center gap-1">
-                            <Building2 className="w-3 h-3 text-slate-400" />
-                            <span className="text-xs text-slate-500 font-medium uppercase tracking-tight">{project.brandName}</span>
+                          <div className="flex items-center gap-1 min-w-0">
+                            <Building2 className="w-3 h-3 text-slate-400 shrink-0" />
+                            <span className="text-xs text-slate-500 font-medium uppercase tracking-tight truncate">{project.brandName}</span>
                           </div>
                           {project.competitors?.length > 0 && (
-                            <span className="px-1.5 py-0.5 bg-blue-50 text-blue-600 text-[8px] font-black rounded-full uppercase tracking-widest border border-blue-100">
+                            <span className="px-1.5 py-0.5 bg-blue-50 text-blue-600 text-[8px] font-black rounded-full uppercase tracking-widest border border-blue-100 shrink-0">
                               {project.competitors.length} RIVAL{project.competitors.length > 1 ? 'S' : ''}
                             </span>
                           )}
                         </div>
                       </div>
                     </div>
-                    
-                    {/* Menu Button */}
-                    <div className="flex items-center gap-4">
-                     {/* Score Gauge */}
-                    <div className="flex items-center gap-4">
-                      <div className="relative w-12 h-12">
-                        <svg className="w-12 h-12 -rotate-90" viewBox="0 0 100 100">
-                          <circle cx="50" cy="50" r="44" fill="none" stroke="#f1f5f9" strokeWidth="10" />
-                          <circle cx="50" cy="50" r="44" fill="none" stroke="#3b82f6" strokeWidth="10"
-                            strokeDasharray={`${2 * Math.PI * 44}`}
-                            strokeDashoffset={`${2 * Math.PI * 44 * (1 - (project.latestScore || 0) / 100)}`}
-                            strokeLinecap="round"
-                            className="transition-all duration-1000"
-                          />
-                        </svg>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-[10px] font-black text-slate-900">{(project.latestScore || 0)}%</span>
+                                        {/* Score Gauge + Menu */}
+                    <div className="flex items-center gap-3 shrink-0">
+                      {/* Score Gauge */}
+                      <div className="flex items-center gap-2">
+                        <div className="relative w-12 h-12">
+                          <svg className="w-12 h-12 -rotate-90" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="44" fill="none" stroke="#f1f5f9" strokeWidth="10" />
+                            <circle cx="50" cy="50" r="44" fill="none" stroke="#3b82f6" strokeWidth="10"
+                              strokeDasharray={`${2 * Math.PI * 44}`}
+                              strokeDashoffset={`${2 * Math.PI * 44 * (1 - (project.latestScore || 0) / 100)}`}
+                              strokeLinecap="round"
+                              className="transition-all duration-1000"
+                            />
+                          </svg>
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="text-[10px] font-black text-slate-900">{(project.latestScore || 0)}%</span>
+                          </div>
+                        </div>
+                        <div className="text-left hidden sm:block">
+                          <div className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none">
+                            GEO INDEX
+                          </div>
                         </div>
                       </div>
-                      <div className="text-left hidden sm:block">
-                        <div className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none">
-                          GEO INDEX
-                        </div>
-                      </div>
-                    </div>
-                      
+
                       {/* Menu Button */}
                       <div className="relative">
                         <button

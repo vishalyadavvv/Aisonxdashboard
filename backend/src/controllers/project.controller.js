@@ -7,16 +7,44 @@ const techAudit = require('../services/techAudit.service');
 const profilerService = require('../services/profiler.service');
 const aiReadinessService = require('../services/aiReadiness.service');
 const { runLiveAudit, profileAIInterceptor } = require('../services/ai_live/live.orchestrator');
+const { fetchKnowledgeGraphFull } = require('../services/externalEntity.service');
 const logger = require('../utils/logger');
+
+// ─── SCAN CONCURRENCY LIMITER ─────────────────────────────────────────────────
+// Prevents too many simultaneous API calls from crashing OpenAI/Gemini rate limits
+// Max 50 scans can run at the same time across ALL users.
+// ⚠️ WARNING: 50 concurrent scans require a high-tier OpenAI (Tier 5) / Gemini API Key.
+// On Tier 1 (Free/Basic), this will still result in 429 errors from the AI, even if the server is open.
+const MAX_CONCURRENT_SCANS = 50;
+let activeScans = 0;
+
+const acquireScanSlot = () => {
+    if (activeScans >= MAX_CONCURRENT_SCANS) return false;
+    activeScans++;
+    return true;
+};
+const releaseScanSlot = () => { if (activeScans > 0) activeScans--; };
+
+// Helper to get project limit by tier
+const getProjectLimit = (tier) => {
+    switch (tier) {
+        case 'professional': return 20;
+        case 'growth': return 5;
+        case 'starter': return 2;
+        default: return 1; // Free Trial (none)
+    }
+};
 
 // Helper to get prompt limit by tier
 const getPromptLimit = (tier) => {
     switch (tier) {
         case 'professional': return 25;
         case 'growth': return 10;
-        default: return 2;
+        case 'starter': return 2;
+        default: return 2; // Free Trial (none) gets 2 prompts
     }
 };
+
 
 // @desc    Create new project
 // @route   POST /api/projects
@@ -29,7 +57,17 @@ exports.createProject = async (req, res) => {
             return res.status(400).json({ error: 'Name, Brand Name, and Domain are required' });
         }
 
-        // Check Prompt Limits
+        // 1. Check Project Quantity Limits
+        const projectCount = await Project.countDocuments({ userId: req.user._id });
+        const projectLimit = getProjectLimit(req.user.subscription?.tier);
+        
+        if (projectCount >= projectLimit) {
+            return res.status(403).json({ 
+                error: `Project limit reached. Your ${req.user.subscription?.tier || 'Free'} plan allows only ${projectLimit} projects.` 
+            });
+        }
+
+        // 2. Check Prompt Limits
         const promptLimit = getPromptLimit(req.user.subscription?.tier);
         const prompts = Array.isArray(promptsInput) ? promptsInput : (promptsInput ? promptsInput.split(',').map(k => k.trim()).filter(Boolean) : []);
         
@@ -189,13 +227,23 @@ exports.getProjectHistory = async (req, res) => {
 // @route   POST /api/projects/:id/scan
 // @access  Private
 exports.runProjectScan = async (req, res) => {
+    // Check if scan slots are available
+    if (!acquireScanSlot()) {
+        return res.status(429).json({ 
+            error: 'System Busy',
+            message: 'Our AI systems are currently at capacity. Please wait 30-60 seconds and try again.'
+        });
+    }
+
     try {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            releaseScanSlot();
             return res.status(400).json({ error: 'Invalid project ID format' });
         }
         const project = await Project.findOne({ _id: req.params.id, userId: req.user._id });
 
         if (!project) {
+            releaseScanSlot();
             return res.status(404).json({ error: 'Project not found' });
         }
 
@@ -204,7 +252,9 @@ exports.runProjectScan = async (req, res) => {
         res.json({ message: 'Scan completed successfully' });
     } catch (err) {
         logger.error('Error running project scan:', err.message);
-        res.status(500).json({ error: 'Scan failed' });
+        res.status(500).json({ error: 'Scan failed', message: 'Something went wrong during the scan. Please try again.' });
+    } finally {
+        releaseScanSlot();
     }
 };
 
@@ -216,7 +266,7 @@ const internalRunProjectScan = async (project) => {
         // ---------------------------------------------------------
         // PHASE 1: Technical & Content Infrastructure (Parallel)
         // ---------------------------------------------------------
-        const [techResults, readinessResults, profilerContent] = await Promise.all([
+        const [techResults, readinessResults, profilerContent, brandAuditResults] = await Promise.all([
             // Technical check
             Promise.all([
                 techAudit.analyzeRobots(project.domain),
@@ -225,7 +275,9 @@ const internalRunProjectScan = async (project) => {
             // AI Readiness Audit
             aiReadinessService.analyzeWebsite(project.domain),
             // Fetch content for Profiler
-            profilerService.fetchWebsiteContent(project.domain)
+            profilerService.fetchWebsiteContent(project.domain),
+            // Brand Audit (Knowledge Graph)
+            fetchKnowledgeGraphFull(project.brandName || project.name)
         ]);
 
         const [robotsJson, sitemapJson] = techResults;
@@ -271,8 +323,13 @@ const internalRunProjectScan = async (project) => {
         ['openai', 'gemini', 'groq'].forEach(engine => {
             const engineRankings = scanResults.promptRankings.filter(r => r.engine === engine);
             if (engineRankings.length > 0) {
+                const negPhrases = ['not found', 'not visible', 'does not appear', 'does not rank', 'not organically visible', 'is not present', 'no mention'];
                 const validRankings = engineRankings.map(r => {
-                    const isFound = r.found || r.rank > 0 || (r.snippet && r.snippet.toLowerCase().includes(project.brandName.toLowerCase()));
+                    const snippetL = (r.snippet || '').toLowerCase();
+                    const brandL = project.brandName.toLowerCase();
+                    const isNeg = negPhrases.some(p => snippetL.includes(p));
+                    const snippetMatch = snippetL.includes(brandL) && !isNeg;
+                    const isFound = r.found || r.rank > 0 || snippetMatch;
                     if (isFound) foundPrompts.add(r.prompt);
                     let score = r.score || 0;
                     if (isFound && score < 60) score = 60;
@@ -288,8 +345,13 @@ const internalRunProjectScan = async (project) => {
         let totalWeightedScore = 0;
         let totalWeights = 0;
 
+        const negPhrasesOverall = ['not found', 'not visible', 'does not appear', 'does not rank', 'not organically visible', 'is not present', 'no mention'];
         scanResults.promptRankings.forEach(r => {
-            const isFound = r.found || r.rank > 0 || (r.snippet && r.snippet.toLowerCase().includes(project.brandName.toLowerCase()));
+            const snippetL = (r.snippet || '').toLowerCase();
+            const brandL = project.brandName.toLowerCase();
+            const isNeg = negPhrasesOverall.some(p => snippetL.includes(p));
+            const snippetMatch = snippetL.includes(brandL) && !isNeg;
+            const isFound = r.found || r.rank > 0 || snippetMatch;
             const score = isFound ? Math.max(r.score, 60) : (r.score || 0);
             const weight = isFound ? 2 : 1; // Double weight for "wins"
             
@@ -400,7 +462,8 @@ const internalRunProjectScan = async (project) => {
                 schemaCount: readinessResults.technicalSignals?.structuredData?.schemaTypes?.length || 0, 
                 pageSpeedScore: 0 
             },
-            summary: visibilityAudit.summary
+            summary: visibilityAudit.summary,
+            brandAudit: brandAuditResults || null
         });
 
         project.lastScanAt = new Date();

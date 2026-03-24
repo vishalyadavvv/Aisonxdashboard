@@ -80,7 +80,7 @@ const Pricing = () => {
   };
 
   const handlePlanAction = (planName) => {
-    if (user?.subscription?.trialUsed) {
+    if (user?.subscription?.trialUsed || planName !== 'Starter') {
       handleUpgrade(planName);
     } else {
       handleStartTrial(planName);
@@ -118,7 +118,7 @@ const Pricing = () => {
       price: 49,
       description: 'Growing Businesses',
       popular: true,
-      trial: '7-Day Free Trial',
+      trial: null,
       features: {
         'AI Engines Included': 'ChatGPT, Gemini, Google AI',
         'Regions Included': '1 Region',
@@ -141,7 +141,7 @@ const Pricing = () => {
       color: 'purple',
       price: 99,
       description: 'Agencies & Advanced Teams',
-      trial: '7-Day Free Trial',
+      trial: null,
       features: {
         'AI Engines Included': 'ChatGPT, Gemini, Perplexity, Claude & Google AI',
         'Regions Included': '1 Region',
@@ -213,9 +213,11 @@ const Pricing = () => {
                 </div>
                 <div className="flex items-center gap-2 mt-2">
                   <p className="text-xs text-slate-500 font-medium">{plan.description}</p>
-                  <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
-                    {plan.trial}
-                  </span>
+                  {plan.trial && (
+                    <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                      {plan.trial}
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -259,7 +261,7 @@ const Pricing = () => {
                   : ((user?.subscription?.promptsUsedThisMonth || 0) >= (plan.name.toLowerCase() === 'professional' ? 20 : (plan.name.toLowerCase() === 'growth' ? 15 : 10)) 
                       ? 'Recharge Plan' 
                       : 'Current Plan')
-              ) : user?.subscription?.trialUsed ? (
+              ) : (user?.subscription?.trialUsed || plan.name !== 'Starter') ? (
                 `Upgrade to ${plan.name}`
               ) : (
                 'Start 7-Day Free Trial'

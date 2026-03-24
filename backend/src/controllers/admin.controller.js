@@ -5,6 +5,7 @@ const AIVisibilityReport = require('../models/AIVisibilityReport');
 const ProfilerReport = require('../models/ProfilerReport');
 const ReadinessReport = require('../models/ReadinessReport');
 const WebsearchReport = require('../models/WebsearchReport');
+const logger = require('../utils/logger');
 
 exports.getAdminStats = async (req, res) => {
   try {
@@ -164,6 +165,29 @@ exports.updateUserSubscription = async (req, res) => {
   } catch (err) {
     res.status(400).json({
       status: 'fail',
+      message: err.message
+    });
+  }
+};
+const cronService = require('../services/cron.service');
+
+exports.triggerDailyScan = async (req, res) => {
+  try {
+    logger.info(`🛠️ [ADMIN-TRIGGER] Manual daily scan triggered by admin: ${req.user.email}`);
+    
+    // We don't await this because it can take a long time. 
+    // We fire it in the background and return a 202 Accepted.
+    cronService.runAllProjectScans().catch(err => {
+      logger.error('❌ [ADMIN-TRIGGER] Background daily scan failed:', err.message);
+    });
+
+    res.status(202).json({
+      status: 'success',
+      message: 'Daily scan master process has been triggered in the background.'
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
       message: err.message
     });
   }

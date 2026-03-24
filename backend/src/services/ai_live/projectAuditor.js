@@ -263,15 +263,35 @@ OUTPUT FORMAT (JSON ARRAY OF OBJECTS):
     `;
 
     logger.info(`🔄 [COMPETITIVE] GPT Batch Audit for ${brandName} vs rivals...`);
-    const res = await client.responses.create({
-      model: "gpt-4o",
-      tools: [{ type: "web_search" }],
-      input: prompt
-    });
-
-    const text = res.output_text || (res.choices && res.choices[0]?.message?.content) || (res.output && res.output.text) || '';
+    let text = '';
+    let retries = 3;
+    while (retries > 0) {
+      try {
+        const res = await client.responses.create({
+          model: "gpt-4o",
+          tools: [{ type: "web_search" }],
+          input: prompt
+        });
+        text = res.output_text || (res.choices && res.choices[0]?.message?.content) || (res.output && res.output.text) || '';
+        break; // Success
+      } catch (apiErr) {
+        retries--;
+        const isRateLimit = apiErr.status === 429 || (apiErr.message && apiErr.message.includes('429'));
+        if (retries > 0 && isRateLimit) {
+            logger.warn(`⚠️ OpenAI 429 Rate Limit hit. Retrying in 5 seconds... (${retries} retries left)`);
+            await new Promise(resolve => setTimeout(resolve, 5000));
+        } else {
+            logger.error(`❌ GPT Competitive Batch Audit API Error:`, apiErr.message);
+            return null; // Give up
+        }
+      }
+    }
+    
     const results = robustParseJSON(text);
-    if (!results) return null;
+    if (!results) {
+        logger.warn('ROBUST PARSE JSON FAILED TO PARSE:', text ? text.substring(0, 200) + '...' : 'empty string');
+        return null;
+    }
     results.forEach(r => {
       if (r.authoritySignals?.citations) {
         r.authoritySignals.citations = r.authoritySignals.citations.map(cleanUrl);

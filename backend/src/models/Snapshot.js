@@ -71,6 +71,7 @@ const SnapshotSchema = new mongoose.Schema({
     aiReadiness: { type: Object },
     webMentions: { type: Object },
     visibilityAudit: { type: Object },
+    brandAudit: { type: Object },
     summary: String,
   createdAt: {
     type: Date,

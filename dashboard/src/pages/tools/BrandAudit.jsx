@@ -6,7 +6,7 @@ import {
   ExternalLink, LineChart, Crown, Info, Trophy,
   AlertTriangle, ChevronRight, 
   Loader2, Mail, Phone, User, Building, Eye,
-  ArrowRight, ArrowLeft, CheckCircle2
+  ArrowRight, ArrowLeft, CheckCircle2, RefreshCw
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useProject } from '../../context/ProjectContext';
@@ -22,7 +22,7 @@ const CONFIG = {
 const BrandAudit = () => {
   const { projectId } = useParams();
   const { user } = useAuth();
-  const { project: contextProject } = useProject();
+  const { project: contextProject, history: contextHistory, loading: projectLoading } = useProject();
 
   const [input, setInput] = useState('');
   const [results, setResults] = useState(null);
@@ -31,12 +31,7 @@ const BrandAudit = () => {
   const [reports, setReports] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-
-  const [leadForm, setLeadForm] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    phone: '',
-  });
+  const [syncLoading, setSyncLoading] = useState(!!projectId);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -49,13 +44,12 @@ const BrandAudit = () => {
     setLoading(true);
     setResults(null);
     try {
-      const url = `https://kgsearch.googleapis.com/v1/entities:search?query=${encodeURIComponent(query)}&limit=10&key=${CONFIG.GOOGLE_API_KEY}`;
+      const url = `https://kgsearch.googleapis.com/v1/entities:search?query=${encodeURIComponent(query)}&limit=20&key=${CONFIG.GOOGLE_API_KEY}`;
       const response = await fetch(url);
       if (!response.ok) throw new Error(`Failed to fetch results (${response.status})`);
       const data = await response.json();
       setResults(data);
       
-      // Save report if results found
       if (data.itemListElement?.length > 0) {
         saveReport(query, data);
       }
@@ -74,17 +68,14 @@ const BrandAudit = () => {
         timestamp: new Date().toISOString(),
         topScore: Math.round(data.itemListElement?.[0]?.resultScore || 0),
         topEntity: data.itemListElement?.[0]?.result?.name || '',
-        data: data, // Store full results for instant viewing
+        data: data,
         id: Date.now()
       };
       
-      // In a real app, this would be an API call
-      // For now, we'll use localStorage to persist reports locally
       const existingReports = JSON.parse(localStorage.getItem('brand_audit_reports') || '[]');
-      const updatedReports = [reportData, ...existingReports].slice(0, 10);
+      const updatedReports = [reportData, ...existingReports].slice(0, 20);
       localStorage.setItem('brand_audit_reports', JSON.stringify(updatedReports));
       setReports(updatedReports);
-      toast.success('Report saved to history');
     } catch (error) {
       console.error('Failed to save report:', error);
     } finally {
@@ -92,14 +83,29 @@ const BrandAudit = () => {
     }
   };
 
+  // Load saved reports for standalone mode
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('brand_audit_reports') || '[]');
-    setReports(saved);
-  }, []);
+    if (!projectId) {
+      const saved = JSON.parse(localStorage.getItem('brand_audit_reports') || '[]');
+      setReports(saved);
+    }
+  }, [projectId]);
 
-
-
-
+  // PROJECT MODE: Read from snapshot data (same pattern as AIVisibilityAudit)
+  useEffect(() => {
+    if (projectId) {
+      if (contextHistory && contextHistory.length > 0) {
+        const latest = contextHistory[0];
+        if (latest.brandAudit) {
+          setResults(latest.brandAudit);
+          setPendingQuery(latest.brandAudit.query || contextProject?.brandName || '');
+        } else {
+          setResults(null);
+        }
+      }
+      setSyncLoading(false);
+    }
+  }, [projectId, contextHistory]);
 
   const cleanId = (id) => id?.startsWith('kg:') ? id.substring(3) : id;
 
@@ -110,6 +116,237 @@ const BrandAudit = () => {
     try { return new URL(url).hostname.replace('www.', ''); } catch { return url; }
   };
 
+  // ─── PROJECT MODE: SYNC LOADING ────────────────────────────
+  if (projectId && (syncLoading || projectLoading) && !results) {
+    return (
+      <div className="flex flex-col items-center justify-center py-40">
+        <div className="w-16 h-16 bg-indigo-500/10 rounded-3xl flex items-center justify-center mb-6 relative">
+          <RefreshCw className="w-8 h-8 text-indigo-600 animate-spin" />
+          <div className="absolute inset-0 bg-indigo-500/20 rounded-3xl animate-ping opacity-20" />
+        </div>
+        <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter mb-2 text-center">Synchronizing Intelligence</h2>
+        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] text-center">Loading brand audit data...</p>
+      </div>
+    );
+  }
+
+  // ─── PROJECT MODE: RESULTS VIEW (No search bar) ────────────
+  if (projectId && results) {
+    const entities = results.entities || [];
+    const brandName = contextProject?.brandName || contextProject?.name || results.query || '';
+
+    return (
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8" id="brand-audit-results">
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 text-sm text-gray-400 mb-6 pt-6">
+          <Link to="/dashboard" className="hover:text-gray-600 transition-colors">Dashboard</Link>
+          <span>›</span>
+          <span className="text-gray-400">AI Module</span>
+          <span>›</span>
+          <span className="text-gray-600 font-medium">Brand Audit</span>
+        </div>
+
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="bg-[#1a202c] text-white p-8 rounded-2xl mb-8 relative overflow-hidden"
+        >
+          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] -mr-32 -mt-32" />
+          <div className="relative z-10 flex items-start justify-between">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 text-[10px] font-bold uppercase tracking-widest mb-4">
+                <Fingerprint className="w-3 h-3" /> Knowledge Graph Synced
+              </div>
+              <h1 className="text-3xl font-black mb-2 tracking-tight">Brand Audit Report</h1>
+              <p className="text-slate-400 text-sm font-medium">
+                Google Knowledge Graph analysis for <span className="text-white font-bold">{brandName}</span> · {entities.length} {entities.length === 1 ? 'entity' : 'entities'} found
+              </p>
+            </div>
+            <button 
+              onClick={() => downloadPDF('brand-audit-results', `Brand_Audit_${brandName}`)}
+              className="flex items-center gap-2 bg-white text-[#1a202c] px-6 py-3 rounded-xl text-sm font-bold hover:bg-gray-100 transition-all active:scale-95 shrink-0"
+            >
+              <FileDown className="w-4 h-4" /> Export PDF
+            </button>
+          </div>
+        </motion.div>
+
+        {/* Results */}
+        {entities.length > 0 ? (
+          <div className="space-y-4">
+            {entities.map((entity, idx) => (
+              <motion.div 
+                key={idx}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.08 }}
+                className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm relative overflow-hidden group"
+              >
+                <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-[80px] -mr-32 -mt-32" />
+                
+                <div className="flex flex-col md:flex-row gap-6 mb-6 relative z-10">
+                  {entity.image && (
+                    <div className="shrink-0 self-center md:self-start">
+                      <img 
+                        src={entity.image} 
+                        alt={entity.name}
+                        className="w-24 h-24 rounded-2xl object-cover border border-gray-100 shadow-md"
+                      />
+                    </div>
+                  )}
+                  <div className="flex-1 text-center md:text-left">
+                    <div className="inline-block px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-widest rounded-lg mb-3">
+                      {entity.types?.[0] || 'Entity'}
+                    </div>
+                    <h2 className="text-2xl font-black text-slate-900 mb-1 tracking-tight">{entity.name}</h2>
+                    <p className="text-gray-400 font-bold text-sm mb-4 italic">{entity.description || 'Google Knowledge Graph Entry'}</p>
+                    
+                    <div className="flex flex-wrap justify-center md:justify-start gap-3">
+                      <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 border border-emerald-100 text-emerald-600 rounded-xl text-xs font-black uppercase tracking-tighter">
+                        <LineChart className="w-4 h-4" /> Confidence: {entity.confidenceScore || 0}
+                      </div>
+                      {entity.kgId && (
+                        <a 
+                          href={`https://www.google.com/search?kgmid=${entity.kgId}`} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 px-4 py-2 bg-gray-50 border border-indigo-100 hover:border-indigo-300 text-indigo-600 rounded-xl text-[10px] font-black uppercase tracking-tighter transition-all hover:bg-white"
+                        >
+                          <Fingerprint className="w-4 h-4" /> ID: {entity.kgId}
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {entity.detailedDescription && (
+                  <div className="bg-gray-50 border border-gray-100 rounded-2xl p-6 mb-6 relative z-10">
+                    <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-3">Entity Synthesis</div>
+                    <p className="text-[13px] text-gray-600 leading-relaxed font-medium">
+                      {truncate(entity.detailedDescription, 400)}
+                    </p>
+                    {entity.descriptionUrl && (
+                      <a href={entity.descriptionUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 mt-4 text-[10px] font-black text-indigo-600 uppercase tracking-widest hover:text-indigo-800 transition-colors">
+                        Read Full Article <ExternalLink className="w-3 h-3" />
+                      </a>
+                    )}
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
+                  {entity.kgId && (
+                    <a 
+                      href={`https://www.google.com/search?kgmid=${entity.kgId}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="px-5 py-4 bg-white border border-gray-100 rounded-2xl hover:border-indigo-200 hover:shadow-md transition-all flex items-center gap-4 group/link shadow-sm"
+                    >
+                      <div className="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600 group-hover/link:scale-110 transition-transform">
+                        <Globe className="w-5 h-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Search Result</p>
+                        <p className="text-xs font-bold text-gray-700 truncate">Google Search Node</p>
+                      </div>
+                      <ExternalLink className="w-4 h-4 ml-auto text-gray-300 group-hover/link:text-indigo-600 transition-colors" />
+                    </a>
+                  )}
+                  {entity.url && (
+                    <a 
+                      href={entity.url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="px-5 py-4 bg-white border border-gray-100 rounded-2xl hover:border-indigo-200 hover:shadow-md transition-all flex items-center gap-4 group/link shadow-sm"
+                    >
+                      <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 group-hover/link:scale-110 transition-transform">
+                        <Globe className="w-5 h-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Official Site</p>
+                        <p className="text-xs font-bold text-gray-700 truncate">{getDomain(entity.url)}</p>
+                      </div>
+                      <ExternalLink className="w-4 h-4 ml-auto text-gray-300 group-hover/link:text-indigo-600 transition-colors" />
+                    </a>
+                  )}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center shadow-sm">
+            <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Fingerprint className="w-8 h-8 text-slate-300" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 mb-2">No Knowledge Graph Data</h3>
+            <p className="text-sm text-slate-500 font-medium max-w-md mx-auto">
+              No entities were found for <span className="font-bold text-slate-700">{brandName}</span> in the Google Knowledge Graph. Run a <span className="font-bold">Comprehensive Scan</span> from the project dashboard to generate this data.
+            </p>
+          </div>
+        )}
+
+        {/* Info Grid */}
+        <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { icon: User, label: 'About You', desc: 'Identity check', color: 'bg-blue-50 text-blue-600' },
+            { icon: Building, label: 'Your Brand', desc: 'Brand recognition', color: 'bg-emerald-50 text-emerald-600' },
+            { icon: LineChart, label: 'Authority', desc: 'Brand ranking', color: 'bg-purple-50 text-purple-600' },
+            { icon: Eye, label: 'Visibility', desc: 'Search presence', color: 'bg-indigo-50 text-indigo-600' }
+          ].map((item, i) => (
+            <div key={i} className="p-6 bg-white border border-gray-100 rounded-2xl text-center hover:border-indigo-200 transition-all shadow-sm group hover:-translate-y-1">
+              <div className={`w-12 h-12 mx-auto mb-4 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 ${item.color}`}>
+                <item.icon className="w-6 h-6" />
+              </div>
+              <h4 className="font-black text-gray-900 mb-1 uppercase tracking-tight text-sm">{item.label}</h4>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // ─── PROJECT MODE: No Data ─────────────────────────────────
+  if (projectId && !results && !syncLoading) {
+    return (
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-2 text-sm text-gray-400 mb-6 pt-6">
+          <Link to="/dashboard" className="hover:text-gray-600 transition-colors">Dashboard</Link>
+          <span>›</span>
+          <span className="text-gray-400">AI Module</span>
+          <span>›</span>
+          <span className="text-gray-600 font-medium">Brand Audit</span>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-[#1a202c] text-white p-8 rounded-2xl mb-8 relative overflow-hidden"
+        >
+          <div className="relative z-10">
+            <h1 className="text-3xl font-black mb-2 tracking-tight">Brand Audit</h1>
+            <p className="text-slate-400 text-sm font-medium">
+              Google Knowledge Graph analysis for <span className="text-white font-bold">{contextProject?.brandName || contextProject?.name || 'your brand'}</span>
+            </p>
+          </div>
+          <div className="mt-6 bg-slate-700/50 border border-slate-600 rounded-2xl p-6 flex items-center gap-4">
+            <div className="w-10 h-10 bg-slate-600 rounded-xl flex items-center justify-center shrink-0">
+              <Fingerprint className="w-5 h-5 text-slate-400" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-slate-300">No Data Available</h4>
+              <p className="text-xs text-slate-500 font-medium">
+                Run a <span className="text-indigo-400 font-bold">Comprehensive Scan</span> from the Project Overview to generate Brand Audit data.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // ─── STANDALONE MODE: Full search UI (when not in a project) ──────
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
@@ -293,8 +530,6 @@ const BrandAudit = () => {
                             </a>
                           )}
                         </div>
-
-
                       </div>
                     </div>
 
@@ -425,7 +660,6 @@ const BrandAudit = () => {
                                      setPendingQuery(report.query);
                                      setInput(report.query);
                                    } else {
-                                     // Fallback for old reports without stored data
                                      setInput(report.query);
                                      performSearch(report.query);
                                    }
@@ -463,12 +697,6 @@ const BrandAudit = () => {
             </div>
           ))}
         </div>
-
-       
-
-
-
-
     </div>
   );
 };

@@ -386,3 +386,6 @@
 })();
 </script>
 
+<!-- Page Wrapper -->
+<div id="page" class="site">
+    <div id="content" class="site-content">

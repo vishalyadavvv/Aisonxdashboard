@@ -1,0 +1,2912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>AISONX – AI Search Optimization & Brand Visibility for Modern Businesses</title>
+
+<meta
+  name="description"
+  content="AISONX helps brands get discovered inside AI search results like ChatGPT, Gemini, and Google AI Overviews through advanced AI search optimization and visibility strategies."
+/>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+       
+        
+        /* CSS Variables */
+        :root {
+            --aisonx-primary: #6366f1;
+            --aisonx-primary-dark: #4f46e5;
+            --aisonx-secondary: #8b5cf6;
+            --aisonx-accent: #06b6d4;
+            --aisonx-success: #10b981;
+            --aisonx-warning: #f59e0b;
+            --aisonx-danger: #ef4444;
+            --aisonx-dark: #0f172a;
+            --aisonx-dark-light: #1e293b;
+            --aisonx-gray: #64748b;
+            --aisonx-light: #f1f5f9;
+            --aisonx-white: #ffffff;
+            --aisonx-gradient-1: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%);
+            --aisonx-gradient-2: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --aisonx-gradient-3: linear-gradient(135deg, #06b6d4 0%, #10b981 100%);
+            --aisonx-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --aisonx-shadow-sm: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            --aisonx-radius: 16px;
+            --aisonx-radius-sm: 8px;
+            --aisonx-transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Reset for AISONX section */
+        .aisonx-wrapper * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .aisonx-wrapper {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--aisonx-dark);
+            overflow-x: hidden;
+            background: var(--aisonx-white);
+        }
+
+        .aisonx-wrapper h1,
+        .aisonx-wrapper h2,
+        .aisonx-wrapper h3,
+        .aisonx-wrapper h4,
+        .aisonx-wrapper h5,
+        .aisonx-wrapper h6 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        /* Utility Classes */
+        .aisonx-container {
+            max-width: 1200px; /* Standardize content width */
+            margin: 0 auto;
+            padding: 0 24px;
+            width: 100%;
+        }
+
+        /* WordPress Full-Width Breakout Utility */
+        .aisonx-full-width {
+            width: 100vw;
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
+        }
+
+        .aisonx-section {
+            padding: 55px 0;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .aisonx-section-compact {
+            padding: 40px 0;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .aisonx-section-dark {
+            background: var(--aisonx-gradient-2);
+            color: var(--aisonx-white);
+        }
+
+        .aisonx-section-gradient {
+            background: var(--aisonx-gradient-1);
+            color: var(--aisonx-white);
+        }
+
+        .aisonx-section-light {
+            background: var(--aisonx-light);
+        }
+
+        .aisonx-text-center {
+            text-align: center;
+        }
+
+        .aisonx-text-gradient {
+            background: var(--aisonx-gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Animations */
+        @keyframes aisonxFadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes aisonxFadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes aisonxFadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes aisonxFadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes aisonxFloat {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        @keyframes aisonxPulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes aisonxRotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes aisonxGlow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(99, 102, 241, 0.6);
+            }
+        }
+
+        @keyframes aisonxSlideIn {
+            from {
+                transform: translateX(-100%);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes aisonxScaleIn {
+            from {
+                transform: scale(1.05);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes aisonxBounce {
+            0%, 20%, 53%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40%, 43% {
+                transform: translateY(-20px);
+            }
+            70% {
+                transform: translateY(-10px);
+            }
+            90% {
+                transform: translateY(-4px);
+            }
+        }
+
+        @keyframes aisonxShimmer {
+            0% {
+                background-position: -200% 0;
+            }
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        @keyframes aisonxTypewriter {
+            from {
+                width: 0;
+            }
+            to {
+                width: 100%;
+            }
+        }
+
+        .aisonx-animate-fadeInUp {
+            animation: aisonxFadeInUp 0.8s ease-out forwards;
+        }
+
+        .aisonx-animate-fadeInDown {
+            animation: aisonxFadeInDown 0.8s ease-out forwards;
+        }
+
+        .aisonx-animate-fadeInLeft {
+            animation: aisonxFadeInLeft 0.8s ease-out forwards;
+        }
+
+        .aisonx-animate-fadeInRight {
+            animation: aisonxFadeInRight 0.8s ease-out forwards;
+        }
+
+        .aisonx-animate-float {
+            animation: aisonxFloat 6s ease-in-out infinite;
+        }
+
+        .aisonx-animate-pulse {
+            animation: aisonxPulse 2s ease-in-out infinite;
+        }
+
+        .aisonx-animate-glow {
+            animation: aisonxGlow 2s ease-in-out infinite;
+        }
+
+        .aisonx-delay-1 { animation-delay: 0.1s; }
+        .aisonx-delay-2 { animation-delay: 0.2s; }
+        .aisonx-delay-3 { animation-delay: 0.3s; }
+        .aisonx-delay-4 { animation-delay: 0.4s; }
+        .aisonx-delay-5 { animation-delay: 0.5s; }
+
+        /* Navigation */
+        .aisonx-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            padding: 20px 0;
+            transition: var(--aisonx-transition);
+            background: transparent;
+        }
+
+        .aisonx-nav-scrolled {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            box-shadow: var(--aisonx-shadow-sm);
+            padding: 15px 0;
+        }
+
+        .aisonx-nav-scrolled .aisonx-mobile-toggle span {
+            background: var(--aisonx-white);
+        }
+
+        .aisonx-nav-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .aisonx-logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            text-decoration: none;
+            color: var(--aisonx-white);
+        }
+
+        .aisonx-nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+
+        .aisonx-nav-links a {
+            text-decoration: none;
+            color: var(--aisonx-white);
+            font-weight: 500;
+            font-size: 15px;
+            transition: var(--aisonx-transition);
+            position: relative;
+        }
+
+        .aisonx-nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--aisonx-gradient-1);
+            transition: var(--aisonx-transition);
+        }
+
+        .aisonx-nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .aisonx-nav-links a:hover {
+            color: var(--aisonx-accent);
+        }
+
+        .aisonx-nav-cta {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .aisonx-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 15px;
+            text-decoration: none;
+            transition: var(--aisonx-transition);
+            cursor: pointer;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .aisonx-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: var(--aisonx-transition);
+        }
+
+        .aisonx-btn:hover::before {
+            left: 100%;
+        }
+
+        .aisonx-btn-primary {
+            background: var(--aisonx-gradient-1);
+            color: var(--aisonx-white);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        }
+
+        .aisonx-btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.5);
+        }
+
+        .aisonx-btn-secondary {
+            background: transparent;
+            color: var(--aisonx-white);
+            border: 2px solid var(--aisonx-white);
+        }
+
+        .aisonx-btn-secondary:hover {
+            background: var(--aisonx-white);
+            color: var(--aisonx-dark);
+            transform: translateY(-3px);
+        }
+
+        .aisonx-btn-white {
+            background: var(--aisonx-white);
+            color: var(--aisonx-primary);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .aisonx-btn-white:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .aisonx-btn-large {
+            padding: 18px 40px;
+            font-size: 17px;
+        }
+
+        .aisonx-mobile-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        .aisonx-mobile-toggle span {
+            width: 25px;
+            height: 3px;
+            background: var(--aisonx-white);
+            border-radius: 3px;
+            transition: var(--aisonx-transition);
+        }
+
+        /* Hero Section */
+        .aisonx-hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 100px 0 40px;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.9) 100%);
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .aisonx-hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+            z-index: 0;
+            background-image: url('https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1920&h=1080&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0;
+            animation: aisonxScaleIn 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            will-change: transform, opacity;
+        }
+
+        .aisonx-hero-bg::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.9) 100%);
+            z-index: 1;
+        }
+
+        .aisonx-hero-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(99, 102, 241, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 2;
+        }
+
+        .aisonx-hero-content {
+            position: relative;
+            z-index: 3;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            text-align: center;
+            padding: 0;
+            will-change: transform, opacity;
+        }
+
+        .aisonx-hero-text {
+            display: block;
+        }
+
+        .aisonx-hero-text-content {
+            margin-bottom: 25px;
+        }
+
+        .aisonx-hero-visual {
+            display: none; /* Hide the separate image element */
+        }
+
+        .aisonx-hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(99, 102, 241, 0.2);
+            padding: 10px 20px;
+            border-radius: 50px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            animation: aisonxFadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.2s forwards;
+        }
+
+        .aisonx-hero-badge-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--aisonx-success);
+            border-radius: 50%;
+            animation: aisonxPulse 1.5s ease-in-out infinite;
+        }
+
+        .aisonx-hero-badge-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--aisonx-white);
+        }
+
+        .aisonx-hero-title {
+            font-size: clamp(36px, 5.5vw, 64px);
+            margin-bottom: 15px;
+            line-height: 1.15;
+            color: var(--aisonx-white);
+            opacity: 0;
+            animation: aisonxFadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.4s forwards;
+        }
+
+        .aisonx-hero-subtitle {
+            font-size: clamp(18px, 2.2vw, 24px);
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 12px;
+            line-height: 1.6;
+            font-weight: 500;
+            opacity: 0;
+            animation: aisonxFadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.6s forwards;
+        }
+
+        .aisonx-hero-description {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 12px;
+            line-height: 1.7;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            opacity: 0;
+            animation: aisonxFadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.8s forwards;
+        }
+
+        .aisonx-hero-description:last-of-type {
+            margin-bottom: 20px;
+        }
+
+        .aisonx-hero-platforms {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+            padding: 0 15px;
+            opacity: 0;
+            animation: aisonxFadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 1s forwards;
+        }
+
+        .aisonx-platform-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--aisonx-white);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: var(--aisonx-transition);
+        }
+
+        .aisonx-platform-tag:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .aisonx-platform-tag i {
+            color: var(--aisonx-accent);
+        }
+
+        .aisonx-hero-cta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+            padding: 0 15px;
+            opacity: 0;
+            animation: aisonxFadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 1.2s forwards;
+        }
+
+        .aisonx-hero-visual {
+            position: relative;
+            opacity: 0;
+            animation: aisonxFadeInRight 1s ease-out 0.5s forwards;
+        }
+
+        .aisonx-hero-image-wrapper {
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--aisonx-shadow);
+        }
+
+        .aisonx-hero-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            border-radius: 24px;
+            transition: var(--aisonx-transition);
+        }
+
+        .aisonx-hero-image:hover {
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .aisonx-hero-floating-card {
+            position: absolute;
+            background: var(--aisonx-white);
+            border-radius: var(--aisonx-radius);
+            padding: 20px;
+            box-shadow: var(--aisonx-shadow);
+            animation: aisonxFloat 4s ease-in-out infinite;
+        }
+
+        .aisonx-hero-card-1 {
+            top: 20px;
+            left: -40px;
+            animation-delay: 0s;
+        }
+
+        .aisonx-hero-card-2 {
+            bottom: 40px;
+            right: -40px;
+            animation-delay: 1s;
+        }
+
+        .aisonx-hero-card-3 {
+            top: 50%;
+            right: -60px;
+            animation-delay: 2s;
+        }
+
+        .aisonx-floating-stat {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .aisonx-floating-stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--aisonx-white);
+        }
+
+        .aisonx-floating-stat-icon.aisonx-icon-purple {
+            background: var(--aisonx-gradient-1);
+        }
+
+        .aisonx-floating-stat-icon.aisonx-icon-green {
+            background: var(--aisonx-gradient-3);
+        }
+
+        .aisonx-floating-stat-icon.aisonx-icon-blue {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+
+        .aisonx-floating-stat-content h4 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--aisonx-dark);
+            margin-bottom: 2px;
+        }
+
+        .aisonx-floating-stat-content p {
+            font-size: 13px;
+            color: var(--aisonx-gray);
+        }
+
+        /* Stats Section */
+        .aisonx-stats-heading {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+.aisonx-stats-heading h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+        .aisonx-stats {
+            padding: 70px 0;
+            background: var(--aisonx-white);
+            position: relative;
+        }
+
+        .aisonx-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+        }
+
+        .aisonx-stat-card {
+            text-align: center;
+            padding: 40px 30px;
+            background: var(--aisonx-white);
+            border-radius: var(--aisonx-radius);
+            box-shadow: var(--aisonx-shadow-sm);
+            transition: var(--aisonx-transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .aisonx-stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--aisonx-gradient-1);
+            transform: scaleX(0);
+            transition: var(--aisonx-transition);
+        }
+
+        .aisonx-stat-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .aisonx-stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--aisonx-shadow);
+        }
+
+        .aisonx-stat-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--aisonx-primary);
+        }
+
+        .aisonx-stat-number {
+            font-size: 48px;
+            font-weight: 800;
+            background: var(--aisonx-gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+        }
+
+        .aisonx-stat-label {
+            font-size: 16px;
+            color: var(--aisonx-gray);
+            font-weight: 500;
+        }
+
+        /* Why AI Visibility Section */
+        .aisonx-why {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .aisonx-why-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 45px;
+            align-items: center;
+        }
+
+        .aisonx-why-text h2 {
+            font-size: clamp(32px, 4vw, 48px);
+            margin-bottom: 24px;
+        }
+
+        .aisonx-why-text h3 {
+            font-size: 24px;
+            color: var(--aisonx-primary);
+            margin-bottom: 20px;
+        }
+
+        .aisonx-why-text p {
+            font-size: 18px;
+            color: var(--aisonx-gray);
+            margin-bottom: 24px;
+            line-height: 1.8;
+        }
+
+        .aisonx-highlight-box {
+            background: rgba(99, 102, 241, 0.1);
+            border-left: 4px solid var(--aisonx-primary);
+            padding: 25px 30px;
+            border-radius: 0 var(--aisonx-radius) var(--aisonx-radius) 0;
+            margin: 30px 0;
+        }
+
+        .aisonx-highlight-box p {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--aisonx-dark);
+            margin: 0;
+        }
+
+        .aisonx-shift-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .aisonx-shift-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 17px;
+            color: var(--aisonx-dark);
+        }
+
+        .aisonx-shift-item i {
+            color: var(--aisonx-success);
+            font-size: 20px;
+        }
+
+        .aisonx-why-visual {
+            position: relative;
+        }
+
+        .aisonx-why-image {
+            border-radius: var(--aisonx-radius);
+            box-shadow: var(--aisonx-shadow);
+            width: 100%;
+            transition: var(--aisonx-transition);
+        }
+
+        .aisonx-why-image:hover {
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Features Section */
+        .aisonx-features {
+            background: var(--aisonx-light);
+        }
+
+        .aisonx-section-header {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 50px;
+        }
+
+        .aisonx-section-header h2 {
+            font-size: clamp(32px, 4vw, 48px);
+            margin-bottom: 20px;
+        }
+
+        .aisonx-section-header p {
+            font-size: 18px;
+            color: var(--aisonx-gray);
+            line-height: 1.7;
+        }
+
+        .aisonx-features-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+        }
+
+        .aisonx-feature-card {
+            background: var(--aisonx-white);
+            border-radius: var(--aisonx-radius);
+            padding: 40px 30px;
+            text-align: center;
+            transition: var(--aisonx-transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .aisonx-feature-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 0;
+            background: var(--aisonx-gradient-1);
+            opacity: 0.1;
+            transition: var(--aisonx-transition);
+        }
+
+        .aisonx-feature-card:hover::after {
+            height: 100%;
+        }
+
+        .aisonx-feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--aisonx-shadow);
+        }
+
+        .aisonx-feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            background: var(--aisonx-gradient-1);
+            color: var(--aisonx-white);
+            position: relative;
+            z-index: 1;
+        }
+
+        .aisonx-feature-card h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .aisonx-feature-card p {
+            font-size: 15px;
+            color: var(--aisonx-gray);
+            line-height: 1.7;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Powerful Features Section */
+        .aisonx-powerful {
+            background: var(--aisonx-gradient-2);
+            color: var(--aisonx-white);
+        }
+
+        .aisonx-powerful-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .aisonx-powerful-header h2 {
+            font-size: clamp(32px, 4vw, 48px);
+            margin-bottom: 15px;
+        }
+
+        .aisonx-powerful-header p {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .aisonx-powerful-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+        }
+
+        .aisonx-powerful-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--aisonx-radius);
+            padding: 40px;
+            transition: var(--aisonx-transition);
+        }
+
+        .aisonx-powerful-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-10px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .aisonx-powerful-card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            background: var(--aisonx-gradient-1);
+            margin-bottom: 24px;
+        }
+
+        .aisonx-powerful-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .aisonx-powerful-card p {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.7;
+        }
+
+
+        /* AI Score Section */
+        .aisonx-score {
+            background: var(--aisonx-gradient-1);
+            color: var(--aisonx-white);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .aisonx-score::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .aisonx-score-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .aisonx-score h2 {
+            font-size: clamp(32px, 4vw, 48px);
+            margin-bottom: 20px;
+        }
+
+        .aisonx-score-subtitle {
+            font-size: 20px;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .aisonx-score-platforms {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .aisonx-score-platform {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: var(--aisonx-transition);
+        }
+
+        .aisonx-score-platform:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-3px);
+        }
+
+        .aisonx-score-time {
+            font-size: 18px;
+            opacity: 0.8;
+            margin-bottom: 40px;
+        }
+
+        /* Two Ways Section */
+        .aisonx-ways {
+            background: var(--aisonx-light);
+        }
+
+        .aisonx-ways-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .aisonx-ways-text h2 {
+            font-size: clamp(28px, 3.5vw, 42px);
+            margin-bottom: 15px;
+        }
+
+        .aisonx-ways-text h3 {
+            font-size: 22px;
+            color: var(--aisonx-primary);
+            margin-bottom: 30px;
+        }
+
+        .aisonx-ways-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .aisonx-way-card {
+            background: var(--aisonx-white);
+            border-radius: var(--aisonx-radius);
+            padding: 20px 15px;
+            text-align: center;
+            box-shadow: var(--aisonx-shadow-sm);
+            transition: var(--aisonx-transition);
+        }
+
+        .aisonx-way-card h4 {
+            font-size: 18px;
+            margin-bottom: 5px;
+            color: var(--aisonx-primary);
+        }
+
+        .aisonx-way-card p {
+            font-size: 14px;
+            color: var(--aisonx-gray);
+        }
+
+        .aisonx-way-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--aisonx-shadow);
+        }
+
+        .aisonx-way-card h4 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: var(--aisonx-primary);
+        }
+
+        .aisonx-way-card p {
+            font-size: 15px;
+            color: var(--aisonx-gray);
+        }
+
+        .aisonx-ways-highlight {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%);
+            border: 2px solid var(--aisonx-primary);
+            border-radius: var(--aisonx-radius);
+            padding: 20px;
+            margin-top: 25px;
+        }
+
+        .aisonx-ways-highlight p {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--aisonx-dark);
+            margin: 0;
+        }
+
+        .aisonx-ways-image {
+            border-radius: var(--aisonx-radius);
+            box-shadow: var(--aisonx-shadow);
+            width: 100%;
+            transition: var(--aisonx-transition);
+        }
+
+        .aisonx-ways-image:hover {
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Problems Section */
+        .aisonx-problems {
+            background: var(--aisonx-dark);
+            color: var(--aisonx-white);
+        }
+
+        .aisonx-problems-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .aisonx-problems-header h2 {
+            font-size: clamp(32px, 4vw, 48px);
+            margin-bottom: 10px;
+        }
+
+        .aisonx-problems-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+        }
+
+        .aisonx-problem-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--aisonx-radius);
+            padding: 35px 25px;
+            text-align: center;
+            transition: var(--aisonx-transition);
+        }
+
+        .aisonx-problem-card:hover {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: var(--aisonx-danger);
+            transform: translateY(-5px);
+        }
+
+        .aisonx-problem-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--aisonx-danger);
+        }
+
+        .aisonx-problem-card h3 {
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .aisonx-problem-card p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.6;
+        }
+
+        /* Solutions Section */
+        .aisonx-solutions {
+            background: var(--aisonx-white);
+        }
+
+        .aisonx-solutions-content {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+        }
+
+        .aisonx-solution-card {
+            text-align: center;
+            padding: 50px 35px;
+            border-radius: var(--aisonx-radius);
+            background: var(--aisonx-gradient-1);
+            color: var(--aisonx-white);
+            transition: var(--aisonx-transition);
+        }
+
+        .aisonx-solution-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(99, 102, 241, 0.4);
+        }
+
+        .aisonx-solution-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .aisonx-solution-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .aisonx-solution-card p {
+            font-size: 16px;
+            opacity: 0.9;
+            line-height: 1.7;
+        }
+
+        /* Expertise Section */
+        .aisonx-expertise {
+            background: var(--aisonx-light);
+        }
+
+        .aisonx-expertise-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+        }
+
+        .aisonx-expertise-card {
+            background: var(--aisonx-white);
+            border-radius: var(--aisonx-radius);
+            padding: 40px 30px;
+            text-align: center;
+            transition: var(--aisonx-transition);
+            border: 2px solid transparent;
+        }
+
+        .aisonx-expertise-card:hover {
+            border-color: var(--aisonx-primary);
+            transform: translateY(-5px);
+            box-shadow: var(--aisonx-shadow-sm);
+        }
+
+        .aisonx-expertise-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 24px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--aisonx-primary);
+            transition: var(--aisonx-transition);
+        }
+
+        .aisonx-expertise-card:hover .aisonx-expertise-icon {
+            background: var(--aisonx-gradient-1);
+            color: var(--aisonx-white);
+        }
+
+        .aisonx-expertise-card h3 {
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .aisonx-expertise-card p {
+            font-size: 14px;
+            color: var(--aisonx-gray);
+            line-height: 1.6;
+        }
+
+        /* Industries Section */
+        .aisonx-industries {
+            background: var(--aisonx-gradient-2);
+            color: var(--aisonx-white);
+        }
+
+        .aisonx-industries-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .aisonx-industries-header h2 {
+            font-size: clamp(32px, 4vw, 48px);
+            margin-bottom: 15px;
+        }
+
+        .aisonx-industries-header p {
+            font-size: 18px;
+            opacity: 0.8;
+        }
+
+        .aisonx-industries-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .aisonx-industry-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 500;
+            transition: var(--aisonx-transition);
+        }
+
+        .aisonx-industry-tag:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .aisonx-industry-tag i {
+            font-size: 18px;
+            color: var(--aisonx-accent);
+        }
+
+        /* Blue Ocean Section */
+        .aisonx-blueocean {
+            background: var(--aisonx-white);
+        }
+
+        .aisonx-blueocean-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 45px;
+            align-items: center;
+        }
+
+        .aisonx-blueocean-text h2 {
+            font-size: clamp(32px, 4vw, 48px);
+            margin-bottom: 24px;
+        }
+
+        .aisonx-blueocean-text h3 {
+            font-size: 24px;
+            color: var(--aisonx-primary);
+            margin-bottom: 20px;
+        }
+
+        .aisonx-blueocean-text p {
+            font-size: 18px;
+            color: var(--aisonx-gray);
+            margin-bottom: 24px;
+            line-height: 1.8;
+        }
+
+        .aisonx-blueocean-stat {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(99, 102, 241, 0.1);
+            padding: 15px 25px;
+            border-radius: var(--aisonx-radius);
+            margin-top: 20px;
+        }
+
+        .aisonx-blueocean-stat i {
+            font-size: 24px;
+            color: var(--aisonx-primary);
+        }
+
+        .aisonx-blueocean-stat span {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--aisonx-dark);
+        }
+
+        /* Why Beyond Section */
+        .aisonx-beyond {
+            background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
+            color: var(--aisonx-white);
+        }
+
+        .aisonx-beyond-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+        }
+
+        .aisonx-beyond-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--aisonx-radius);
+            padding: 40px 30px;
+            text-align: center;
+            transition: var(--aisonx-transition);
+        }
+
+        .aisonx-beyond-card:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .aisonx-beyond-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            background: var(--aisonx-white);
+            color: var(--aisonx-primary);
+        }
+
+        .aisonx-beyond-card h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        .aisonx-beyond-card p {
+            font-size: 15px;
+            opacity: 0.9;
+            line-height: 1.7;
+        }
+
+        /* Platform Shift Section */
+        .aisonx-platform-shift {
+            background: var(--aisonx-light);
+        }
+
+        .aisonx-platform-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 25px;
+        }
+
+        .aisonx-platform-card {
+            background: var(--aisonx-white);
+            border-radius: var(--aisonx-radius);
+            padding: 35px 20px;
+            text-align: center;
+            transition: var(--aisonx-transition);
+            border: 2px solid transparent;
+        }
+
+        .aisonx-platform-card:hover {
+            border-color: var(--aisonx-primary);
+            transform: translateY(-10px);
+            box-shadow: var(--aisonx-shadow);
+        }
+
+        .aisonx-platform-card-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            background: var(--aisonx-gradient-1);
+            color: var(--aisonx-white);
+        }
+
+        .aisonx-platform-card h4 {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .aisonx-platform-card p {
+            font-size: 13px;
+            color: var(--aisonx-gray);
+            line-height: 1.5;
+        }
+
+        /* CTA Section */
+        .aisonx-cta {
+            background: var(--aisonx-gradient-2);
+            color: var(--aisonx-white);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .aisonx-cta-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+        }
+
+        .aisonx-cta-particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .aisonx-cta-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .aisonx-cta h2 {
+            font-size: clamp(32px, 4vw, 52px);
+            margin-bottom: 20px;
+        }
+
+        .aisonx-cta p {
+            font-size: 20px;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .aisonx-cta-tagline {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .aisonx-cta-tagline span {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* Footer */
+        .aisonx-footer {
+            background: #0a0f1c;
+            color: var(--aisonx-white);
+            padding: 40px 0 20px;
+        }
+
+        .aisonx-footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .aisonx-footer-brand .aisonx-logo {
+            font-size: 28px;
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        .aisonx-footer-brand p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.6;
+            margin-bottom: 20px;
+            max-width: 450px;
+        }
+
+        .aisonx-footer-social {
+            display: flex;
+            gap: 15px;
+        }
+
+        .aisonx-footer-social a {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--aisonx-white);
+            font-size: 18px;
+            transition: var(--aisonx-transition);
+        }
+
+        .aisonx-footer-social a:hover {
+            background: var(--aisonx-gradient-1);
+            transform: translateY(-3px);
+        }
+
+        .aisonx-footer-col h4 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: var(--aisonx-white);
+        }
+
+        .aisonx-footer-links {
+            list-style: none;
+        }
+
+        .aisonx-footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .aisonx-footer-links a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 15px;
+            transition: var(--aisonx-transition);
+        }
+
+        .aisonx-footer-links a:hover {
+            color: var(--aisonx-accent);
+            padding-left: 5px;
+        }
+
+        .aisonx-footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .aisonx-footer-bottom p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .aisonx-footer-bottom-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .aisonx-footer-bottom-links a {
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-size: 14px;
+            transition: var(--aisonx-transition);
+        }
+
+        .aisonx-footer-bottom-links a:hover {
+            color: var(--aisonx-white);
+        }
+
+        /* Scroll Animation Classes */
+        .aisonx-scroll-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .aisonx-scroll-reveal.aisonx-revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Counter Animation */
+        .aisonx-counter {
+            display: inline-block;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 1200px) {
+            .aisonx-features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .aisonx-problems-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .aisonx-expertise-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .aisonx-platform-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .aisonx-nav-links {
+                display: none;
+            }
+
+            .aisonx-mobile-toggle {
+                display: flex;
+            }
+
+            .aisonx-hero-content {
+                padding: 0 20px;
+                
+            }
+
+            .aisonx-hero-text {
+                display: block;
+            }
+
+            .aisonx-why-content,
+            .aisonx-blueocean-content,
+            .aisonx-ways-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .aisonx-stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .aisonx-powerful-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .aisonx-audience-grid,
+            .aisonx-solutions-content {
+                grid-template-columns: 1fr;
+            }
+
+            .aisonx-beyond-grid {
+                grid-template-columns: 1fr;
+            }
+
+
+            .aisonx-footer-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .aisonx-section {
+                padding: 60px 0;
+            }
+
+            .aisonx-hero {
+                padding-top: 80px;
+            }
+
+            .aisonx-stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .aisonx-features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .aisonx-problems-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .aisonx-expertise-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .aisonx-platform-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .aisonx-ways-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .aisonx-hero-floating-card {
+                display: none;
+            }
+
+            .aisonx-nav-cta {
+                display: none;
+            }
+
+            .aisonx-hero-cta {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .aisonx-hero-platforms {
+                justify-content: center;
+            }
+
+            .aisonx-footer-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .aisonx-footer-bottom {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .aisonx-container {
+                padding: 0 16px;
+            }
+
+            .aisonx-hero-title {
+                font-size: 28px;
+            }
+
+            .aisonx-section-header h2,
+            .aisonx-why-text h2,
+            .aisonx-blueocean-text h2,
+            .aisonx-ways-text h2 {
+                font-size: 28px;
+            }
+
+            .aisonx-btn {
+                padding: 12px 24px;
+                font-size: 14px;
+            }
+
+            .aisonx-stat-number {
+                font-size: 36px;
+            }
+
+            .aisonx-platform-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .aisonx-score-platforms {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .aisonx-cta-tagline {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        /* Mobile Navigation */
+        .aisonx-mobile-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(15px);
+            z-index: 2000; /* Increased to overlay fixed nav */
+            padding: 80px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            
+            /* Animation properties */
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-20px);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            pointer-events: none;
+        }
+
+        .aisonx-mobile-nav.aisonx-active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .aisonx-mobile-nav a {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--aisonx-dark);
+            text-decoration: none;
+            transition: var(--aisonx-transition);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .aisonx-mobile-nav.aisonx-active a {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .aisonx-mobile-nav.aisonx-active a:nth-of-type(1) { transition-delay: 0.1s; }
+        .aisonx-mobile-nav.aisonx-active a:nth-of-type(2) { transition-delay: 0.15s; }
+        .aisonx-mobile-nav.aisonx-active a:nth-of-type(3) { transition-delay: 0.2s; }
+        .aisonx-mobile-nav.aisonx-active a:nth-of-type(4) { transition-delay: 0.25s; }
+        .aisonx-mobile-nav.aisonx-active a:nth-of-type(5) { transition-delay: 0.3s; }
+        .aisonx-mobile-nav.aisonx-active a:nth-of-type(6) { transition-delay: 0.35s; }
+        .aisonx-mobile-nav.aisonx-active a:nth-of-type(7) { transition-delay: 0.4s; }
+
+        .aisonx-mobile-nav a:hover {
+            color: var(--aisonx-primary);
+        }
+
+        .aisonx-mobile-close {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            font-size: 30px;
+            cursor: pointer;
+            color: var(--aisonx-dark);
+        }
+
+        /* Dropdown Styles */
+        .aisonx-nav-links li {
+            position: relative;
+        }
+
+        .aisonx-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            min-width: 220px;
+            border-radius: var(--aisonx-radius-sm);
+            padding: 15px 0;
+            box-shadow: var(--aisonx-shadow);
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--aisonx-transition);
+            z-index: 1000;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            list-style: none; /* Ensure no bullets */
+            margin: 0;
+        }
+
+        .aisonx-nav-links li:hover .aisonx-dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .aisonx-dropdown-menu li {
+            width: 100%;
+            padding: 0; /* Override any parent padding */
+        }
+
+        .aisonx-dropdown-menu a {
+            display: block;
+            padding: 10px 25px;
+            color: rgba(255, 255, 255, 0.8) !important;
+            font-size: 14px;
+            font-weight: 500;
+            transition: var(--aisonx-transition);
+            white-space: nowrap;
+            text-align: left;
+        }
+
+        .aisonx-dropdown-menu a::after {
+            display: none; /* Remove underline animation for dropdown links */
+        }
+
+        .aisonx-dropdown-menu a:hover {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--aisonx-white) !important;
+            padding-left: 30px;
+        }
+
+        .aisonx-dropdown-trigger i {
+            font-size: 10px;
+            margin-left: 5px;
+            transition: var(--aisonx-transition);
+        }
+
+        .aisonx-nav-links li:hover .aisonx-dropdown-trigger i {
+            transform: rotate(180deg);
+        }
+
+        .aisonx-nav-highlight {
+            background: var(--aisonx-gradient-1);
+            color: var(--aisonx-white) !important;
+            padding: 10px 15px !important;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700 !important;
+            transition: var(--aisonx-transition);
+        }
+
+        .aisonx-nav-highlight:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+        }
+
+        .aisonx-nav-highlight::after {
+            display: none !important;
+        }
+
+        /* Mobile Dropdown Styles */
+        .aisonx-mobile-dropdown {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-left: 20px;
+            border-left: 2px solid var(--aisonx-primary);
+        }
+
+        .aisonx-mobile-dropdown a {
+            font-size: 16px !important;
+            opacity: 0.8 !important;
+            text-align: left !important;
+        }
+
+        /* Loading Animation */
+        .aisonx-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--aisonx-white);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .aisonx-loader.aisonx-hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .current-menu-item > a,
+.current_page_item > a {
+  color: yellow;           /* highlight color */
+  font-weight: 600;
+ 
+}
+
+
+       
+    </style>
+</head>
+<body class="aisonx-wrapper">
+   
+
+
+
+    <!-- Hero Section -->
+    <section class="aisonx-hero aisonx-full-width">
+        <div class="aisonx-hero-bg">
+            <div class="aisonx-hero-shape aisonx-hero-shape-1"></div>
+            <div class="aisonx-hero-shape aisonx-hero-shape-2"></div>
+            <div class="aisonx-hero-shape aisonx-hero-shape-3"></div>
+            <div class="aisonx-hero-grid"></div>
+        </div>
+        <div class="aisonx-container">
+            <div class="aisonx-hero-content">
+                <div class="aisonx-hero-text">
+                    <div class="aisonx-hero-text-content">
+                        <div class="aisonx-hero-badge">
+                            <span class="aisonx-hero-badge-dot"></span>
+                            <span class="aisonx-hero-badge-text">AI-Powered SEO Platform</span>
+                        </div>
+                        <h1 class="aisonx-hero-title">
+                            Transform Your <span class="aisonx-text-gradient">AI Visibility</span> With Smarter SEO Insights
+                        </h1>
+                        <p class="aisonx-hero-subtitle">
+                            Get your brand discovered where decisions are made — inside AI answers.
+                        </p>
+                        <p class="aisonx-hero-description">
+                            AISONX helps your brand appear, rank, and get cited in ChatGPT, Google AI Overviews, Bing Copilot, Perplexity, Gemini, and Claude.
+                        </p>
+                        <p class="aisonx-hero-description">
+                            Track mentions, analyze citations, and optimize your site with a 120-point AI Visibility Audit—built for agencies, consultants, and in-house teams.
+                        </p>
+                    </div>
+                    <div class="aisonx-hero-text-actions">
+                        <div class="aisonx-hero-platforms">
+                            <span class="aisonx-platform-tag"><i class="fas fa-robot"></i> ChatGPT</span>
+                            <span class="aisonx-platform-tag"><i class="fab fa-google"></i> Google AI</span>
+                            <span class="aisonx-platform-tag"><i class="fab fa-microsoft"></i> Bing Copilot</span>
+                            <span class="aisonx-platform-tag"><i class="fas fa-search"></i> Perplexity</span>
+                            <span class="aisonx-platform-tag"><i class="fas fa-gem"></i> Gemini</span>
+                            <span class="aisonx-platform-tag"><i class="fas fa-brain"></i> Claude</span>
+                        </div>
+                        <div class="aisonx-hero-cta">
+                            <a href="http://aisonx.com/aisonx-check-brand-visibility/" target="_blank" class="aisonx-btn aisonx-btn-primary aisonx-btn-large">
+                                <i class="fas fa-rocket"></i> Check Your AI Visibility
+                            </a>
+                            <a href="http://aisonx.com/aisonx-check-brand-visibility/" target="_blank" class="aisonx-btn aisonx-btn-secondary aisonx-btn-large">
+                                <i class="fas fa-play-circle"></i> Watch Demo
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="aisonx-hero-visual">
+                    <div class="aisonx-hero-image-wrapper">
+                        <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=600&fit=crop" alt="AI Dashboard Analytics" class="aisonx-hero-image">
+                    </div>
+                    <div class="aisonx-hero-floating-card aisonx-hero-card-1">
+                        <div class="aisonx-floating-stat">
+                            <div class="aisonx-floating-stat-icon aisonx-icon-purple">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="aisonx-floating-stat-content">
+                                <h4><span class="aisonx-counter" data-target="98.5">0</span>%</h4>
+                                <p>Reliable Performance</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="aisonx-hero-floating-card aisonx-hero-card-2">
+                        <div class="aisonx-floating-stat">
+                            <div class="aisonx-floating-stat-icon aisonx-icon-green">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="aisonx-floating-stat-content">
+                                <h4><span class="aisonx-counter" data-target="100">0</span>k+</h4>
+                                <p>Audits Completed</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="aisonx-hero-floating-card aisonx-hero-card-3">
+                        <div class="aisonx-floating-stat">
+                            <div class="aisonx-floating-stat-icon aisonx-icon-blue">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="aisonx-floating-stat-content">
+                                <h4><span class="aisonx-counter" data-target="100">0</span>+</h4>
+                                <p>Active brands</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+   <section class="aisonx-stats">
+    <div class="aisonx-container">
+
+        <!-- Section Heading -->
+        <div class="aisonx-stats-heading aisonx-scroll-reveal">
+            <h2>Proven. Predictable. Performance-Driven.</h2>
+        </div>
+
+        <div class="aisonx-stats-grid">
+            <div class="aisonx-stat-card aisonx-scroll-reveal">
+                <div class="aisonx-stat-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="aisonx-stat-number">
+                    <span class="aisonx-counter" data-target="98.5">0</span>%
+                </div>
+                <div class="aisonx-stat-label">
+                    Reliable Performance<br>
+                    Agencies improved AI mentions within 4 weeks
+                </div>
+            </div>
+
+            <div class="aisonx-stat-card aisonx-scroll-reveal aisonx-delay-1">
+                <div class="aisonx-stat-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="aisonx-stat-number">
+                    <span class="aisonx-counter" data-target="100">0</span>k+
+                </div>
+                <div class="aisonx-stat-label">
+                    Audits Completed<br>
+                    AI queries tracked across ChatGPT, Bing & Google AI
+                </div>
+            </div>
+
+            <div class="aisonx-stat-card aisonx-scroll-reveal aisonx-delay-2">
+                <div class="aisonx-stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="aisonx-stat-number">
+                    <span class="aisonx-counter" data-target="100">0</span>+
+                </div>
+                <div class="aisonx-stat-label">
+                    Active brands<br>
+                    Trusted across industries — from healthcare to SaaS
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+    <!-- Why AI Visibility Section -->
+    <section class="aisonx-section aisonx-why" id="why">
+        <div class="aisonx-container">
+            <div class="aisonx-why-content">
+                <div class="aisonx-why-text aisonx-scroll-reveal">
+                    <h2>Why <span class="aisonx-text-gradient">AI Visibility</span> Matters</h2>
+                    <h3>AI assistants are the new search engines</h3>
+                    <p>Your customers no longer scroll — they ask.</p>
+                    <p>If your brand isn't mentioned in AI answers, you don't exist in the decision journey.</p>
+                    <div class="aisonx-highlight-box">
+                        <p>Search has shifted from links to answers. From keywords to context. From traffic to trust.</p>
+                    </div>
+                    <p><strong>AISONX ensures your brand is ranked, cited, and recommended—not ignored.</strong></p>
+                    <div class="aisonx-shift-list">
+                        <div class="aisonx-shift-item">
+                            <i class="fas fa-arrow-right"></i>
+                            <span>From links to answers</span>
+                        </div>
+                        <div class="aisonx-shift-item">
+                            <i class="fas fa-arrow-right"></i>
+                            <span>From keywords to context</span>
+                        </div>
+                        <div class="aisonx-shift-item">
+                            <i class="fas fa-arrow-right"></i>
+                            <span>From traffic to trust</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="aisonx-why-visual aisonx-scroll-reveal aisonx-delay-2">
+                    <img src="https://res.cloudinary.com/dbbll23jz/image/upload/v1766825639/af17dc7df8c34f8eabeff48b321109b8_copy_oswg54.jpg" alt="AI Search Evolution" class="aisonx-why-image">
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- AI Score Section -->
+    <section class="aisonx-section aisonx-score aisonx-full-width">
+        <div class="aisonx-container">
+            <div class="aisonx-score-content aisonx-scroll-reveal">
+                <h2>Rooted in Performance. Built for the Future of Search.</h2>
+                <p class="aisonx-score-subtitle">How Visible Is Your Brand in AI Search?</p>
+                <p>Get your AI Visibility Score across</p>
+                <div class="aisonx-score-platforms">
+                    <span class="aisonx-score-platform"><i class="fas fa-robot"></i> ChatGPT</span>
+                    <span class="aisonx-score-platform"><i class="fas fa-search"></i> Perplexity</span>
+                    <span class="aisonx-score-platform"><i class="fas fa-gem"></i> Gemini</span>
+                    <span class="aisonx-score-platform"><i class="fab fa-google"></i> Google AI Overviews</span>
+                    <span class="aisonx-score-platform"><i class="fab fa-microsoft"></i> Bing Copilot</span>
+                    <span class="aisonx-score-platform"><i class="fas fa-brain"></i> Claude</span>
+                </div>
+                <p class="aisonx-score-time">— in under 30 seconds.</p>
+                <a href="http://aisonx.com/aisonx-check-brand-visibility/" target="_blank" class="aisonx-btn aisonx-btn-white aisonx-btn-large">
+                    <i class="fas fa-chart-pie"></i> Get Your AI Score Now
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Two Ways Section -->
+    <section class="aisonx-section aisonx-ways aisonx-full-width">
+        <div class="aisonx-container">
+            <div class="aisonx-ways-content">
+                <div class="aisonx-ways-text aisonx-scroll-reveal">
+                    <h2>Your Customers Now Search Everywhere</h2>
+                    <h3>Make sure they find you everywhere.</h3>
+                    <p>Two Ways to Search. One Way to Win.</p>
+                    <div class="aisonx-ways-cards">
+                        <div class="aisonx-way-card">
+                            <h4>SEO</h4>
+                            <p>Captures the click.</p>
+                        </div>
+                        <div class="aisonx-way-card">
+                            <h4>GEO</h4>
+                            <p>Owns the answer.</p>
+                        </div>
+                    </div>
+                    <div class="aisonx-ways-highlight">
+                        <p>Ignore either — and lose half your market.</p>
+                    </div>
+                </div>
+                <div class="aisonx-scroll-reveal aisonx-delay-2">
+                    <img src="https://res.cloudinary.com/dbbll23jz/image/upload/v1766825638/1_-X5UOYBY9Ewt4SFtcy9RRw_liya1v.webp" alt="Search Analytics" class="aisonx-ways-image">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problems Section -->
+    <section class="aisonx-section aisonx-problems aisonx-full-width">
+        <div class="aisonx-container">
+            <div class="aisonx-problems-header aisonx-scroll-reveal">
+                <h2>Brands Are Losing Visibility — And Revenue</h2>
+            </div>
+            <div class="aisonx-problems-grid">
+                <div class="aisonx-problem-card aisonx-scroll-reveal">
+                    <div class="aisonx-problem-icon">
+                        <i class="fas fa-eye-slash"></i>
+                    </div>
+                    <h3>Missed AI visibility = lost customers</h3>
+                    <p>No presence in AI answers means declining demand.</p>
+                </div>
+                <div class="aisonx-problem-card aisonx-scroll-reveal aisonx-delay-1">
+                    <div class="aisonx-problem-icon">
+                        <i class="fas fa-running"></i>
+                    </div>
+                    <h3>Competitors are pulling ahead</h3>
+                    <p>Brands integrating SEO + GEO + AI are capturing your buyers.</p>
+                </div>
+                <div class="aisonx-problem-card aisonx-scroll-reveal aisonx-delay-2">
+                    <div class="aisonx-problem-icon">
+                        <i class="fas fa-volume-mute"></i>
+                    </div>
+                    <h3>Your share of voice is shrinking</h3>
+                    <p>Fewer mentions reduce trust, authority, and influence.</p>
+                </div>
+                <div class="aisonx-problem-card aisonx-scroll-reveal aisonx-delay-3">
+                    <div class="aisonx-problem-icon">
+                        <i class="fas fa-chart-line fa-flip-vertical"></i>
+                    </div>
+                    <h3>The visibility gap is widening</h3>
+                    <p>Those who adapt win. Others disappear.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solutions Section -->
+    <section class="aisonx-section aisonx-solutions" id="solutions">
+        <div class="aisonx-container">
+            <div class="aisonx-section-header aisonx-scroll-reveal">
+                <h2>One Search Solution. <span class="aisonx-text-gradient">Total Market Control.</span></h2>
+            </div>
+            <div class="aisonx-solutions-content">
+                <div class="aisonx-solution-card aisonx-scroll-reveal">
+                    <div class="aisonx-solution-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3>Get Ranked</h3>
+                    <p>Be visible across traditional and AI search engines.</p>
+                </div>
+                <div class="aisonx-solution-card aisonx-scroll-reveal aisonx-delay-1">
+                    <div class="aisonx-solution-icon">
+                        <i class="fas fa-quote-left"></i>
+                    </div>
+                    <h3>Get Cited</h3>
+                    <p>Earn credible mentions where AI pulls answers from.</p>
+                </div>
+                <div class="aisonx-solution-card aisonx-scroll-reveal aisonx-delay-2">
+                    <div class="aisonx-solution-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h3>Get Recommended</h3>
+                    <p>Turn AI responses into real revenue growth.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Expertise Section -->
+    <section class="aisonx-section aisonx-expertise aisonx-full-width">
+        <div class="aisonx-container">
+            <div class="aisonx-section-header aisonx-scroll-reveal">
+                <h2>Expertise Powering <span class="aisonx-text-gradient">Modern Search Performance</span></h2>
+            </div>
+            <div class="aisonx-expertise-grid">
+                <div class="aisonx-expertise-card aisonx-scroll-reveal">
+                    <div class="aisonx-expertise-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h3>Predictable, Transparent Delivery</h3>
+                    <p>Weekly workflows, structured reviews, and real-time visibility via dashboards.</p>
+                </div>
+                <div class="aisonx-expertise-card aisonx-scroll-reveal aisonx-delay-1">
+                    <div class="aisonx-expertise-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>Data-Driven. Expert-Validated</h3>
+                    <p>Advanced analytics combined with human expertise for strategic clarity.</p>
+                </div>
+                <div class="aisonx-expertise-card aisonx-scroll-reveal aisonx-delay-2">
+                    <div class="aisonx-expertise-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3>Speed That Matches Your Ambition</h3>
+                    <p>24–48 hour execution cycles. Zero operational lag.</p>
+                </div>
+                <div class="aisonx-expertise-card aisonx-scroll-reveal aisonx-delay-3">
+                    <div class="aisonx-expertise-icon">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <h3>Built on Partnership</h3>
+                    <p>Proactive communication, accountability, and outcome ownership.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Industries Section -->
+    <section class="aisonx-section aisonx-industries aisonx-full-width" id="industries">
+        <div class="aisonx-container">
+            <div class="aisonx-industries-header aisonx-scroll-reveal">
+                <h2>Industries We Serve</h2>
+                <p>Trusted by brands across 15+ industries, including:</p>
+            </div>
+            <div class="aisonx-industries-grid aisonx-scroll-reveal">
+                <span class="aisonx-industry-tag"><i class="fas fa-heartbeat"></i> Healthcare</span>
+                <span class="aisonx-industry-tag"><i class="fas fa-hotel"></i> Hospitality</span>
+                <span class="aisonx-industry-tag"><i class="fas fa-graduation-cap"></i> Education</span>
+                <span class="aisonx-industry-tag"><i class="fas fa-briefcase"></i> Professional Services</span>
+                <span class="aisonx-industry-tag"><i class="fas fa-shopping-cart"></i> eCommerce</span>
+                <span class="aisonx-industry-tag"><i class="fas fa-home"></i> Real Estate</span>
+                <span class="aisonx-industry-tag"><i class="fas fa-chart-pie"></i> Finance</span>
+                <span class="aisonx-industry-tag"><i class="fas fa-shield-alt"></i> Insurance</span>
+                <span class="aisonx-industry-tag"><i class="fas fa-car"></i> Automotive</span>
+                <span class="aisonx-industry-tag"><i class="fas fa-cloud"></i> SaaS</span>
+                <span class="aisonx-industry-tag"><i class="fas fa-truck"></i> Logistics</span>
+                <span class="aisonx-industry-tag"><i class="fas fa-industry"></i> Industrial</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blue Ocean Section -->
+    <section class="aisonx-section aisonx-blueocean">
+        <div class="aisonx-container">
+            <div class="aisonx-blueocean-content">
+                <div class="aisonx-blueocean-text aisonx-scroll-reveal">
+                    <h2>Blue Ocean SEO — <span class="aisonx-text-gradient">Beyond Searches</span></h2>
+                    <h3>From Keywords to Queries</h3>
+                    <p>User search behavior has fundamentally changed.</p>
+                    <p>Search engines now understand context, intent, and conversation.</p>
+                    <div class="aisonx-blueocean-stat">
+                        <i class="fas fa-chart-line"></i>
+                        <span>68% of users expect personalized results.</span>
+                    </div>
+                </div>
+                <div class="aisonx-scroll-reveal aisonx-delay-2">
+                    <img src="https://res.cloudinary.com/dbbll23jz/image/upload/v1766825924/2106.i201.007.F.m004.c9.call_center_technical_support_isometric-removebg-preview_xqvrxm.png" alt="Search Evolution" class="aisonx-why-image">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Beyond Section -->
+    <section class="aisonx-section aisonx-beyond aisonx-full-width">
+        <div class="aisonx-container">
+            <div class="aisonx-section-header aisonx-scroll-reveal">
+                <h2>Why Beyond Searches?</h2>
+            </div>
+            <div class="aisonx-beyond-grid">
+                <div class="aisonx-beyond-card aisonx-scroll-reveal">
+                    <div class="aisonx-beyond-icon">
+                        <i class="fas fa-microphone"></i>
+                    </div>
+                    <h3>Voice Search</h3>
+                    <p>Voice search will account for 50% of all searches. Powered by Siri, Alexa, Google Assistant — fast, intent-driven.</p>
+                </div>
+                <div class="aisonx-beyond-card aisonx-scroll-reveal aisonx-delay-1">
+                    <div class="aisonx-beyond-icon">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <h3>Visual & Image Search</h3>
+                    <p>Visual & image search is exploding. Pinterest Lens alone drives 600M+ visual searches/month.</p>
+                </div>
+                <div class="aisonx-beyond-card aisonx-scroll-reveal aisonx-delay-2">
+                    <div class="aisonx-beyond-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3>AI Chatbots</h3>
+                    <p>AI chatbots already handle 80%+ of customer interactions.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Platform Shift Section -->
+    <section class="aisonx-section aisonx-platform-shift aisonx-full-width">
+        <div class="aisonx-container">
+            <div class="aisonx-section-header aisonx-scroll-reveal">
+                <h2>Platform Shift in <span class="aisonx-text-gradient">User Search Behavior</span></h2>
+            </div>
+            <div class="aisonx-platform-grid">
+                <div class="aisonx-platform-card aisonx-scroll-reveal">
+                    <div class="aisonx-platform-card-icon">
+                        <i class="fas fa-keyboard"></i>
+                    </div>
+                    <h4>Text Search</h4>
+                    <p>Traditional keyword queries — still relevant, but evolving.</p>
+                </div>
+                <div class="aisonx-platform-card aisonx-scroll-reveal aisonx-delay-1">
+                    <div class="aisonx-platform-card-icon">
+                        <i class="fas fa-microphone-alt"></i>
+                    </div>
+                    <h4>Voice Search</h4>
+                    <p>Powered by Siri, Alexa, Google Assistant — fast, intent-driven.</p>
+                </div>
+                <div class="aisonx-platform-card aisonx-scroll-reveal aisonx-delay-2">
+                    <div class="aisonx-platform-card-icon">
+                        <i class="fas fa-comment-dots"></i>
+                    </div>
+                    <h4>Conversational Search</h4>
+                    <p>Natural language AI chats replacing search bars.</p>
+                </div>
+                <div class="aisonx-platform-card aisonx-scroll-reveal aisonx-delay-3">
+                    <div class="aisonx-platform-card-icon">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <h4>Video Search</h4>
+                    <p>YouTube, short-form, and visual discovery dominate attention.</p>
+                </div>
+                <div class="aisonx-platform-card aisonx-scroll-reveal aisonx-delay-4">
+                    <div class="aisonx-platform-card-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <h4>Image Search</h4>
+                    <p>Google Lens & Pinterest Lens redefine how users search visually.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Powerful Features Section - Compact Spacing -->
+    <section class="aisonx-section-compact aisonx-powerful aisonx-full-width">
+        <div class="aisonx-container">
+            <div class="aisonx-powerful-header aisonx-scroll-reveal">
+                <h2>Powerful AI Features in Action</h2>
+                <p>Built for scale. Designed for precision. Optimized for results.</p>
+            </div>
+            <div class="aisonx-powerful-grid">
+                <div class="aisonx-powerful-card aisonx-scroll-reveal">
+                    <div class="aisonx-powerful-card-icon">
+                        <i class="fas fa-radar"></i>
+                    </div>
+                    <h3>AI Visibility Audit</h3>
+                    <p>Instant assessment of how your brand appears across AI-driven search engines — exposing blind spots instantly.</p>
+                </div>
+                <div class="aisonx-powerful-card aisonx-scroll-reveal aisonx-delay-1">
+                    <div class="aisonx-powerful-card-icon">
+                        <i class="fas fa-chart-area"></i>
+                    </div>
+                    <h3>AI Visibility Tracker</h3>
+                    <p>Monitor your brand's presence across AI platforms continuously, not quarterly.</p>
+                </div>
+                <div class="aisonx-powerful-card aisonx-scroll-reveal aisonx-delay-2">
+                    <div class="aisonx-powerful-card-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h3>Industry Benchmarks</h3>
+                    <p>See exactly where competitors are winning—and where you should be.</p>
+                </div>
+                <div class="aisonx-powerful-card aisonx-scroll-reveal aisonx-delay-3">
+                    <div class="aisonx-powerful-card-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h3>On-Page Analysis</h3>
+                    <p>Optimize content and structure for AI retrieval, trust, and citations, not just rankings.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="aisonx-section aisonx-features aisonx-full-width" id="features">
+        <div class="aisonx-container">
+            <div class="aisonx-section-header aisonx-scroll-reveal">
+                <h2><span class="aisonx-text-gradient">Total AI Visibility</span> Control.</h2>
+                <p>Everything you need to dominate AI search results in one powerful platform.</p>
+            </div>
+            <div class="aisonx-features-grid">
+                <div class="aisonx-feature-card aisonx-scroll-reveal">
+                    <div class="aisonx-feature-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <h3>AI Visibility Audit</h3>
+                    <p>Instantly see what AI knows about your brand—and what it doesn't.</p>
+                </div>
+                <div class="aisonx-feature-card aisonx-scroll-reveal aisonx-delay-1">
+                    <div class="aisonx-feature-icon">
+                        <i class="fas fa-crosshairs"></i>
+                    </div>
+                    <h3>Prompt Tracking & Competitor Benchmarking</h3>
+                    <p>Track share of voice across LLMs and benchmark against competitors.</p>
+                </div>
+                <div class="aisonx-feature-card aisonx-scroll-reveal aisonx-delay-2">
+                    <div class="aisonx-feature-icon">
+                        <i class="fas fa-quote-right"></i>
+                    </div>
+                    <h3>Citation Analyzer</h3>
+                    <p>Uncover which sources AI trusts—and replicate them strategically.</p>
+                </div>
+                <div class="aisonx-feature-card aisonx-scroll-reveal aisonx-delay-3">
+                    <div class="aisonx-feature-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3>On-Page AI Audit</h3>
+                    <p>Fix schema, E-E-A-T, metadata, entity signals, and structure for maximum AI visibility.</p>
+            </div>
+        </div>
+    </section>
+
+
+
+
+    <script>
+        // AISONX JavaScript - Namespaced to avoid conflicts
+        (function() {
+            'use strict';
+
+            // Wait for DOM to load
+            document.addEventListener('DOMContentLoaded', function() {
+                
+                // Hide loader
+                setTimeout(function() {
+                    const loader = document.getElementById('aisonxLoader');
+                    if (loader) {
+                        loader.classList.add('aisonx-hidden');
+                    }
+                }, 1000);
+
+
+
+                // Scroll reveal animation
+                const scrollRevealElements = document.querySelectorAll('.aisonx-scroll-reveal');
+                
+                const revealOnScroll = function() {
+                    scrollRevealElements.forEach(function(element) {
+                        const elementTop = element.getBoundingClientRect().top;
+                        const windowHeight = window.innerHeight;
+                        
+                        if (elementTop < windowHeight - 100) {
+                            element.classList.add('aisonx-revealed');
+                        }
+                    });
+                };
+
+                window.addEventListener('scroll', revealOnScroll);
+                revealOnScroll(); // Initial check
+
+                // Optimized Counter animation with Intersection Observer
+                const animateCounter = function(counter) {
+                    const target = parseFloat(counter.getAttribute('data-target'));
+                    const duration = 2000;
+                    const startTime = performance.now();
+                    const isDecimal = target % 1 !== 0;
+
+                    const updateCounter = function(currentTime) {
+                        const elapsed = currentTime - startTime;
+                        const progress = Math.min(elapsed / duration, 1);
+                        
+                        // Ease out quad function
+                        const easeProgress = progress * (2 - progress);
+                        const current = easeProgress * target;
+
+                        if (isDecimal) {
+                            counter.textContent = current.toFixed(1);
+                        } else {
+                            counter.textContent = Math.floor(current);
+                        }
+
+                        if (progress < 1) {
+                            requestAnimationFrame(updateCounter);
+                        } else {
+                            counter.textContent = target;
+                        }
+                    };
+
+                    requestAnimationFrame(updateCounter);
+                };
+
+                const counterObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            animateCounter(entry.target);
+                            counterObserver.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.5 });
+
+                document.querySelectorAll('.aisonx-counter').forEach(counter => {
+                    counterObserver.observe(counter);
+                });
+
+                // Smooth scroll for anchor links
+                document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+                    anchor.addEventListener('click', function(e) {
+                        const href = this.getAttribute('href');
+                        if (href !== '#') {
+                            e.preventDefault();
+                            const target = document.querySelector(href);
+                            if (target) {
+                                const targetPosition = target.offsetTop;
+                                window.scrollTo({
+                                    top: targetPosition,
+                                    behavior: 'smooth'
+                                });
+                            }
+                        }
+                    });
+                });
+
+                // Particle animation for CTA section
+                const particlesContainer = document.getElementById('aisonxParticles');
+                if (particlesContainer) {
+                    for (let i = 0; i < 50; i++) {
+                        const particle = document.createElement('div');
+                        particle.className = 'aisonx-cta-particle';
+                        particle.style.left = Math.random() * 100 + '%';
+                        particle.style.top = Math.random() * 100 + '%';
+                        particle.style.width = (Math.random() * 10 + 5) + 'px';
+                        particle.style.height = particle.style.width;
+                        particle.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                        particle.style.animationDelay = (Math.random() * 2) + 's';
+                        particle.style.animation = 'aisonxFloat ' + (Math.random() * 5 + 3) + 's ease-in-out infinite';
+                        particlesContainer.appendChild(particle);
+                    }
+                }
+
+                // Add hover effects to cards
+                const cards = document.querySelectorAll('.aisonx-feature-card, .aisonx-stat-card, .aisonx-audience-card, .aisonx-solution-card');
+                cards.forEach(function(card) {
+                    card.addEventListener('mouseenter', function() {
+                        this.style.transform = 'translateY(-10px)';
+                    });
+                    card.addEventListener('mouseleave', function() {
+                        this.style.transform = 'translateY(0)';
+                    });
+                });
+
+                // Parallax effect for hero shapes
+                window.addEventListener('scroll', function() {
+                    const scrolled = window.pageYOffset;
+                    const shapes = document.querySelectorAll('.aisonx-hero-shape');
+                    shapes.forEach(function(shape, index) {
+                        const speed = 0.1 + (index * 0.05);
+                        shape.style.transform = 'translateY(' + (scrolled * speed) + 'px)';
+                    });
+                });
+
+                // Intersection Observer for better performance
+                if ('IntersectionObserver' in window) {
+                    const observerOptions = {
+                        root: null,
+                        rootMargin: '0px',
+                        threshold: 0.1
+                    };
+
+                    const observer = new IntersectionObserver(function(entries) {
+                        entries.forEach(function(entry) {
+                            if (entry.isIntersecting) {
+                                entry.target.classList.add('aisonx-revealed');
+                            }
+                        });
+                    }, observerOptions);
+
+                    scrollRevealElements.forEach(function(element) {
+                        observer.observe(element);
+                    });
+                }
+
+                // Button ripple effect
+                const buttons = document.querySelectorAll('.aisonx-btn');
+                buttons.forEach(function(button) {
+                    button.addEventListener('click', function(e) {
+                        const x = e.clientX - e.target.offsetLeft;
+                        const y = e.clientY - e.target.offsetTop;
+
+                        const ripple = document.createElement('span');
+                        ripple.style.cssText = `
+                            position: absolute;
+                            background: rgba(255,255,255,0.3);
+                            border-radius: 50%;
+                            pointer-events: none;
+                            width: 100px;
+                            height: 100px;
+                            left: ${x - 50}px;
+                            top: ${y - 50}px;
+                            transform: scale(0);
+                            animation: aisonxRipple 0.6s linear;
+                        `;
+
+                        this.appendChild(ripple);
+                        setTimeout(function() {
+                            ripple.remove();
+                        }, 600);
+                    });
+                });
+
+                // Add ripple keyframes dynamically
+                const styleSheet = document.createElement('style');
+                styleSheet.textContent = `
+                    @keyframes aisonxRipple {
+                        to {
+                            transform: scale(4);
+                            opacity: 0;
+                        }
+                    }
+                `;
+                document.head.appendChild(styleSheet);
+
+                // Typed effect for hero title (optional enhancement)
+                const heroTitle = document.querySelector('.aisonx-hero-title');
+                if (heroTitle) {
+                    heroTitle.style.opacity = '1';
+                }
+
+                // Platform tags hover effect
+                const platformTags = document.querySelectorAll('.aisonx-platform-tag, .aisonx-score-platform, .aisonx-industry-tag');
+                platformTags.forEach(function(tag) {
+                    tag.addEventListener('mouseenter', function() {
+                        this.style.transform = 'translateY(-5px) scale(1.05)';
+                    });
+                    tag.addEventListener('mouseleave', function() {
+                        this.style.transform = 'translateY(0) scale(1)';
+                    });
+                });
+
+                console.log('AISONX: All scripts loaded successfully');
+            });
+        })();
+    </script>
+</body>
+</html>

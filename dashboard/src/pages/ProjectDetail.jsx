@@ -21,6 +21,7 @@ import {
   Filter,
   MoreHorizontal,
   Building2,
+  Fingerprint,
   Link as LinkIcon
 } from 'lucide-react';
 import { 
@@ -268,7 +269,7 @@ const ProjectDetail = () => {
         {/* Title Section */}
         <div className="space-y-4">
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-slate-900">Rankings</h1>
+            <h1 className="text-2xl font-bold text-slate-900">Dashboard Overview</h1>
             <Info className="w-4 h-4 text-slate-400" />
           </div>
           
@@ -381,14 +382,24 @@ const ProjectDetail = () => {
                     
                     if (score === 0 && engineRankings.length > 0) {
                       const brandName = project?.brandName || project?.name || '';
-                      const foundCount = engineRankings.filter(r => 
-                        r.found || 
-                        r.rank > 0 || 
-                        r.snippet?.toLowerCase().includes(brandName.toLowerCase())
-                      ).length;
+                      const negPhrases = ['not found', 'not visible', 'does not appear', 'does not rank', 'not organically visible', 'is not present', 'no mention'];
                       
-                      if (foundCount > 0) {
-                        score = Math.round((foundCount / engineRankings.length) * 60); // Floor it to 60 for consistency
+                      // Step 1: Try to use actual prompt scores from the backend (real data)
+                      const actualScores = engineRankings.filter(r => r.score > 0).map(r => r.score);
+                      if (actualScores.length > 0) {
+                        score = Math.round(actualScores.reduce((a, b) => a + b, 0) / engineRankings.length);
+                      } else {
+                        // Step 2: Fallback to found count, but filter out negative snippets
+                        const foundCount = engineRankings.filter(r => {
+                          if (r.found || r.rank > 0) return true;
+                          const snippetL = r.snippet?.toLowerCase() || '';
+                          const isNeg = negPhrases.some(p => snippetL.includes(p));
+                          return snippetL.includes(brandName.toLowerCase()) && !isNeg;
+                        }).length;
+                        
+                        if (foundCount > 0) {
+                          score = Math.round((foundCount / engineRankings.length) * 60);
+                        }
                       }
                     }
 
@@ -616,18 +627,12 @@ const ProjectDetail = () => {
                               }
                             }}
                           >
-                            <td className="px-3 py-5">
-                              <div className="flex items-center gap-2">
-                                {expandedPrompt === promptText ? <ChevronUp className="w-4 h-4 text-blue-600 shrink-0" /> : <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />}
+                            <td className="px-4 py-4 min-w-[280px] max-w-[500px]">
+                              <div className="flex items-start gap-2">
+                                {expandedPrompt === promptText ? <ChevronUp className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" /> : <ChevronDown className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />}
                                 <span 
-                                  className="text-sm font-black text-black leading-tight break-words max-w-[400px]" 
+                                  className="text-sm font-bold text-slate-900 leading-snug" 
                                   title={promptText}
-                                  style={{
-                                    display: '-webkit-box',
-                                    WebkitLineClamp: 2,
-                                    WebkitBoxOrient: 'vertical',
-                                    overflow: 'hidden'
-                                  }}
                                 >
                                   {promptText}
                                 </span>
@@ -638,7 +643,12 @@ const ProjectDetail = () => {
                               const engResults = h.promptRankings?.filter(r => 
                                 r.prompt === promptText && (selectedEngine === 'all' || r.engine === selectedEngine)
                               ) || [];
-                              const isFound = engResults.some(r => r.found);
+                              const isFound = engResults.some(r => {
+                                const brandN = project?.brandName || project?.name || '';
+                                const snippetL = r.snippet?.toLowerCase() || '';
+                                const isNeg = snippetL.includes('not found') || snippetL.includes('not visible') || snippetL.includes('does not appear') || snippetL.includes('does not rank') || snippetL.includes('not organically visible') || snippetL.includes('is not present');
+                                return r.found || (snippetL.includes(brandN.toLowerCase()) && !isNeg);
+                              });
                               const isLinkFound = engResults.some(r => r.linkFound);
                               
                               const getRankIndicator = (found, type) => (
@@ -725,7 +735,9 @@ const ProjectDetail = () => {
                                       {['openai', 'gemini', 'groq'].filter(e => selectedEngine === 'all' || e === selectedEngine).map((engine) => {
                                         const res = tableHistory[activeSnapshotIndex].promptRankings?.find(r => r.prompt === promptText && r.engine === engine);
                                         const brandName = project?.brandName || project?.name || '';
-                                        const snippetFound = res?.snippet?.toLowerCase().includes(brandName.toLowerCase());
+                                        const snippetLower = res?.snippet?.toLowerCase() || '';
+                                        const hasNegativePhrase = snippetLower.includes('not found') || snippetLower.includes('not visible') || snippetLower.includes('does not appear') || snippetLower.includes('does not rank') || snippetLower.includes('no mention') || snippetLower.includes('not organically visible') || snippetLower.includes('is not present');
+                                        const snippetFound = snippetLower.includes(brandName.toLowerCase()) && !hasNegativePhrase;
                                         const isFound = res?.found || snippetFound;
                                         
                                       return (
@@ -813,6 +825,97 @@ const ProjectDetail = () => {
                 </div>
               </div>
             </div>
+
+            {/* Brand Audit — Knowledge Graph Results */}
+            {lastSnapshot?.brandAudit && lastSnapshot.brandAudit.entities?.length > 0 && (
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center">
+                      <Fingerprint className="w-5 h-5 text-indigo-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-slate-900">Brand Audit</h3>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Google Knowledge Graph · {lastSnapshot.brandAudit.totalResults} entities found</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-6 space-y-4">
+                  {lastSnapshot.brandAudit.entities.map((entity, idx) => (
+                    <motion.div 
+                      key={idx}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.08 }}
+                      className="bg-slate-50 border border-slate-100 rounded-2xl p-5 space-y-4"
+                    >
+                      <div className="flex flex-col md:flex-row gap-5">
+                        {entity.image && (
+                          <div className="shrink-0">
+                            <img 
+                              src={entity.image} 
+                              alt={entity.name}
+                              className="w-20 h-20 rounded-xl object-cover border border-slate-200 shadow-sm"
+                            />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 mb-1">
+                            <span className="px-2 py-0.5 bg-indigo-50 text-indigo-600 text-[9px] font-black uppercase tracking-widest rounded-md">
+                              {entity.types?.[0] || 'Entity'}
+                            </span>
+                            <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 text-[9px] font-black uppercase tracking-tight rounded-md flex items-center gap-1">
+                              Confidence: {entity.confidenceScore}
+                            </span>
+                          </div>
+                          <h4 className="text-xl font-black text-slate-900 tracking-tight">{entity.name}</h4>
+                          {entity.description && (
+                            <p className="text-xs text-slate-500 font-medium italic mt-0.5">{entity.description}</p>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {entity.detailedDescription && (
+                        <div className="bg-white border border-slate-100 rounded-xl p-4">
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Entity Synthesis</p>
+                          <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                            {entity.detailedDescription.length > 400 ? entity.detailedDescription.substring(0, 400) + '...' : entity.detailedDescription}
+                          </p>
+                          {entity.descriptionUrl && (
+                            <a href={entity.descriptionUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 mt-3 text-[10px] font-black text-indigo-600 uppercase tracking-widest hover:text-indigo-800 transition-colors">
+                              Read Full Article <ExternalLink className="w-3 h-3" />
+                            </a>
+                          )}
+                        </div>
+                      )}
+
+                      <div className="flex flex-wrap gap-3">
+                        {entity.kgId && (
+                          <a 
+                            href={`https://www.google.com/search?kgmid=${entity.kgId}`} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="px-4 py-2 bg-white border border-indigo-100 hover:border-indigo-300 text-indigo-600 rounded-xl text-[10px] font-black uppercase tracking-tighter transition-all hover:shadow-sm flex items-center gap-2"
+                          >
+                            <Fingerprint className="w-3.5 h-3.5" /> KG: {entity.kgId}
+                          </a>
+                        )}
+                        {entity.url && (
+                          <a 
+                            href={entity.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="px-4 py-2 bg-white border border-emerald-100 hover:border-emerald-300 text-emerald-600 rounded-xl text-[10px] font-black uppercase tracking-tighter transition-all hover:shadow-sm flex items-center gap-2"
+                          >
+                            <Globe className="w-3.5 h-3.5" /> Official Site
+                          </a>
+                        )}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            )}
           </>
         ) : (
           /* Competitor Comparison Tab */

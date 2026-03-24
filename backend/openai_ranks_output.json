@@ -1,0 +1,82 @@
+[
+  {
+    "prompt": "Websites where brands hire Instagram creators",
+    "engine": "openai",
+    "visibility": "None",
+    "found": false,
+    "linkFound": true,
+    "rank": 0,
+    "linkRank": 0,
+    "score": 0,
+    "snippet": "CreatorsXchange does not appear in top organic search results for this query in India.",
+    "citations": [
+      "https://vicomma.com/hire-creators/india"
+    ],
+    "authoritySource": "OpenAI Search",
+    "authoritySignals": {
+      "citations": [
+        "https://vicomma.com/hire-creators/india"
+      ]
+    }
+  },
+  {
+    "prompt": "brand collaboration platforms",
+    "engine": "openai",
+    "visibility": "None",
+    "found": false,
+    "linkFound": true,
+    "rank": 0,
+    "linkRank": 0,
+    "score": 0,
+    "snippet": "CreatorsXchange is not present in the top organic search results for this query in India.",
+    "citations": [
+      "https://vicomma.com/hire-creators/india"
+    ],
+    "authoritySource": "OpenAI Search",
+    "authoritySignals": {
+      "citations": [
+        "https://vicomma.com/hire-creators/india"
+      ]
+    }
+  },
+  {
+    "prompt": "best Instagram influencer marketplace",
+    "engine": "openai",
+    "visibility": "None",
+    "found": false,
+    "linkFound": true,
+    "rank": 0,
+    "linkRank": 0,
+    "score": 0,
+    "snippet": "CreatorsXchange does not rank organically for this query in India.",
+    "citations": [
+      "https://www.supafluencer.me/"
+    ],
+    "authoritySource": "OpenAI Search",
+    "authoritySignals": {
+      "citations": [
+        "https://www.supafluencer.me/"
+      ]
+    }
+  },
+  {
+    "prompt": "Best websites to find Instagram influencers for brand collaborations",
+    "engine": "openai",
+    "visibility": "None",
+    "found": false,
+    "linkFound": true,
+    "rank": 0,
+    "linkRank": 0,
+    "score": 0,
+    "snippet": "CreatorsXchange is not visible in top organic search results for this prompt in India.",
+    "citations": [
+      "https://www.hobo.video/blog/where-to-find-the-best-influencer-listings/"
+    ],
+    "authoritySource": "OpenAI Search",
+    "authoritySignals": {
+      "citations": [
+        "https://www.hobo.video/blog/where-to-find-the-best-influencer-listings/"
+      ]
+    }
+  }
+]
