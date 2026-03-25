@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, 
@@ -16,11 +16,11 @@ import {
   BarChart3,
   Activity,
   Zap,
-  Target,
-  ArrowRightLeft,
   Layout,
-  Link as LinkIcon
+  Link as LinkIcon,
+  FileDown
 } from 'lucide-react';
+import { downloadPDF } from '../utils/downloadPDF';
 import { 
   XAxis, 
   YAxis, 
@@ -207,11 +207,21 @@ const Rankings = () => {
                  </button>
                ))}
              </div>
+
+             <div className="h-4 w-px bg-slate-200 mx-2" />
+
+             <button 
+               onClick={() => downloadPDF('rankings-content', `${project?.name}_Rankings_Report.pdf`)}
+               className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all active:scale-95 shadow-sm cursor-pointer"
+             >
+               <FileDown className="w-3.5 h-3.5" />
+               Export PDF
+             </button>
           </div>
         </div>
       </div>
 
-      <div className="max-w-[1600px] mx-auto px-6 pt-8 space-y-8">
+      <div className="max-w-[1600px] mx-auto px-6 pt-8 space-y-8" id="rankings-content">
         {/* KPI Grid - SEO Style */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
           <KPICard title="Total Keywords" value={metrics.total} color="slate" />
@@ -372,7 +382,7 @@ const Rankings = () => {
                   const reachVal = isFound ? (displayRank !== '-' ? Math.max(30, 100 - displayRank * 5) : 30) : 0;
 
                   return (
-                    <div key={idx} className="contents">
+                    <React.Fragment key={idx}>
                       <tr 
                         onClick={() => setExpandedRow(expandedRow === idx ? null : idx)}
                         className={`hover:bg-slate-50/50 transition-all cursor-pointer ${expandedRow === idx ? 'bg-blue-50/30' : ''}`}
@@ -545,7 +555,7 @@ const Rankings = () => {
                           </td>
                         </tr>
                       )}
-                    </div>
+                    </React.Fragment>
                   );
                 })}
               </tbody>

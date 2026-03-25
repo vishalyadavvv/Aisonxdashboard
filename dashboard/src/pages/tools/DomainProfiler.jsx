@@ -216,7 +216,7 @@ const DomainProfiler = () => {
               <div className="flex items-center gap-3" data-html2canvas-ignore>
                 <button 
                   onClick={() => downloadPDF('report-content', 'Domain_Profiler_Report.pdf')}
-                  className="flex items-center gap-2 bg-white text-[#1a202c] px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-100 transition-colors"
+                  className="flex items-center gap-2 bg-white text-[#1a202c] px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-100 transition-colors cursor-pointer"
                 >
                   <FileDown className="w-4 h-4" /> Export PDF Profile
                 </button>

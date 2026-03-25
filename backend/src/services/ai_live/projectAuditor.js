@@ -254,7 +254,7 @@ OUTPUT FORMAT (JSON ARRAY OF OBJECTS):
     [
       {
         "prompt": "Exact prompt text",
-        "brandRanking": { "rank": 1-10 (0 if not found), "score": 1-100 (0 if not found), "isRecommended": true/false, "linkProvided": true/false, "snippet": "Specific findings." },
+        "brandRanking": { "rank": 1-10 (0 if not found), "score": 1-100 (0 if not found), "isRecommended": "true/false. MUST BE false if rank is 0 or if brand not found", "linkProvided": true/false, "snippet": "Specific findings." },
         "competitorRankings": [ { "name": "Competitor", "domain": "domain.com", "rank": 1-10, "score": 1-100, "found": true/false } ],
         "authoritySignals": { "citations": ["URLs"] }
       }
@@ -277,11 +277,18 @@ OUTPUT FORMAT (JSON ARRAY OF OBJECTS):
       } catch (apiErr) {
         retries--;
         const isRateLimit = apiErr.status === 429 || (apiErr.message && apiErr.message.includes('429'));
-        if (retries > 0 && isRateLimit) {
-            logger.warn(`⚠️ OpenAI 429 Rate Limit hit. Retrying in 5 seconds... (${retries} retries left)`);
-            await new Promise(resolve => setTimeout(resolve, 5000));
+        const isTimeoutOrServer = apiErr.status >= 500 || apiErr.code === 'ETIMEDOUT' || (apiErr.message && (apiErr.message.includes('timeout') || apiErr.message.includes('socket')));
+        
+        if (retries > 0 && (isRateLimit || isTimeoutOrServer)) {
+            const delay = isRateLimit ? 5000 : 3000;
+            logger.warn(`⚠️ OpenAI API Issue (${apiErr.status || 'Timeout'}). Retrying in ${delay/1000}s... (${retries} retries left) | Error: ${apiErr.message}`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+        } else if (retries > 0) {
+            // Unexpected error but try once more with a short delay
+            logger.warn(`⚠️ OpenAI API Unexpected Error. Retrying... (${retries} retries left) | Error: ${apiErr.message}`);
+            await new Promise(resolve => setTimeout(resolve, 2000));
         } else {
-            logger.error(`❌ GPT Competitive Batch Audit API Error:`, apiErr.message);
+            logger.error(`❌ GPT Competitive Batch Audit API Error after retries:`, apiErr.message);
             return null; // Give up
         }
       }

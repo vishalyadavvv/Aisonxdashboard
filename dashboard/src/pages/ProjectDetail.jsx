@@ -258,7 +258,7 @@ const ProjectDetail = () => {
             </button>
             <button 
               onClick={() => downloadPDF('project-detail-report', `${project?.name || 'Project'}_Full_Report.pdf`)}
-              className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2"
+              className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2 cursor-pointer"
             >
               <Download className="w-4 h-4" />
               EXPORT

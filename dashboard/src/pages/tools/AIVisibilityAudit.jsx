@@ -670,7 +670,7 @@ const AIVisibilityAudit = () => {
               <div className="flex items-center gap-3" data-html2canvas-ignore>
                 <button 
                   onClick={() => downloadPDF('report-content', 'AI_Visibility_Audit.pdf')}
-                  className="flex items-center gap-2 bg-white text-[#1a202c] px-6 py-3 rounded-xl text-sm font-bold hover:bg-gray-100 transition-all active:scale-95"
+                  className="flex items-center gap-2 bg-white text-[#1a202c] px-6 py-3 rounded-xl text-sm font-bold hover:bg-gray-100 transition-all active:scale-95 cursor-pointer"
                 >
                   <FileDown className="w-4 h-4" /> Export PDF Report
                 </button>
