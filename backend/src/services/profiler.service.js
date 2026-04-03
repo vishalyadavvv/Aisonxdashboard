@@ -90,7 +90,7 @@ BODY: ${bodyText}
     }
     
     if (lastError && lastError.code === 'ENOTFOUND') {
-        throw new Error(`Domain not found: "${domain}".`);
+        return { error: `Domain not found: "${domain}".`, isNotFound: true };
     }
 
     return { error: 'Website unreachable or blocking requests.', isBlocked: true };
@@ -245,7 +245,7 @@ const synthesizeResults = async (domain, results, websiteContent) => {
 const analyzeDomainMulti = async (domain, content) => {
     logger.info(`Starting Multi-Agent Analysis for ${domain}`);
 
-    if (content && content.isBlocked) {
+    if (content && (content.isBlocked || content.isNotFound)) {
         return content;
     }
 

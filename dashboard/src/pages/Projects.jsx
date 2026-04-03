@@ -180,12 +180,42 @@ const Projects = () => {
     tier === 'starter' ? 2 : 1; // none or missing tier = 1 (Free Trial)
     
   const isProjectLimitReached = projects.length >= projectLimit;
+  const hasActivePlan = user?.subscription?.status === 'active' || user?.subscription?.status === 'trialing';
+  const showOnboardingHero = projects.length === 0 && !searchTerm;
 
   return (
     <div className="min-h-screen bg-gray-50" id="projects-dashboard">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8">
         <AnimatePresence>
-          {isLimitReached && (
+          {!hasActivePlan && !showOnboardingHero && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="mb-8 overflow-hidden"
+            >
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-6 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 border border-white/10 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-white/20 transition-all pointer-events-none" />
+                <div className="flex items-center gap-4 relative z-10">
+                  <div className="bg-white/20 p-3 rounded-2xl backdrop-blur-sm border border-white/20">
+                    <Zap className="w-6 h-6 text-white fill-white" />
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-black tracking-tight">No Active Plan</h4>
+                    <p className="text-sm text-blue-50/80 font-medium">Your current status is {user?.subscription?.status || 'inactive'}. Activate a plan to unlock automated GE0 visibility monitoring.</p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => navigate('/dashboard/pricing')}
+                  className="bg-white text-blue-600 px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-50 transition-all shadow-lg hover:scale-105 active:scale-95 shrink-0 relative z-10"
+                >
+                  {user?.subscription?.trialUsed ? 'Upgrade Plan ✦' : 'Start Free Trial ✦'}
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {isLimitReached && hasActivePlan && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
@@ -224,7 +254,7 @@ const Projects = () => {
           <div className="flex flex-col items-end">
             <button 
               onClick={() => setIsModalOpen(true)}
-              disabled={isExpired || isProjectLimitReached}
+              disabled={(isExpired && !hasActivePlan) || isProjectLimitReached}
               className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-bold rounded-lg hover:bg-blue-700 transition-all disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed shadow-md hover:shadow-lg active:scale-95"
             >
               <Plus className="w-4 h-4" />
@@ -258,22 +288,78 @@ const Projects = () => {
             <Loader2 className="w-8 h-8 text-blue-600 animate-spin mb-4" />
             <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Loading your projects...</p>
           </div>
+        ) : showOnboardingHero ? (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white border-2 border-dashed border-slate-200 rounded-3xl p-8 md:p-16 text-center shadow-sm relative overflow-hidden"
+          >
+            {/* Background elements */}
+            <div className="absolute top-0 left-0 w-64 h-64 bg-blue-50 rounded-full blur-3xl -ml-32 -mt-32 opacity-60" />
+            <div className="absolute bottom-0 right-0 w-64 h-64 bg-indigo-50 rounded-full blur-3xl -mr-32 -mt-32 opacity-60" />
+            
+            <div className="relative z-10 max-w-2xl mx-auto">
+              <div className="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-blue-200 rotate-3 transform transition-transform hover:rotate-0">
+                <Zap className="w-10 h-10 text-white fill-white" />
+              </div>
+              
+              <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4 tracking-tight leading-tight">
+                Unlock Your Brand's <span className="text-blue-600">AI Visibility</span>
+              </h2>
+              
+              <p className="text-lg text-slate-600 font-medium mb-10 leading-relaxed">
+                Welcome to AIsonx. Get started by creating your first project to monitor how AI models like ChatGPT and Gemini perceive your brand across the web.
+              </p>
+
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button 
+                  onClick={() => setIsModalOpen(true)}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 bg-blue-600 text-white text-base font-black rounded-2xl hover:bg-blue-700 transition-all shadow-xl shadow-blue-200 hover:scale-105 active:scale-95"
+                >
+                  <Plus className="w-5 h-5" />
+                  Create First Project
+                </button>
+                
+                {!hasActivePlan && (
+                  <button 
+                    onClick={() => navigate('/dashboard/pricing')}
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 bg-white text-slate-900 text-base font-black rounded-2xl border-2 border-slate-100 hover:bg-slate-50 transition-all hover:scale-105 active:scale-95"
+                  >
+                    <Zap className="w-5 h-5 text-blue-600 fill-blue-600" />
+                    {user?.subscription?.trialUsed ? 'Upgrade Plan' : 'Start Free Trial'}
+                  </button>
+                )}
+              </div>
+              
+              <div className="mt-12 pt-8 border-t border-slate-100 flex flex-wrap justify-center gap-8 md:gap-12">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                  <span className="text-sm font-bold text-slate-500 uppercase tracking-widest">Multi-Model Audit</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                  <span className="text-sm font-bold text-slate-500 uppercase tracking-widest">Live Search Tracking</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                  <span className="text-sm font-bold text-slate-500 uppercase tracking-widest">Market Context</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
         ) : filteredProjects.length === 0 ? (
-          <div className="bg-white border border-slate-900 rounded-lg p-12 text-center shadow-sm">
-            <Folder className="w-12 h-12 text-black mx-auto mb-4" />
-            <h3 className="text-lg font-black text-black mb-2 uppercase tracking-tight">No projects found</h3>
-            <p className="text-sm text-black font-bold mb-6">
-              {searchTerm ? 'Try adjusting your search' : 'Get started by creating your first project'}
+          <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center shadow-sm">
+            <Folder className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+            <h3 className="text-lg font-black text-slate-900 mb-2 uppercase tracking-tight">No results matched</h3>
+            <p className="text-sm text-slate-500 font-bold mb-6">
+              Try adjusting your search term to find what you're looking for.
             </p>
-            {!searchTerm && (
-              <button 
-                onClick={() => setIsModalOpen(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                Create Project
-              </button>
-            )}
+            <button 
+              onClick={() => setSearchTerm('')}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-600 text-sm font-bold rounded-lg hover:bg-slate-200 transition-all"
+            >
+              Clear Search
+            </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

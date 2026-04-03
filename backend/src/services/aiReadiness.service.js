@@ -1042,19 +1042,18 @@ exports.analyzeWebsite = async (url) => {
                     xRobotsTag: 'None' 
                 };
                 blockedSignals.crawlability.isNoindex = true;
-
-                // Return a "Blocked" state object instead of throwing
+                // Return a "Blocked" or "Inaccessible" state object instead of throwing
                 return {
                     businessType: 'General',
-                    summary: `Direct analysis of ${baseUrl} was blocked by a firewall or security layer (Status: ${statusMsg}). Our scanner was unable to retrieve technical signals or content depth.`,
+                    summary: `Analysis of ${baseUrl} was unavailable (Status: ${statusMsg}). Our scanner was unable to retrieve technical signals or content depth.`,
                     coverageScore: 0,
                     corePagesFound: 0,
                     totalPages: 0,
                     totalMissing: 0,
                     queries: [],
-                    sitemapUrl: 'Blocked by Security',
+                    sitemapUrl: 'Inaccessible',
                     totalSitemapUrls: 0,
-                    method: 'blocked',
+                    method: 'error',
                     isBlocked: true,
                     blockReason: statusMsg,
                     technicalSignals: blockedSignals
@@ -1064,11 +1063,12 @@ exports.analyzeWebsite = async (url) => {
                  console.log("Site is accessible but 0 internal links found. Proceeding with single-page analysis.");
                  sitemapUrls = [baseUrl];
             } else {
-                 throw new Error('Could not analyze website. Please check if the URL is accessible and not blocking automated requests.');
+                 return { businessType: 'General', summary: 'Could not analyze website. Please check if the URL is accessible.', isBlocked: true, method: 'error', technicalSignals: getDefaultTechnicalSignals() };
             }
         } else {
-            throw new Error('Could not analyze website. Please check if the URL is accessible and not blocking automated requests.');
+             return { businessType: 'General', summary: 'Could not analyze website. Please check if the URL is accessible.', isBlocked: true, method: 'error', technicalSignals: getDefaultTechnicalSignals() };
         }
+
     }
     
     // Classify business

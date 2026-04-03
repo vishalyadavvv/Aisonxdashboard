@@ -263,37 +263,98 @@ const internalRunProjectScan = async (project) => {
     try {
         logger.info(`🚀 COMPREHENSIVE scan triggered for: ${project.name}`);
         
-        // ---------------------------------------------------------
-        // PHASE 1: Technical & Content Infrastructure (Parallel)
-        // ---------------------------------------------------------
+        // PHASE 1: Technical & Content Infrastructure (Defensive Parallel)
         const [techResults, readinessResults, profilerContent, brandAuditResults] = await Promise.all([
-            // Technical check
-            Promise.all([
-                techAudit.analyzeRobots(project.domain),
-                techAudit.analyzeSitemap(project.domain)
-            ]),
+            // Technical check (Robots/Sitemap)
+            (async () => {
+                try {
+                    return await Promise.all([
+                        techAudit.analyzeRobots(project.domain),
+                        techAudit.analyzeSitemap(project.domain)
+                    ]);
+                } catch (e) {
+                    logger.warn(`Tech Audit sub-phase failed for ${project.domain}:`, e.message);
+                    return [{ found: false, error: e.message }, { found: false, error: e.message }];
+                }
+            })(),
             // AI Readiness Audit
-            aiReadinessService.analyzeWebsite(project.domain),
+            (async () => {
+                try {
+                    return await aiReadinessService.analyzeWebsite(project.domain);
+                } catch (e) {
+                    logger.warn(`AI Readiness sub-phase failed for ${project.domain}:`, e.message);
+                    return { error: e.message, method: 'failed' };
+                }
+            })(),
             // Fetch content for Profiler
-            profilerService.fetchWebsiteContent(project.domain),
+            (async () => {
+                try {
+                    return await profilerService.fetchWebsiteContent(project.domain);
+                } catch (e) {
+                    logger.warn(`Profiler fetch sub-phase failed for ${project.domain}:`, e.message);
+                    return { error: e.message, isNotFound: true };
+                }
+            })(),
             // Brand Audit (Knowledge Graph)
-            fetchKnowledgeGraphFull(project.brandName || project.name)
+            (async () => {
+                try {
+                    return await fetchKnowledgeGraphFull(project.brandName || project.name);
+                } catch (e) {
+                    logger.warn(`Brand Audit sub-phase failed for ${project.brandName}:`, e.message);
+                    return null;
+                }
+            })()
         ]);
 
         const [robotsJson, sitemapJson] = techResults;
 
-        // 2. MULTI-MODEL INTERNAL AUDIT (CRITICAL: Strictly Internal Knowledge for this tool)
+        // PHASE 2: MULTI-MODEL INTERNAL AUDIT (Defensive Parallel)
         const [scanResults, synthesisResults, liveAuditResults, auditProfile, auditModelResults] = await Promise.all([
             // 1. Visibility Audit (Brand + Competitors — typically uses Search)
-            promptOrchestrator.performProjectScan(project),
+            (async () => {
+                try {
+                    return await promptOrchestrator.performProjectScan(project);
+                } catch (e) {
+                    logger.error(`Visibility Audit phase failed for ${project.name}:`, e.message);
+                    return { promptRankings: [], competitorRankings: [], customPromptResults: [], error: e.message };
+                }
+            })(),
             // 2. Domain Profiler (Synthesis)
-            profilerService.analyzeDomainMulti(project.domain, profilerContent),
+            (async () => {
+                try {
+                    return await profilerService.analyzeDomainMulti(project.domain, profilerContent);
+                } catch (e) {
+                    logger.error(`Domain Profiler phase failed for ${project.domain}:`, e.message);
+                    return { brandType: 'Unknown', error: e.message };
+                }
+            })(),
             // 3. Web search (Live Brand Mentions)
-            runLiveAudit(project.brandName),
+            (async () => {
+                try {
+                    return await runLiveAudit(project.brandName);
+                } catch (e) {
+                    logger.error(`Live Brand Audit phase failed for ${project.brandName}:`, e.message);
+                    return { citations: [], mentions: [] };
+                }
+            })(),
             // 4. Independent Audit Profile (for Visibility Audit tool)
-            aiOrchestrator.getStructuredProfile(project.brandName),
+            (async () => {
+                try {
+                    return await aiOrchestrator.getStructuredProfile(project.brandName);
+                } catch (e) {
+                    logger.error(`Structured Profile phase failed for ${project.brandName}:`, e.message);
+                    return { summary: 'Profile generation failed.', error: e.message };
+                }
+            })(),
             // 5. Independent Model Results (for Visibility Audit tool engine cards)
-            aiOrchestrator.broadcastQuery(project.brandName)
+            (async () => {
+                try {
+                    return await aiOrchestrator.broadcastQuery(project.brandName);
+                } catch (e) {
+                    logger.error(`Broadcast Query phase failed for ${project.brandName}:`, e.message);
+                    return [];
+                }
+            })()
         ]);
 
         // ---------------------------------------------------------
