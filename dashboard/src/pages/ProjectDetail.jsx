@@ -303,7 +303,6 @@ const ProjectDetail = () => {
                 <option value="all">All AI Engines</option>
                 <option value="gemini">Google Gemini</option>
                 <option value="openai">OpenAI GPT-4o</option>
-                {/* <option value="groq">Groq Llama 3</option> */}
               </select>
             </div>
           </div>
@@ -374,7 +373,6 @@ const ProjectDetail = () => {
                   {[
                     { name: 'OpenAI', id: 'openai', color: 'bg-emerald-500' },
                     { name: 'Gemini', id: 'gemini', color: 'bg-blue-500' },
-                    // { name: 'Groq', id: 'groq', color: 'bg-amber-500' },
                   ].map((engine) => {
                     // Calculate a live score for this engine based on the same logic used in the insights
                     const engineRankings = lastSnapshot?.promptRankings?.filter(r => r.engine === engine.id) || [];
@@ -732,7 +730,7 @@ const ProjectDetail = () => {
                                       </div>
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                      {['openai', 'gemini'/*, 'groq'*/].filter(e => selectedEngine === 'all' || e === selectedEngine).map((engine) => {
+                                      {['openai', 'gemini'].filter(e => selectedEngine === 'all' || e === selectedEngine).map((engine) => {
                                         const res = tableHistory[activeSnapshotIndex].promptRankings?.find(r => r.prompt === promptText && r.engine === engine);
                                         const brandName = project?.brandName || project?.name || '';
                                         const snippetLower = res?.snippet?.toLowerCase() || '';

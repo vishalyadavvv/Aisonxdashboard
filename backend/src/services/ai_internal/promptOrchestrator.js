@@ -135,13 +135,21 @@ async function discoverCompetitors(brandName, domain, market = { name: 'Global' 
     try {
         logger.info(`🔍 [DISCOVERY] Researching rivals for ${brandName} in ${market.name} using Multi-Engine Live Search...`);
         
-        const [gptRivals, geminiRivals] = await Promise.all([
-            gptSearchCompetitors(brandName, domain, market),
-            geminiSearchCompetitors(brandName, domain, market)
-        ]);
+        let allRivals = [];
+        try {
+            const [gptRivals, geminiRivals] = await Promise.all([
+                gptSearchCompetitors(brandName, domain, market),
+                geminiSearchCompetitors(brandName, domain, market)
+            ]);
+            allRivals = [...(gptRivals || []), ...(geminiRivals || [])];
+        } catch (parallelErr) {
+            logger.warn(`⚠️ [DISCOVERY] Parallel search failed, trying sequentially for ${brandName}...`);
+            const gptRivals = await gptSearchCompetitors(brandName, domain, market).catch(() => []);
+            const geminiRivals = await geminiSearchCompetitors(brandName, domain, market).catch(() => []);
+            allRivals = [...(gptRivals || []), ...(geminiRivals || [])];
+        }
 
         // Merge and deduplicate by domain
-        const allRivals = [...(gptRivals || []), ...(geminiRivals || [])];
         const uniqueMap = new Map();
         
         allRivals.forEach(r => {
@@ -156,14 +164,14 @@ async function discoverCompetitors(brandName, domain, market = { name: 'Global' 
         const discovered = Array.from(uniqueMap.values()).slice(0, 5);
         
         if (discovered.length > 0) {
-            logger.info(`✅ [DISCOVERY] Found ${discovered.length} unique rivals via combined search`);
+            logger.info(`✅ [DISCOVERY] Found ${discovered.length} unique rivals via search`);
             return discovered;
         } else {
-            logger.warn(`⚠️ [DISCOVERY] No rivals found for ${brandName} via multi-engine search`);
+            logger.warn(`⚠️ [DISCOVERY] No rivals found for ${brandName} after fallback attempts`);
             return [];
         }
     } catch (err) {
-        logger.error(`❌ [DISCOVERY] Multi-engine error for ${brandName}:`, err.message);
+        logger.error(`❌ [DISCOVERY] Fatal error for ${brandName}:`, err.message);
         return [];
     }
 }
@@ -219,8 +227,8 @@ exports.performProjectScan = async (project) => {
         logger.info(`🔄 [COMPETITIVE] Running OpenAI Battle View for ${project.prompts.length} prompts in ${market.name}...`);
         const compResults = await gptCompetitiveBatchAudit(brandName, domain, project.competitors, project.prompts, market);
         
-        if (compResults && Array.isArray(compResults)) {
-            for (const audit of (compResults || [])) {
+        if (compResults && Array.isArray(compResults) && compResults.length > 0) {
+            for (const audit of compResults) {
                 if (!audit || !audit.brandRanking) continue;
                 
                 const isRanked = audit.brandRanking.rank > 0;
@@ -256,7 +264,9 @@ exports.performProjectScan = async (project) => {
                     }
                 }
             }
-            logger.info(`✅ [COMPETITIVE] OpenAI Battle View complete`);
+            logger.info(`✅ [COMPETITIVE] OpenAI Battle View complete with ${compResults.length} results`);
+        } else {
+            logger.warn(`⚠️ [COMPETITIVE] OpenAI Battle View returned NO results for ${project.name}`);
         }
     }
 
@@ -267,46 +277,51 @@ exports.performProjectScan = async (project) => {
             geminiCompetitiveAudit(brandName, domain, project.competitors, promptText, market)
         );
         
-        const gCompResults = await runWithLimit(tasks, 3); // Gemini search is heavy, lower limit
+        const gCompResultsRaw = await runWithLimit(tasks, 3); // Gemini search is heavy, lower limit
+        const gCompResults = gCompResultsRaw.filter(Boolean);
         
-        for (const audit of gCompResults.filter(Boolean)) {
-             if (!audit.brandRanking) continue;
- 
-             const isRanked = audit.brandRanking.rank > 0;
-             // Map Brand Result
-             results.promptRankings.push({
-                prompt: audit.prompt || '',
-                engine: 'gemini',
-                visibility: isRanked ? (audit.brandRanking.rank <= 3 ? 'High' : 'Moderate') : 'None',
-                found: isRanked || (audit.brandRanking.isRecommended === true && audit.brandRanking.rank > 0),
-                linkFound: audit.brandRanking.linkProvided || false,
-                rank: audit.brandRanking.rank || 0,
-                linkRank: audit.brandRanking.rank || 0,
-                score: audit.brandRanking.score || 0,
-                snippet: audit.brandRanking.snippet || '',
-                citations: audit.authoritySignals?.citations || [],
-                authoritySource: audit.authoritySignals?.sourceType || 'Gemini Google Search',
-                authoritySignals: audit.authoritySignals || { sourceType: 'Comparison', citations: [] }
-            });
-
-            // Map Competitor Results
-            if (audit.competitorRankings) {
-                for (const cr of audit.competitorRankings) {
-                    results.competitorRankings.push({
-                        competitorName: cr.name,
-                        competitorDomain: cr.domain,
-                        prompt: audit.prompt,
-                        engine: 'gemini',
-                        visibility: cr.rank > 0 ? (cr.rank <= 3 ? 'High' : 'Moderate') : 'None',
-                        found: cr.found || cr.rank > 0,
-                        score: cr.score || 0,
-                        rank: cr.rank || 0,
-                        authoritySignals: audit.authoritySignals || {}
-                    });
+        if (gCompResults.length > 0) {
+            for (const audit of gCompResults) {
+                 if (!audit.brandRanking) continue;
+     
+                 const isRanked = audit.brandRanking.rank > 0;
+                 // Map Brand Result
+                 results.promptRankings.push({
+                    prompt: audit.prompt || '',
+                    engine: 'gemini',
+                    visibility: isRanked ? (audit.brandRanking.rank <= 3 ? 'High' : 'Moderate') : 'None',
+                    found: isRanked || (audit.brandRanking.isRecommended === true && audit.brandRanking.rank > 0),
+                    linkFound: audit.brandRanking.linkProvided || false,
+                    rank: audit.brandRanking.rank || 0,
+                    linkRank: audit.brandRanking.rank || 0,
+                    score: audit.brandRanking.score || 0,
+                    snippet: audit.brandRanking.snippet || '',
+                    citations: audit.authoritySignals?.citations || [],
+                    authoritySource: audit.authoritySignals?.sourceType || 'Gemini Google Search',
+                    authoritySignals: audit.authoritySignals || { sourceType: 'Comparison', citations: [] }
+                });
+    
+                // Map Competitor Results
+                if (audit.competitorRankings) {
+                    for (const cr of audit.competitorRankings) {
+                        results.competitorRankings.push({
+                            competitorName: cr.name,
+                            competitorDomain: cr.domain,
+                            prompt: audit.prompt,
+                            engine: 'gemini',
+                            visibility: cr.rank > 0 ? (cr.rank <= 3 ? 'High' : 'Moderate') : 'None',
+                            found: cr.found || cr.rank > 0,
+                            score: cr.score || 0,
+                            rank: cr.rank || 0,
+                            authoritySignals: audit.authoritySignals || {}
+                        });
+                    }
                 }
             }
+            logger.info(`✅ [COMPETITIVE] Gemini Battle View complete with ${gCompResults.length} results`);
+        } else {
+            logger.warn(`⚠️ [COMPETITIVE] Gemini Battle View returned NO results for ${project.name}`);
         }
-        logger.info(`✅ [COMPETITIVE] Gemini Battle View complete`);
     }
 
     // 2. Fallback Audits (Non-Search Internal Knowledge)

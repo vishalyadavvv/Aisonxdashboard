@@ -147,11 +147,7 @@ OUTPUT FORMAT (JSON):
   }
 };
 
-/**
- * GEMINI INDIVIDUAL PROMPT AUDIT
- * Uses Google Search via Gemini to audit a single prompt.
- */
-exports.geminiPromptAudit = async function geminiPromptAudit(brandName, domain, promptText, market = { name: 'Global' }) {
+exports.geminiPromptAudit = async function gptPromptAudit(brandName, domain, promptText, market = { name: 'Global' }) {
   try {
     if (!process.env.GEMINI_API_KEY) return null;
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -180,41 +176,55 @@ INSTRUCTIONS:
 }
 🚨 RETURN ONLY JSON.`;
 
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.4 }
-    });
+    let text = '';
+    let retries = 3;
+    let finalResult = null;
 
-    const text = result.response.text();
-    const parsed = robustParseJSON(text);
-    if (!parsed) return null;
-
-    // Extract citations
-    try {
-      let allUrls = [];
-      const candidates = result.response.candidates;
-      if (candidates?.[0]?.groundingMetadata?.groundingChunks) {
-        let groundingUrls = candidates[0].groundingMetadata.groundingChunks.map(c => c.web?.uri).filter(u => u);
-        allUrls.push(...groundingUrls);
+    while (retries > 0) {
+      try {
+        const result = await model.generateContent({
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.4 }
+        });
+        text = result.response.text();
+        finalResult = robustParseJSON(text);
+        if (finalResult) {
+            // Extract citations
+            try {
+              let allUrls = [];
+              const candidates = result.response.candidates;
+              if (candidates?.[0]?.groundingMetadata?.groundingChunks) {
+                let groundingUrls = candidates[0].groundingMetadata.groundingChunks.map(c => c.web?.uri).filter(u => u);
+                allUrls.push(...groundingUrls);
+              }
+              const textUrls = text.match(/(https?:\/\/[^\s]+)/g);
+              if (textUrls) allUrls.push(...textUrls);
+              if (allUrls.length > 0) {
+                const cleanedUrls = [...new Set(allUrls.map(cleanUrl).filter(Boolean))];
+                finalResult.authoritySignals.citations = await Promise.all(cleanedUrls.map(resolveVertexRedirect));
+              }
+            } catch (e) {
+              logger.warn("Error extracting Gemini citations:", e.message);
+            }
+            return finalResult;
+        }
+        retries--;
+      } catch (err) {
+        retries--;
+        const isRateLimit = err.message && (err.message.includes('429') || err.message.includes('quota'));
+        if (retries > 0 && isRateLimit) {
+            logger.warn(`⚠️ Gemini Rate Limit. Retrying in 5s...`);
+            await new Promise(resolve => setTimeout(resolve, 5000));
+        } else if (retries > 0) {
+            await new Promise(resolve => setTimeout(resolve, 1500));
+        } else {
+            logger.error(`❌ Gemini Individual Audit Error:`, err.message);
+        }
       }
-
-      // Also extract URLs from the main text if groundingMetadata is not sufficient
-      const textUrls = text.match(/(https?:\/\/[^\s]+)/g);
-      if (textUrls) {
-        allUrls.push(...textUrls);
-      }
-
-      if (allUrls.length > 0) {
-        const cleanedUrls = [...new Set(allUrls.map(cleanUrl).filter(Boolean))];
-        parsed.authoritySignals.citations = await Promise.all(cleanedUrls.map(resolveVertexRedirect));
-      }
-    } catch (e) {
-      logger.warn("Error extracting Gemini citations:", e.message);
     }
-
-    return parsed;
+    return null;
   } catch (err) {
-    logger.error("❌ Gemini individual Audit Error:", err.message);
+    logger.error("❌ Gemini Audit Fatal Error:", err.message);
     return null;
   }
 };
@@ -311,10 +321,6 @@ OUTPUT FORMAT (JSON ARRAY OF OBJECTS):
   }
 };
 
-/**
- * GEMINI COMPETITIVE AUDIT
- * Comparative audit using Google Search.
- */
 exports.geminiCompetitiveAudit = async function geminiCompetitiveAudit(brandName, domain, competitors, promptText, market = { name: 'Global' }) {
   try {
     if (!process.env.GEMINI_API_KEY) return null;
@@ -349,41 +355,55 @@ INSTRUCTIONS:
 }
 🚨 RETURN ONLY JSON.`;
 
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.4 }
-    });
+    let text = '';
+    let retries = 3;
+    let finalResult = null;
 
-    const text = result.response.text();
-    const parsed = robustParseJSON(text);
-    if (!parsed) return null;
-
-    // Extract citations
-    try {
-      let allUrls = [];
-      const candidates = result.response.candidates;
-      if (candidates?.[0]?.groundingMetadata?.groundingChunks) {
-        let groundingUrls = candidates[0].groundingMetadata.groundingChunks.map(c => c.web?.uri).filter(u => u);
-        allUrls.push(...groundingUrls);
+    while (retries > 0) {
+      try {
+        const result = await model.generateContent({
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.4 }
+        });
+        text = result.response.text();
+        finalResult = robustParseJSON(text);
+        if (finalResult) {
+            // Extract citations
+            try {
+              let allUrls = [];
+              const candidates = result.response.candidates;
+              if (candidates?.[0]?.groundingMetadata?.groundingChunks) {
+                let groundingUrls = candidates[0].groundingMetadata.groundingChunks.map(c => c.web?.uri).filter(u => u);
+                allUrls.push(...groundingUrls);
+              }
+              const textUrls = text.match(/(https?:\/\/[^\s]+)/g);
+              if (textUrls) allUrls.push(...textUrls);
+              if (allUrls.length > 0) {
+                const cleanedUrls = [...new Set(allUrls.map(cleanUrl).filter(Boolean))];
+                finalResult.authoritySignals.citations = await Promise.all(cleanedUrls.map(resolveVertexRedirect));
+              }
+            } catch (e) {
+              logger.warn("Error extracting Gemini competitive citations:", e.message);
+            }
+            return finalResult;
+        }
+        retries--;
+      } catch (err) {
+        retries--;
+        const isRateLimit = err.message && (err.message.includes('429') || err.message.includes('quota'));
+        if (retries > 0 && isRateLimit) {
+            logger.warn(`⚠️ Gemini Competitive Rate Limit. Retrying in 5s...`);
+            await new Promise(resolve => setTimeout(resolve, 5000));
+        } else if (retries > 0) {
+            await new Promise(resolve => setTimeout(resolve, 1500));
+        } else {
+            logger.error(`❌ Gemini Competitive Audit Error:`, err.message);
+        }
       }
-
-      // Also extract URLs from the main text
-      const textUrls = text.match(/(https?:\/\/[^\s]+)/g);
-      if (textUrls) {
-        allUrls.push(...textUrls);
-      }
-
-      if (allUrls.length > 0) {
-        const cleanedUrls = [...new Set(allUrls.map(cleanUrl).filter(Boolean))];
-        parsed.authoritySignals.citations = await Promise.all(cleanedUrls.map(resolveVertexRedirect));
-      }
-    } catch (e) {
-      logger.warn("Error extracting Gemini competitive citations:", e.message);
     }
-
-    return parsed;
+    return null;
   } catch (err) {
-    logger.error("❌ Gemini Competitive Audit Error:", err.message);
+    logger.error("❌ Gemini Competitive Audit Fatal Error:", err.message);
     return null;
   }
 };
@@ -434,10 +454,6 @@ Rules:
   }
 };
 
-/**
- * GEMINI SEARCH COMPETITORS
- * Uses Google Search to find current rivals.
- */
 exports.geminiSearchCompetitors = async function geminiSearchCompetitors(brandName, domain, market = { name: 'Global' }) {
   try {
     if (!process.env.GEMINI_API_KEY) return [];
@@ -446,8 +462,6 @@ exports.geminiSearchCompetitors = async function geminiSearchCompetitors(brandNa
       model: "gemini-2.0-flash",
       tools: [{ googleSearch: {} }]
     });
-
-    const contextStr = market.name !== 'Global' ? `specifically in the ${market.name} market` : 'in 2026';
 
     const prompt = `Who are the top 5 direct competitors of "${brandName}" (${domain}) in the ${market.name} market?
 
@@ -459,18 +473,35 @@ Return ONLY a JSON array:
 [{"name": "Company Name", "domain": "company.com"}]`;
 
     logger.info(`🔍 [PROJECT_AUDITOR] Searching GOOGLE LIVE for rivals of ${brandName}...`);
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.5 }
-    });
+    
+    let retries = 3;
+    while (retries > 0) {
+        try {
+            const result = await model.generateContent({
+              contents: [{ role: "user", parts: [{ text: prompt }] }],
+              generationConfig: { temperature: 0.5 }
+            });
 
-    const text = result.response.text();
-    const discovered = robustParseJSON(text);
-    if (!discovered) return [];
-    logger.info(`✅ [PROJECT_AUDITOR] Gemini discovered ${discovered.length} rivals for ${brandName}`);
-    return discovered;
+            const text = result.response.text();
+            const discovered = robustParseJSON(text);
+            if (discovered && Array.isArray(discovered)) {
+                logger.info(`✅ [PROJECT_AUDITOR] Gemini discovered ${discovered.length} rivals for ${brandName}`);
+                return discovered;
+            }
+            retries--;
+        } catch (err) {
+            retries--;
+            if (retries > 0) {
+                logger.warn(`⚠️ Gemini Competitor Search Error. Retrying... (${retries} left)`);
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            } else {
+                logger.error(`❌ [PROJECT_AUDITOR] Gemini Competitor Search Error:`, err.message);
+            }
+        }
+    }
+    return [];
   } catch (err) {
-    logger.error(`❌ [PROJECT_AUDITOR] Gemini Competitor Search Error:`, err.message);
+    logger.error(`❌ [PROJECT_AUDITOR] Gemini Competitor Search Fatal Error:`, err.message);
     return [];
   }
 };

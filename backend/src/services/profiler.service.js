@@ -140,28 +140,6 @@ const analyzeWithGemini = async (domain, content) => {
     }
 };
 
-/**
- * Provider: Groq (The Technical Semanticist)
- */
-/*
-const analyzeWithGroq = async (domain, content) => {
-    try {
-        const response = await axios.post('https://api.groq.com/openai/v1/chat/completions', {
-            model: 'llama-3.3-70b-versatile',
-            messages: [{ role: 'user', content: `Analyze the technical and semantic footprint of "${domain}". Identify if it is B2B, B2C, or D2C, along with its industry niche and business model. Context: ${content.substring(0, 5000)}. Output JSON.` }],
-            response_format: { type: "json_object" }
-        }, {
-            headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` }
-        });
-        return JSON.parse(response.data.choices[0].message.content);
-    } catch (e) { 
-        logger.error(`Groq Error: ${e.response?.data?.error?.message || e.message}`); 
-        return null; 
-    }
-};
-*/
-
-
 
 /**
  * The Master Synthesizer: Elevating Accuracy to Professional Grade

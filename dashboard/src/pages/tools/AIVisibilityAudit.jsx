@@ -733,9 +733,8 @@ const AIVisibilityAudit = () => {
                   <span className="text-[9px] font-black text-blue-600 uppercase tracking-tighter">Internal Knowledge</span>
                 </div>
               </div>
-              
               <div className="grid grid-cols-1 gap-4">
-                {['Gemini', 'ChatGPT'/*, 'Groq'*/].map((id, i) => (
+                {['Gemini', 'ChatGPT'].map((id, i) => (
                   modelResults[id] && (
                     <motion.div 
                       key={id}
