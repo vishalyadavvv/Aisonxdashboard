@@ -34,11 +34,17 @@ build/
 
 # Temporary Output & Test Files
 *.txt
+*.log
 test*
+tests/
 verify*
 temp/
 gemini_fix_output.txt
 nike_results_api_fix.json
 nike_results_api.json
 nike_results_v2.json
+seed-admin.js
+*.json
+!package.json
+!package-lock.json
 
