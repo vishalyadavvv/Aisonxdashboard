@@ -35,6 +35,23 @@ frontend/node_modules/
 frontend/.env
 frontend/dist/
 frontend/build/
+aisonx-footer.html/
+aisonx-header.html/
+aisonx-header.php/
+Home.html/
+new.txt/
+*.html/
+*.php/
+*.txt/
+home.html/
+index.html/
+index2.html/
+index3.html/
+web-search.html/
+ROADMAP_AND_ARCHITECTURE.md
+package-lock.json
+package.json
+README.md
 
 # Temporary files
 *.log
