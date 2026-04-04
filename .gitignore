@@ -61,6 +61,12 @@ test*
 verify*
 gemini_fix_output.txt
 
-.google-knowledge-graph-explorer/
-
-
+# Root Cleanup - Only keep backend and dashboard
+/*
+!/backend/
+!/dashboard/
+!/.gitignore
+!/package.json
+!/package-lock.json
+!/README.md
+!/ROADMAP_AND_ARCHITECTURE.md

@@ -1,6 +1,6 @@
 const gemini = require('./gemini.service');
 const openai = require('./openai.service');
-const groq = require('./groq.service');
+// const groq = require('./groq.service');
 // const perplexity = require('./perplexity.service');
 const logger = require('../../utils/logger');
 
@@ -357,12 +357,12 @@ OUTPUT FORMAT (Valid JSON - MANDATORY):
             fn: (p) => gemini.fetchGemini(p, true, false),
             priority: 2
         },
-        { 
-            id: 'groq', 
-            name: 'Groq LLaMA',
-            fn: (p) => groq.fetchGroq(p, true, false),
-            priority: 3
-        }
+        // { 
+        //     id: 'groq', 
+        //     name: 'Groq LLaMA',
+        //     fn: (p) => groq.fetchGroq(p, true, false),
+        //     priority: 3
+        // }
     ];
 
     const results = {};
@@ -543,7 +543,7 @@ OUTPUT FORMAT (Valid JSON - MANDATORY):
     const models = [
         { name: 'Google Gemini', fn: () => gemini.fetchGemini(independentProfilePrompt, true, false) },
         { name: 'OpenAI GPT-4o', fn: () => openai.fetchOpenAI(independentProfilePrompt, true, false) },
-        { name: 'Groq LLaMA', fn: () => groq.fetchGroq(independentProfilePrompt, true, false) }
+        // { name: 'Groq LLaMA', fn: () => groq.fetchGroq(independentProfilePrompt, true, false) }
     ];
 
     for (const model of models) {
@@ -645,7 +645,7 @@ Do not use generic placeholders if search data is available. Return ONLY JSON.`;
     const synthesisModels = [
         { name: 'Gemini', fn: () => gemini.fetchGemini(synthesisPrompt, true) },
         { name: 'OpenAI', fn: () => openai.fetchOpenAI(synthesisPrompt, true, false) },
-        { name: 'Groq', fn: () => groq.fetchGroq(synthesisPrompt, true) }
+        // { name: 'Groq', fn: () => groq.fetchGroq(synthesisPrompt, true) }
     ];
 
     for (const model of synthesisModels) {

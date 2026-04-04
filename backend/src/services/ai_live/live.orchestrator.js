@@ -1,7 +1,7 @@
 const logger = require("../../utils/logger");
 const chatgptLive = require("./gptlive");
 const geminiLive = require("./geminilive");
-const groqLive = require("./groqlive");
+// const groqLive = require("./groqlive");
 // const perplexityLive = require("./perpexilitylive");
 
 
@@ -143,7 +143,7 @@ const runLiveAudit = async (brand, onResult = null) => {
   const models = [
     { id: 'chatgpt', fn: () => chatgptLive(brand), name: 'ChatGPT Live' },
     { id: 'gemini', fn: () => geminiLive(brand), name: 'Gemini Live' },
-    { id: 'groq', fn: () => groqLive(brand), name: 'Groq Live' },
+    // { id: 'groq', fn: () => groqLive(brand), name: 'Groq Live' },
     // { id: 'perplexity', fn: () => perplexityLive(brand), name: 'Perplexity Live' }
   ];
 

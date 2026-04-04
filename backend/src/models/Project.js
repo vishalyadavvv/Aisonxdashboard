@@ -35,8 +35,8 @@ const ProjectSchema = new mongoose.Schema({
   }],
   targetEngines: [{
     type: String,
-    enum: ['openai', 'gemini', 'groq'],
-    default: ['openai', 'gemini', 'groq']
+    enum: ['openai', 'gemini'],
+    default: ['openai', 'gemini']
   }],
   market: {
     name: { type: String, default: 'Global' },

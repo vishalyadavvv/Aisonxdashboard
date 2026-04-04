@@ -143,6 +143,7 @@ const analyzeWithGemini = async (domain, content) => {
 /**
  * Provider: Groq (The Technical Semanticist)
  */
+/*
 const analyzeWithGroq = async (domain, content) => {
     try {
         const response = await axios.post('https://api.groq.com/openai/v1/chat/completions', {
@@ -158,6 +159,7 @@ const analyzeWithGroq = async (domain, content) => {
         return null; 
     }
 };
+*/
 
 
 
@@ -166,7 +168,7 @@ const analyzeWithGroq = async (domain, content) => {
  */
 const synthesizeResults = async (domain, results, websiteContent) => {
     const valid = [];
-    const providers = ['OpenAI', 'Gemini', 'Groq'];
+    const providers = ['OpenAI', 'Gemini'/*, 'Groq'*/];
     results.forEach((r, idx) => {
         if (r.status === 'fulfilled' && r.value) valid.push({ p: providers[idx], d: r.value });
     });
@@ -254,8 +256,8 @@ const analyzeDomainMulti = async (domain, content) => {
     // 1. Run base agents in parallel
     const results = await Promise.allSettled([
         analyzeWithOpenAI(domain, content),
-        analyzeWithGemini(domain, content),
-        analyzeWithGroq(domain, content)
+        analyzeWithGemini(domain, content)
+        // analyzeWithGroq(domain, content)
     ]);
     return await synthesizeResults(domain, results, content);
 };

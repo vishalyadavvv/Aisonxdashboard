@@ -63,7 +63,7 @@ const WebSearch = () => {
           const mk = {
             ChatGPT: raw.chatgpt || raw.openai || raw.ChatGPT,
             Gemini: raw.gemini || raw.Gemini,
-            Groq: raw.groq || raw.Groq
+            // Groq: raw.groq || raw.Groq
           };
           const filteredMk = {};
           Object.entries(mk).forEach(([k, v]) => {
@@ -148,7 +148,7 @@ const WebSearch = () => {
                 case 'model_result':
                   setModelResults(prev => ({ 
                     ...prev, 
-                    [data.modelId === 'chatgpt' ? 'ChatGPT' : data.modelId === 'gemini' ? 'Gemini' : 'Groq']: data.result 
+                    [data.modelId === 'chatgpt' ? 'ChatGPT' : data.modelId === 'gemini' ? 'Gemini' : 'ChatGPT']: data.result 
                   }));
                   break;
                 case 'profile_result':
@@ -204,7 +204,7 @@ const WebSearch = () => {
     setModelResults({
       ChatGPT: data.openai,
       Gemini: data.gemini,
-      Groq: data.groq
+      // Groq: data.groq
     });
 
     setActiveModel(null);
@@ -591,7 +591,7 @@ const WebSearch = () => {
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-                {['Gemini', 'ChatGPT', 'Groq'].map((id, i) => (
+                {['Gemini', 'ChatGPT'/*, 'Groq'*/].map((id, i) => (
                   modelResults[id] && (
                     <motion.div 
                       key={id}

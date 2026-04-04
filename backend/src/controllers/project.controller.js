@@ -84,7 +84,7 @@ exports.createProject = async (req, res) => {
             domain,
             prompts,
             competitors: competitors || [],
-            targetEngines: targetEngines || ['openai', 'gemini', 'groq'],
+            targetEngines: targetEngines || ['openai', 'gemini'],
             market: market || { name: 'Global', code: 'GLB', type: 'global' }
         });
 
@@ -378,10 +378,10 @@ const internalRunProjectScan = async (project) => {
         const uniqueCitations = [...new Set(allSignals.flatMap(s => s.citations || []))].filter(Boolean).slice(0, 10);
 
         // Engine-Specific Scores (Live Search based)
-        const engineScores = { openai: 0, gemini: 0, groq: 0 };
+        const engineScores = { openai: 0, gemini: 0 };
         const foundPrompts = new Set();
         
-        ['openai', 'gemini', 'groq'].forEach(engine => {
+        ['openai', 'gemini'].forEach(engine => {
             const engineRankings = scanResults.promptRankings.filter(r => r.engine === engine);
             if (engineRankings.length > 0) {
                 const negPhrases = ['not found', 'not visible', 'does not appear', 'does not rank', 'not organically visible', 'is not present', 'no mention'];
@@ -478,7 +478,7 @@ const internalRunProjectScan = async (project) => {
         };
         
         // Map individual engine cards from the dedicated internal audit results
-        ['openai', 'gemini', 'groq'].forEach(engine => {
+        ['openai', 'gemini'].forEach(engine => {
             const internalResult = auditModelResults[engine];
             if (internalResult) {
                 visibilityAudit[engine] = {

@@ -1997,6 +1997,8 @@
                             </div>
                         </div>
 
+                        <!-- 
+                        <!-- 
                         <div class="model-card" id="groqCard">
                             <div class="model-header">
                                 <div class="model-icon">
@@ -2009,6 +2011,8 @@
                                 Waiting for live analysis...
                             </div>
                         </div>
+                        -->
+                        -->
 
                         <!-- 
                         <div class="model-card" id="perplexityCard">
@@ -2277,7 +2281,7 @@
             chatgpt: null,
             // perplexity: null,
             gemini: null,
-            groq: null
+            // groq: null
         };
         let activeModelId = null;
         
@@ -2364,7 +2368,7 @@
             if (results.openai) window.aiEngineData.chatgpt = results.openai;
             // if (results.perplexity) window.aiEngineData.perplexity = results.perplexity;
             if (results.gemini) window.aiEngineData.gemini = results.gemini;
-            if (results.groq) window.aiEngineData.groq = results.groq;
+            // if (results.groq) window.aiEngineData.groq = results.groq;
 
             if (results.profile) {
                 // The master profile is the primary synthesis the user prefers
@@ -2384,7 +2388,7 @@
             if (results.openai) updateModelUI('chatgpt', results.openai);
             // if (results.perplexity) updateModelUI('perplexity', results.perplexity);
             if (results.gemini) updateModelUI('gemini', results.gemini);
-            if (results.groq) updateModelUI('groq', results.groq);
+            // if (results.groq) updateModelUI('groq', results.groq);
         }
 
         // Set Active Model for Analysis Panels
@@ -2582,7 +2586,7 @@
                                  brandStatus.toLowerCase().includes('not found') ||
                                  brandStatus.toLowerCase().includes('minimal');
 
-                // Groq-specific refinement: check summary content if status says "Present"
+                /*
                 if (modelId === 'groq' && !isUnknown) {
                     const lowContent = content.toLowerCase();
                     if (lowContent.includes('does not contain specific information') || 
@@ -2592,6 +2596,7 @@
                         isUnknown = true;
                     }
                 }
+                */
                                  
                 brandStatus = isUnknown ? 'UNKNOWN' : 'PRESENT';
 
@@ -2705,13 +2710,11 @@
                 cardEl.onclick = () => setActiveModel(modelId);
                 
                 // If this is the first successful result and nothing is active, set it
-                // Priority: Gemini > Groq > ChatGPT
-                if (!activeModelId /* && modelId !== 'perplexity' */) {
+                // Priority: Gemini > ChatGPT
+                if (!activeModelId) {
                     if (modelId === 'gemini') {
                         setActiveModel(modelId);
-                    } else if (modelId === 'groq' && !window.aiEngineData.gemini) {
-                        setActiveModel(modelId);
-                    } else if (modelId === 'chatgpt' && !window.aiEngineData.gemini && !window.aiEngineData.groq) {
+                    } else if (modelId === 'chatgpt' && !window.aiEngineData.gemini) {
                         setActiveModel(modelId);
                     }
                 }
@@ -2744,9 +2747,9 @@
             
             // Reset Models
             activeModelId = null;
-            window.aiEngineData = { chatgpt: null, /* perplexity: null, */ gemini: null, groq: null };
+            window.aiEngineData = { chatgpt: null, /* perplexity: null, */ gemini: null/*, groq: null*/ };
 
-            ['chatgpt', /* 'perplexity', */ 'gemini', 'groq'].forEach(id => {
+            ['chatgpt', /* 'perplexity', */ 'gemini'/*, 'groq'*/].forEach(id => {
                 const el = document.getElementById(`${id}Content`);
                 if (el) el.textContent = 'Waiting for live analysis...';
                 const status = document.getElementById(`${id}Status`);

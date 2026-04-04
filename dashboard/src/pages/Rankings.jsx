@@ -189,7 +189,7 @@ const Rankings = () => {
                  <option value="all">Global AI Index</option>
                  <option value="openai">OpenAI Intelligence</option>
                  <option value="gemini">Google Gemini</option>
-                 <option value="groq">Groq / Llama 3</option>
+                 {/* <option value="groq">Groq / Llama 3</option> */}
                </select>
              </div>
 
@@ -464,7 +464,7 @@ const Rankings = () => {
                                      <h4 className="text-[11px] font-black uppercase tracking-widest">Engine Intelligence</h4>
                                    </div>
                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                      {['openai', 'gemini', 'groq'].filter(e => selectedEngine === 'all' || e === selectedEngine).map(eng => {
+                                      {['openai', 'gemini'/*, 'groq'*/].filter(e => selectedEngine === 'all' || e === selectedEngine).map(eng => {
                                         const engRes = allEngResults.find(r => r.engine === eng);
                                         const brandName = project?.brandName || project?.name || '';
                                         const isFound = engRes?.found || engRes?.rank > 0;

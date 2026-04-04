@@ -1997,6 +1997,7 @@
                             </div>
                         </div>
 
+                        <!-- 
                         <div class="model-card" id="groqCard">
                             <div class="model-header">
                                 <div class="model-icon">
@@ -2009,6 +2010,7 @@
                                 Waiting for live analysis...
                             </div>
                         </div>
+                        -->
 
                         <!-- 
                         <div class="model-card" id="perplexityCard">
@@ -2277,7 +2279,7 @@
             chatgpt: null,
             // perplexity: null,
             gemini: null,
-            groq: null
+            // groq: null
         };
         let activeModelId = null;
         
@@ -2501,7 +2503,7 @@
             if (results.openai) window.aiEngineData.chatgpt = results.openai;
             // if (results.perplexity) window.aiEngineData.perplexity = results.perplexity;
             if (results.gemini) window.aiEngineData.gemini = results.gemini;
-            if (results.groq) window.aiEngineData.groq = results.groq;
+            // if (results.groq) window.aiEngineData.groq = results.groq;
 
             switchTab('results');
 
@@ -2529,7 +2531,7 @@
                 const allCitations = [];
                 let bestContextData = null;
                 
-                ['gemini', 'openai', 'groq'].forEach(key => {
+                ['gemini', 'openai'/*, 'groq'*/].forEach(key => {
                     const raw = results[key];
                     if (raw) {
                         const processed = processRawContent(raw, results);
@@ -2548,7 +2550,7 @@
                             if (!bestContextData) bestContextData = raw;
                             // Extract first sentence or bullet
                             const firstPoint = processed.interpretation.split('. ')[0].replace(/•|-|\*/g, '').trim();
-                            const modelName = key === 'openai' ? 'ChatGPT' : (key === 'gemini' ? 'Gemini' : 'Groq');
+                            const modelName = key === 'openai' ? 'ChatGPT' : (key === 'gemini' ? 'Gemini'/* : 'Groq'*/ : 'AI');
                             parts.push(`**${modelName} reports:** ${firstPoint}.`);
                             if (processed.citations) allCitations.push(...processed.citations);
                         }
@@ -2586,7 +2588,7 @@
             updateModelUI('chatgpt', results.openai);
             // updateModelUI('perplexity', results.perplexity);
             updateModelUI('gemini', results.gemini);
-            updateModelUI('groq', results.groq);
+            // updateModelUI('groq', results.groq);
         }
         
         // Update Profile UI
@@ -2978,9 +2980,7 @@
                     if (isDefaultState) {
                        if (modelId === 'gemini') {
                            setActiveModel(modelId);
-                       } else if (modelId === 'groq' && (!window.aiEngineData.gemini || String(window.aiEngineData.gemini).includes('failed'))) {
-                           setActiveModel(modelId);
-                       } else if (modelId === 'chatgpt' && (!window.aiEngineData.gemini || String(window.aiEngineData.gemini).includes('failed')) && (!window.aiEngineData.groq || String(window.aiEngineData.groq).includes('failed'))) {
+                       } else if (modelId === 'chatgpt' && (!window.aiEngineData.gemini || String(window.aiEngineData.gemini).includes('failed')) /* && (!window.aiEngineData.groq || String(window.aiEngineData.groq).includes('failed')) */) {
                            setActiveModel(modelId);
                        }
                     }
@@ -3014,9 +3014,9 @@
             
             // Reset Models
             activeModelId = null;
-            window.aiEngineData = { chatgpt: null, /* perplexity: null, */ gemini: null, groq: null };
+            window.aiEngineData = { chatgpt: null, /* perplexity: null, */ gemini: null/*, groq: null*/ };
 
-            ['chatgpt', /* 'perplexity', */ 'gemini', 'groq'].forEach(id => {
+            ['chatgpt', /* 'perplexity', */ 'gemini'/*, 'groq'*/].forEach(id => {
                 const el = document.getElementById(`${id}Content`);
                 if (el) el.textContent = 'Waiting for live analysis...';
                 const status = document.getElementById(`${id}Status`);
@@ -3121,7 +3121,7 @@
                 'chatgpt': 'ChatGPT',
                 'gemini': 'Gemini',
                 'perplexity': 'Perplexity',
-                'groq': 'Groq'
+                // 'groq': 'Groq'
             };
             const name = names[modelId] || modelId;
             targetModelName.textContent = name;
@@ -3287,9 +3287,9 @@
                                                 'openai': 'chatgpt',
                                                 'chatgpt': 'chatgpt',
                                                 'perplexity': 'perplexity',
-                                                'gemini': 'gemini',
-                                                'groq': 'groq',
-                                                'grok': 'groq'
+                                                'gemini': 'gemini'
+                                                // 'groq': 'groq',
+                                                // 'grok': 'groq'
                                             };
                                             const normalizedId = modelMap[data.modelId] || modelMap[data.model];
                                             if (normalizedId) {

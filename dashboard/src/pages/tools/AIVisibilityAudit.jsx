@@ -131,7 +131,7 @@ const AIVisibilityAudit = () => {
           const mk = {};
           if (data.openai) mk['ChatGPT'] = data.openai;
           if (data.gemini) mk['Gemini'] = data.gemini;
-          if (data.groq) mk['Groq'] = data.groq;
+          // if (data.groq) mk['Groq'] = data.groq;
           
           setModelResults(mk);
           const firstAvailable = Object.keys(mk)[0];
@@ -250,7 +250,7 @@ const AIVisibilityAudit = () => {
                   if (data.step) setStep(data.step);
                   break;
                 case 'model_result': {
-                  let modelKey = 'Groq';
+                  let modelKey = 'ChatGPT';
                   if (data.model === 'openai') modelKey = 'ChatGPT';
                   else if (data.model === 'gemini') modelKey = 'Gemini';
                   setModelResults(prev => ({ ...prev, [modelKey]: data.data }));
@@ -310,7 +310,7 @@ const AIVisibilityAudit = () => {
     setModelResults({
       ChatGPT: data.openai,
       Gemini: data.gemini,
-      Groq: data.groq
+      // Groq: data.groq
     });
 
     setActiveModel(null);
@@ -735,7 +735,7 @@ const AIVisibilityAudit = () => {
               </div>
               
               <div className="grid grid-cols-1 gap-4">
-                {['Gemini', 'ChatGPT', 'Groq'].map((id, i) => (
+                {['Gemini', 'ChatGPT'/*, 'Groq'*/].map((id, i) => (
                   modelResults[id] && (
                     <motion.div 
                       key={id}
