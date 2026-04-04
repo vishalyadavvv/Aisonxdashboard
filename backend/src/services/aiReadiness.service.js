@@ -279,10 +279,7 @@ Return ONLY a raw JSON array of objects. Do not wrap in markdown tags like \`\`\
 - "intentType": "Informational", "Transactional", "Navigational", "Commercial", or "How-to".
 - "queryLayer": "Core Entity", "Adjacent Topics", "Problem-Solution", "Decision Making", etc.`;
 
-        const response = await fetchOpenAI([
-            { role: "system", content: "You are a senior SEO and AI-Readiness technical expert. Output ONLY raw JSON." },
-            { role: "user", content: prompt }
-        ], 1000, 0.4);
+        const response = await fetchOpenAI(prompt, true);
 
         if (response) {
             queriesToCheck = JSON.parse(response.replace(/```json/g, '').replace(/```/g, '').trim());

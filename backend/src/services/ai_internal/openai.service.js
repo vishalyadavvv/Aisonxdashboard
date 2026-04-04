@@ -8,15 +8,19 @@ const fetchOpenAI = async (query, jsonMode = false, enableSearch = false) => {
       timeout: 30000 // 30s timeout
     });
 
+    const messages = Array.isArray(query) 
+      ? query 
+      : [
+          { 
+            role: "system", 
+            content: "You are a specific AI model. Follow the user's detailed instructions exactly. Output valid JSON if requested." 
+          },
+          { role: "user", content: query }
+        ];
+
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
-      messages: [
-        { 
-          role: "system", 
-          content: "You are a specific AI model. Follow the user's detailed instructions exactly. Output valid JSON if requested." 
-        },
-        { role: "user", content: query }
-      ],
+      messages: messages,
       temperature: 0.3, // Lower temperature for more stable JSON
       response_format: jsonMode ? { type: "json_object" } : undefined,
     });
