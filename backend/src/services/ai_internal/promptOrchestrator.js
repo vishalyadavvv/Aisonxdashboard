@@ -1,6 +1,6 @@
 const geminiInternal = require('./gemini.service');
 const openaiInternal = require('./openai.service');
-const groqInternal = require('./groq.service');
+// const groqInternal = require('./groq.service');
 const logger = require('../../utils/logger');
 
 // Live Services
@@ -61,7 +61,7 @@ INSTRUCTIONS:
             let response;
             if (modelName === 'openai') response = await openaiInternal.fetchOpenAI(prompt, true);
             else if (modelName === 'gemini') response = await geminiInternal.fetchGemini(prompt, true);
-            else if (modelName === 'groq') response = await groqInternal.fetchGroq(prompt, true);
+            // else if (modelName === 'groq') response = await groqInternal.fetchGroq(prompt, true);
 
             if (response) {
                 audit = robustParseJSON(response);
@@ -120,7 +120,7 @@ OUTPUT FORMAT (JSON ONLY):
         let response;
         if (engine === 'openai') response = await openaiInternal.fetchOpenAI(prompt, true);
         else if (engine === 'gemini') response = await geminiInternal.fetchGemini(prompt, true);
-        else if (engine === 'groq') response = await groqInternal.fetchGroq(prompt, true);
+        // else if (engine === 'groq') response = await groqInternal.fetchGroq(prompt, true);
 
         if (!response) return { brandMentioned: false, sentiment: 'Neutral', error: true };
 
@@ -195,7 +195,7 @@ exports.performProjectScan = async (project) => {
         competitorRankings: [],
         customPromptResults: []
     };
-    const engines = project.targetEngines && project.targetEngines.length > 0 ? project.targetEngines : ['openai', 'gemini', 'groq'];
+    const engines = project.targetEngines && project.targetEngines.length > 0 ? project.targetEngines : ['openai', 'gemini'];
     const brandName = project.brandName || project.name;
     const domain = project.domain;
     const market = project.market || { name: 'Global', type: 'global' };
@@ -309,8 +309,8 @@ exports.performProjectScan = async (project) => {
         logger.info(`✅ [COMPETITIVE] Gemini Battle View complete`);
     }
 
-    // 2. Groq/Fallback Audits (Non-Search Internal Knowledge)
-    const otherEngines = engines.filter(e => e === 'groq'); // Groq doesn't support competitive search well
+    // 2. Fallback Audits (Non-Search Internal Knowledge)
+    const otherEngines = engines.filter(e => e === 'other'); // Placeholder if needed, currently none
     if (otherEngines.length > 0) {
         const tasks = [];
         for (const promptText of project.prompts) {
