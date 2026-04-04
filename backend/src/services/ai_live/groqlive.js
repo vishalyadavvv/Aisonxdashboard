@@ -1,4 +1,4 @@
-const Groq = require("groq-sdk");
+// const Groq = require("groq-sdk");
 const logger = require("../../utils/logger");
 
 module.exports = async function groqLive(brand) {

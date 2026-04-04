@@ -1,4 +1,4 @@
-const Groq = require("groq-sdk");
+// const Groq = require("groq-sdk");
 const logger = require('../../utils/logger');
 
 const fetchGroq = async (query, jsonMode = false, enableSearch = false) => {

@@ -263,35 +263,39 @@ const internalRunProjectScan = async (project) => {
     try {
         logger.info(`🚀 COMPREHENSIVE scan triggered for: ${project.name}`);
         
+        // Fix: Clean the domain for specialized services (profiler, tech audit)
+        // This ensures things like fetchWebsiteContent don't try to fetch https://https://domain.com
+        const domain = project.domain.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/$/, '').split('/')[0];
+        
         // PHASE 1: Technical & Content Infrastructure (Defensive Parallel)
         const [techResults, readinessResults, profilerContent, brandAuditResults] = await Promise.all([
             // Technical check (Robots/Sitemap)
             (async () => {
                 try {
                     return await Promise.all([
-                        techAudit.analyzeRobots(project.domain),
-                        techAudit.analyzeSitemap(project.domain)
+                        techAudit.analyzeRobots(domain),
+                        techAudit.analyzeSitemap(domain)
                     ]);
                 } catch (e) {
-                    logger.warn(`Tech Audit sub-phase failed for ${project.domain}:`, e.message);
+                    logger.warn(`Tech Audit sub-phase failed for ${domain}:`, e.message);
                     return [{ found: false, error: e.message }, { found: false, error: e.message }];
                 }
             })(),
             // AI Readiness Audit
             (async () => {
                 try {
-                    return await aiReadinessService.analyzeWebsite(project.domain);
+                    return await aiReadinessService.analyzeWebsite(domain);
                 } catch (e) {
-                    logger.warn(`AI Readiness sub-phase failed for ${project.domain}:`, e.message);
+                    logger.warn(`AI Readiness sub-phase failed for ${domain}:`, e.message);
                     return { error: e.message, method: 'failed' };
                 }
             })(),
             // Fetch content for Profiler
             (async () => {
                 try {
-                    return await profilerService.fetchWebsiteContent(project.domain);
+                    return await profilerService.fetchWebsiteContent(domain);
                 } catch (e) {
-                    logger.warn(`Profiler fetch sub-phase failed for ${project.domain}:`, e.message);
+                    logger.warn(`Profiler fetch sub-phase failed for ${domain}:`, e.message);
                     return { error: e.message, isNotFound: true };
                 }
             })(),
@@ -322,9 +326,9 @@ const internalRunProjectScan = async (project) => {
             // 2. Domain Profiler (Synthesis)
             (async () => {
                 try {
-                    return await profilerService.analyzeDomainMulti(project.domain, profilerContent);
+                    return await profilerService.analyzeDomainMulti(domain, profilerContent);
                 } catch (e) {
-                    logger.error(`Domain Profiler phase failed for ${project.domain}:`, e.message);
+                    logger.error(`Domain Profiler phase failed for ${domain}:`, e.message);
                     return { brandType: 'Unknown', error: e.message };
                 }
             })(),

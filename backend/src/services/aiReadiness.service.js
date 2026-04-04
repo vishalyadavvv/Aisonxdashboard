@@ -282,7 +282,13 @@ Return ONLY a raw JSON array of objects. Do not wrap in markdown tags like \`\`\
         const response = await fetchOpenAI(prompt, true);
 
         if (response) {
-            queriesToCheck = JSON.parse(response.replace(/```json/g, '').replace(/```/g, '').trim());
+            let parsed = JSON.parse(response.replace(/```json/g, '').replace(/```/g, '').trim());
+            if (Array.isArray(parsed)) {
+                queriesToCheck = parsed;
+            } else if (parsed && typeof parsed === 'object') {
+                // Some LLMs wrap the array in an object like { "queries": [...] }
+                queriesToCheck = parsed.queries || parsed.data || parsed.results || [];
+            }
             console.log(`Successfully generated ${queriesToCheck.length} dynamic queries.`);
         }
     } catch (e) {

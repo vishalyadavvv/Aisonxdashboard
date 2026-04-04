@@ -135,6 +135,7 @@ const AIReadiness = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [view, setView] = useState('home'); // 'home' | 'analyzing' | 'report'
   const [syncLoading, setSyncLoading] = useState(!!projectId);
+  const [currentStep, setCurrentStep] = useState(0);
 
   const project = contextProject;
   const setProject = () => {}; // Placeholder, as project is now from context
@@ -240,7 +241,7 @@ const AIReadiness = () => {
     setUrl('');
   };
 
-  const filteredReports = reports.filter(r =>
+  const filteredReports = (reports || []).filter(r =>
     r.domain?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     r.businessType?.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -593,7 +594,7 @@ const AIReadiness = () => {
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
               className="bg-white border border-gray-200/60 rounded-2xl p-8">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {ds.topics?.length > 0 && (
+                {Array.isArray(ds.topics) && ds.topics.length > 0 && (
                   <div>
                     <h4 className="text-sm font-bold text-[#1E293B] mb-3">Topics</h4>
                     <div className="flex flex-wrap gap-2">
@@ -603,7 +604,7 @@ const AIReadiness = () => {
                     </div>
                   </div>
                 )}
-                {ds.competitors?.length > 0 && (
+                {Array.isArray(ds.competitors) && ds.competitors.length > 0 && (
                   <div>
                     <h4 className="text-sm font-bold text-[#1E293B] mb-3">Competitors</h4>
                     <div className="flex flex-wrap gap-2">
@@ -613,7 +614,7 @@ const AIReadiness = () => {
                     </div>
                   </div>
                 )}
-                {ds.prompts?.length > 0 && (
+                {Array.isArray(ds.prompts) && ds.prompts.length > 0 && (
                   <div>
                     <h4 className="text-sm font-bold text-[#1E293B] mb-3">Prompts</h4>
                     <div className="flex flex-wrap gap-2">
@@ -677,7 +678,7 @@ const AIReadiness = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {results.queries.map((q, i) => (
+                    {(results.queries || []).map((q, i) => (
                       <tr key={i} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
                         <td className="py-4 px-4 text-sm text-blue-700 font-medium max-w-[220px]">{q.query}</td>
                         <td className="py-4 px-4">
@@ -722,7 +723,7 @@ const AIReadiness = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {results.queries.map((q, i) => (
+                    {(results.queries || []).map((q, i) => (
                       <tr key={i} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors group">
                         <td className="py-4 px-4 text-sm text-gray-600 font-medium max-w-[150px] truncate" title={q.parentQuery}>{q.parentQuery || 'General Query'}</td>
                         <td className="py-4 px-4 text-sm text-[#1E293B]">{q.query}</td>
@@ -966,9 +967,9 @@ const AIReadiness = () => {
               description="These pages are missing but expected by AI agents based on your domain archetype. Filling these gaps is the most powerful way to improve your visibility score immediately."
               defaultOpen={true}
             >
-              {results.queries?.filter(q => q.status === 'missing').length > 0 ? (
+            {(results.queries || []).filter(q => q.status === 'missing').length > 0 ? (
                 <div className="space-y-3">
-                  {results.queries.filter(q => q.status === 'missing').map((q, i) => (
+                  {(results.queries || []).filter(q => q.status === 'missing').map((q, i) => (
                     <div key={i} className="bg-[#F8F9FB] border border-gray-100 rounded-xl p-4 flex items-start justify-between gap-4">
                       <div>
                         <p className="text-sm font-semibold text-[#1E293B]">Publish {q.path}</p>
@@ -1191,7 +1192,7 @@ const AIReadiness = () => {
                    </tr>
                  </thead>
                  <tbody>
-                   {filteredReports.map((r, i) => (
+                   {(filteredReports || []).map((r, i) => (
                      <tr key={i} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
                        <td className="py-4 px-4 text-sm font-bold text-[#1E293B]">
                          {r.domain}
