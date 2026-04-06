@@ -754,34 +754,39 @@ const ProjectDetail = () => {
                                         const snippetLower = res?.snippet?.toLowerCase() || '';
                                         const hasNegativePhrase = snippetLower.includes('not found') || snippetLower.includes('not visible') || snippetLower.includes('does not appear') || snippetLower.includes('does not rank') || snippetLower.includes('no mention') || snippetLower.includes('not organically visible') || snippetLower.includes('is not present');
                                         const snippetFound = snippetLower.includes(brandName.toLowerCase()) && !hasNegativePhrase;
-                                        const isFound = res?.found || snippetFound;
                                         
+                                        // A brand is "visible" if its rank > 0 OR it shows up specifically in the snippet
+                                        const isFound = res?.rank > 0 || snippetFound;
+                                        
+                                        // Citations should be shown if found OR if we have explicit citation URLs
+                                        const rawCits = (res?.citations || res?.authoritySignals?.citations || [])
+                                          .filter(c => c && typeof c === 'string' && (c.startsWith('http') || c.startsWith('www.') || /^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}/.test(c.trim())));
+                                        const hasCitations = rawCits.length > 0;
+
                                       return (
                                         <div key={engine} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                                           <div className="flex items-center justify-between">
                                             <span className="font-bold text-slate-900 capitalize text-sm">{engine}</span>
                                             <span 
-                                              title={!isFound && res?.score > 0 ? "Has Content (Unranked: Did not appear in top organic AI results)" : ""}
-                                              className={`text-[10px] font-bold px-2 py-1 rounded-md uppercase transition-all ${res?.rank > 0 && res?.rank <= 5 ? 'bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100' : isFound ? 'bg-amber-50 text-amber-600 ring-1 ring-amber-100' : (!isFound && res?.score > 0) ? 'bg-amber-50 text-amber-500' : 'bg-slate-50 text-slate-400'}`}
+                                              title={!isFound && res?.score > 0 ? "Has Content (Verified via detailed market analysis)" : ""}
+                                              className={`text-[10px] font-bold px-2 py-1 rounded-md uppercase transition-all ${res?.rank > 0 && res?.rank <= 5 ? 'bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100' : isFound ? 'bg-amber-50 text-amber-600 ring-1 ring-amber-100' : (!isFound && res?.score > 0) ? 'bg-blue-50 text-blue-600 ring-1 ring-blue-100' : 'bg-slate-50 text-slate-400'}`}
                                             >
-                                              {res?.rank > 0 && res?.rank <= 5 ? 'Recommended' : isFound ? (res?.rank > 0 ? `Rank #${res.rank}` : 'Mentioned') : (!isFound && res?.score > 0 ? 'Content Found (Unranked)' : 'Not Found')}
+                                              {res?.rank > 0 && res?.rank <= 5 ? 'Recommended' : isFound ? (res?.rank > 0 ? `Rank #${res.rank}` : 'Mentioned') : (!isFound && res?.score > 0 ? 'Verified Mention' : 'Not Found')}
                                             </span>
                                           </div>
                                           <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-3">
-                                            {isFound ? (
+                                            {isFound || (res?.score > 0 && hasCitations) ? (
                                               <>
                                                 <p className="text-xs text-slate-600 leading-relaxed italic">
                                                   "{res?.snippet || 'No specific insight captured.'}"
                                                 </p>
                                                 
-                                                {isFound && (
+                                                {(isFound || hasCitations) && (
                                                   <div className="pt-2 border-t border-slate-200/50 space-y-1.5">
                                                     <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Verified Sources</p>
                                                     <div className="flex flex-wrap gap-2">
                                                       {(() => {
                                                         // Build citation list: project domain + actual citations
-                                                        const rawCits = (res.citations || res.authoritySignals?.citations || [])
-                                                          .filter(c => c && typeof c === 'string' && (c.startsWith('http') || c.startsWith('www.') || /^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}/.test(c.trim())));
                                                         const allCits = [];
                                                         const projDomain = project?.domain?.replace(/^https?:\/\/(www\.)?/, '');
                                                         if (projDomain && !rawCits.some(u => u.includes(projDomain))) {
@@ -974,7 +979,7 @@ const ProjectDetail = () => {
                                )}
                              </div>
                           </td>
-                          {project?.competitors?.map((comp, cIdx) => {
+                           {project?.competitors?.map((comp, cIdx) => {
                              const compResults = lastSnapshot?.competitorRankings?.filter(cr => cr.prompt === promptText && cr.competitorDomain === comp.domain) || [];
                              const compAvgRank = compResults.length > 0
                                ? Math.round(compResults.filter(r => r.rank > 0).reduce((a, b) => a + b.rank, 0) / (compResults.filter(r => r.rank > 0).length || 1))
@@ -982,8 +987,8 @@ const ProjectDetail = () => {
                              const compAvgScore = compResults.length > 0
                                ? Math.round(compResults.reduce((a, b) => a + (b.score || 0), 0) / compResults.length)
                                : 0;
-                             const compFound = compResults.some(r => r.found);
-                             const isAhead = compFound && compAvgRank > 0 && (!brandFound || compAvgRank < brandAvgRank);
+                             const compFound = compResults.some(r => r.found) || (compAvgScore > 0 && compResults.some(r => r.citations?.length > 0));
+                             const isAhead = compFound && compAvgRank > 0 && (!brandFound || (brandAvgRank > 0 && compAvgRank < brandAvgRank));
 
                              return (
                                <td key={cIdx} className="px-8 py-6">
@@ -996,7 +1001,12 @@ const ProjectDetail = () => {
                                        <span className="text-[10px] font-bold text-slate-400">{compAvgScore}%</span>
                                      </div>
                                    ) : (
-                                     <span className="text-[10px] font-black text-slate-300 uppercase">Not Found</span>
+                                     <span 
+                                       title={!compFound && compAvgScore > 0 ? "Has Content (Verified via specialized market analysis)" : ""}
+                                       className={`text-[10px] font-black uppercase transition-all ${!compFound && compAvgScore > 0 ? 'text-blue-500' : 'text-slate-300'}`}
+                                     >
+                                       {!compFound && compAvgScore > 0 ? 'Verified Mention' : 'Not Found'}
+                                     </span>
                                    )}
                                  </div>
                                </td>
