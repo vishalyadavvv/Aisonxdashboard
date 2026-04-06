@@ -515,7 +515,11 @@ const internalRunProjectScan = async (project) => {
                 rank: r.rank || 0,
                 linkRank: r.linkRank || 0
             })),
-            competitorRankings: scanResults.competitorRankings,
+            competitorRankings: (scanResults.competitorRankings || []).map(cr => ({
+                ...cr,
+                // Clean the AI result domain (remove http, www, etc.) for robust matching
+                competitorDomain: (cr.competitorDomain || '').toLowerCase().replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')
+            })),
             customPromptResults: scanResults.customPromptResults,
             
             // New Tool Data

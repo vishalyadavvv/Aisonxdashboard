@@ -857,13 +857,26 @@ const ProjectDetail = () => {
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {project?.competitors?.map((comp, idx) => {
-                // Find latest score for this competitor from last snapshot — use ACTUAL data points, not theoretical max
-                const compRankings = lastSnapshot?.competitorRankings?.filter(cr => cr.competitorDomain === comp.domain) || [];
+                // Domain normalization for robust matching
+                const normalize = (d) => d?.toLowerCase().replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+                const targetDomain = normalize(comp.domain);
+
+                // Find latest score for this competitor from last snapshot
+                const compRankings = lastSnapshot?.competitorRankings?.filter(cr => normalize(cr.competitorDomain) === targetDomain) || [];
                 const compScore = compRankings.length > 0
                   ? Math.round(compRankings.reduce((a, b) => a + (b.score || 0), 0) / compRankings.length)
                   : 0;
                 
                 const gap = compScore - stats.overallScore;
+                
+                // Dynamic market status labels
+                const getMarketStatus = (score) => {
+                  if (score === 0) return 'N/A';
+                  if (score < 20) return 'Nascent Presence';
+                  if (score < 50) return 'Growing Rival';
+                  if (score < 80) return 'Core Competitor';
+                  return 'Dominant Authority';
+                };
 
                 return (
                   <motion.div 
@@ -897,8 +910,8 @@ const ProjectDetail = () => {
                             <div className="text-3xl font-black text-slate-900">{compScore}%</div>
                           </div>
                           <div className="text-right">
-                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Market Share</span>
-                             <div className="text-sm font-bold text-slate-600 mt-1">High Presence</div>
+                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Market Stage</span>
+                             <div className="text-sm font-bold text-slate-600 mt-1">{getMarketStatus(compScore)}</div>
                           </div>
                         </div>
 

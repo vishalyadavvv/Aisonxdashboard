@@ -255,15 +255,12 @@ PROMPTS TO AUDIT:
 ${promptListStr}
 
 INSTRUCTIONS:
-1. ⚠️ HYBRID BATTLE VIEW: 
-   - Step 1: Search ONLY for the prompt text in ${market.name}. Map the top 10 results.
-   - Step 2: If any major brand (target or rivals) is missing, do a targeted verification search for them.
-2. 🚨 DATA INTEGRITY: Reporting "Not Found" for a household-name brand (target or rival) just because they aren't the #1 snippet result is WRONG. Use search grounding to find their actual position in the lists.
-3. 🚨 RICH SNIPPETS: Snippets MUST be 2-3 detailed sentences (max 60 words).
-4. 🚨 CITATIONS: You MUST return FULL, VALID 'https://' URLs.
+2. ⚠️ RIVAL VERIFICATION (The "Spotlight" Step): If any of the Rivals [${compListStr}] do not appear in the top 10 organic results, you MUST perform a targeted search for each missing rival to determine their proximity to the topic (e.g., "Competitor Name ${promptText}").
+3. 🚨 DATA INTEGRITY: Do not report "Not Found" for a known rival unless they are truly irrelevant. Use search grounding to find their real rank.
+4. 🚨 RICH ANALYTICS: Snippets MUST be 2-3 detailed sentences (max 60 words).
 5. SCORING & MAPPING: 
    - Found gracefully (Organically or via Verification): Rank 1-10, Score 60-100.
-   - Assign ranks to BOTH the target brand and any rivals found.
+   - Assign realistic ranks to BOTH the target brand and any rivals found.
    - Not found after thorough research: Rank 0, Score 0.
 
 OUTPUT FORMAT (JSON ARRAY OF OBJECTS):
@@ -345,13 +342,12 @@ COMPETITORS (The Rivals): [${compListStr}]
 TASK: Evaluate the visibility of "${brandName}" AGAINST the rivals for the query: "${promptText}" in the ${market.name} market. Think like a helpful AI providing a balanced comparison.
 
 INSTRUCTIONS:
-1. HYBRID BATTLE VIEW: Search for "${promptText} in ${market.name}". If anyone is missing, verify their specific presence with a second search.
-2. 🚨 NATURAL ANALYSIS: Avoid being a strict binary auditor. If "${brandName}" or a rival is found via specialized search or mentioned in top-tier guides/lists, rank them appropriately (Rank 1-10).
-3. 🚨 RICH ANALYTICS: Snippet MUST be 2-3 factual sentences (max 60 words). Explain the competitive landscape naturally.
-4. 🚨 PROOF: You MUST return FULL, VALID 'https://' URLs for citations.
+1. HYBRID BATTLE VIEW: Search for "${promptText} in ${market.name}". 
+2. ⚠️ RIVAL SPOTLIGHT: If any competitor from [${compListStr}] is missing, verify their specific presence with a targeted search for them in this niche.
+3. 🚨 NATURAL ANALYSIS: Avoid being a strict binary auditor. If a rival is mentioned in top-tier guides or niche articles, rank them appropriately (Rank 1-10).
+4. 🚨 RICH ANALYTICS: Snippet MUST be 2-3 factual sentences (max 60 words).
 5. SCORING & MAPPING: 
    - Found organically or via specialized search: Rank 1-10, Score 60-100.
-   - Assign realistic ranks to both target and rivals.
    - Not found at all: Rank 0, Score 0.
 8. OUTPUT FORMAT (JSON ONLY):
 {
