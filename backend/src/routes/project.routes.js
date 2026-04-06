@@ -7,7 +7,7 @@ const {
   updateProject,
   deleteProject,
   getProjectHistory,
-  runProjectScan
+  runProjectSync
 } = require('../controllers/project.controller');
 const { protect } = require('../utils/auth.middleware');
 
@@ -20,6 +20,7 @@ router.get('/:id', getProject);
 router.put('/:id', updateProject);
 router.delete('/:id', deleteProject);
 router.get('/:id/history', getProjectHistory);
-router.post('/:id/scan', runProjectScan);
+router.post('/:id/sync', runProjectSync);
+router.post('/:id/scan', runProjectSync); // Alias for backward compatibility
 
 module.exports = router;
