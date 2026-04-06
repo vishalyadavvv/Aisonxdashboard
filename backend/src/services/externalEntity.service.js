@@ -28,7 +28,8 @@ async function checkWikidata(brandName) {
 // 2. Check Knowledge Graph (Needs Google API Key)
 async function checkKnowledgeGraph(brandName) {
     if (!brandName || !GOOGLE_API_KEY) return false;
-    const url = `https://kgsearch.googleapis.com/v1/entities:search?query=${encodeURIComponent(brandName)}&key=${GOOGLE_API_KEY}&limit=1&types=Organization`;
+    // Broaden check: Remove 'types=Organization' to detect ANY valid brand entity record
+    const url = `https://kgsearch.googleapis.com/v1/entities:search?query=${encodeURIComponent(brandName)}&key=${GOOGLE_API_KEY}&limit=10`;
     
     try {
         const response = await axios.get(url);
@@ -44,7 +45,8 @@ async function checkKnowledgeGraph(brandName) {
  */
 async function fetchKnowledgeGraphFull(brandName) {
     if (!brandName || !GOOGLE_API_KEY) return null;
-    const url = `https://kgsearch.googleapis.com/v1/entities:search?query=${encodeURIComponent(brandName)}&key=${GOOGLE_API_KEY}&limit=20`;
+    // Proper Fix: Increase limit to 100 for a more comprehensive audit
+    const url = `https://kgsearch.googleapis.com/v1/entities:search?query=${encodeURIComponent(brandName)}&key=${GOOGLE_API_KEY}&limit=100`;
     
     try {
         const response = await axios.get(url);

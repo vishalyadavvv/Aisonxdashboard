@@ -44,7 +44,9 @@ const BrandAudit = () => {
     setLoading(true);
     setResults(null);
     try {
-      const url = `https://kgsearch.googleapis.com/v1/entities:search?query=${encodeURIComponent(query)}&limit=20&key=${CONFIG.GOOGLE_API_KEY}`;
+      // PROPER FIX: Use a higher limit (Google max is usually around 500 per request, but let's go for 100)
+      // Note: limit=10000 might hit quota or timeouts, 100 is safer but providing a broader set
+      const url = `https://kgsearch.googleapis.com/v1/entities:search?query=${encodeURIComponent(query)}&limit=100&key=${CONFIG.GOOGLE_API_KEY}`;
       const response = await fetch(url);
       if (!response.ok) throw new Error(`Failed to fetch results (${response.status})`);
       const data = await response.json();
@@ -179,95 +181,128 @@ const BrandAudit = () => {
             {entities.map((entity, idx) => (
               <motion.div 
                 key={idx}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.08 }}
-                className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm relative overflow-hidden group"
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: idx * 0.05 }}
+                className="bg-white/70 backdrop-blur-md border border-white/40 rounded-3xl p-8 mb-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-500 relative overflow-hidden group"
               >
-                <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-[80px] -mr-32 -mt-32" />
-                
-                <div className="flex flex-col md:flex-row gap-6 mb-6 relative z-10">
+                {/* Decorative Background Glows */}
+                <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/5 rounded-full blur-[100px] -mr-40 -mt-40 group-hover:bg-indigo-500/10 transition-colors" />
+                <div className="absolute bottom-0 left-0 w-60 h-60 bg-emerald-500/5 rounded-full blur-[80px] -ml-30 -mb-30 transition-colors group-hover:bg-emerald-500/10" />
+
+                <div className="flex flex-col md:flex-row gap-8 mb-8 relative z-10">
                   {entity.image && (
                     <div className="shrink-0 self-center md:self-start">
-                      <img 
-                        src={entity.image} 
-                        alt={entity.name}
-                        className="w-24 h-24 rounded-2xl object-cover border border-gray-100 shadow-md"
-                      />
+                      <div className="p-1 bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 group-hover:scale-105 transition-transform duration-500">
+                        <img 
+                          src={entity.image} 
+                          alt={entity.name}
+                          className="w-32 h-32 rounded-xl object-cover"
+                        />
+                      </div>
                     </div>
                   )}
+
                   <div className="flex-1 text-center md:text-left">
-                    <div className="inline-block px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-widest rounded-lg mb-3">
-                      {entity.types?.[0] || 'Entity'}
+                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-4">
+                      {entity.types?.slice(0, 3).map((type, tIdx) => (
+                        <span key={tIdx} className="px-3 py-1 bg-indigo-50/80 text-indigo-600 text-[10px] font-black uppercase tracking-widest rounded-lg border border-indigo-100/50 backdrop-blur-sm">
+                          {type}
+                        </span>
+                      ))}
                     </div>
-                    <h2 className="text-2xl font-black text-slate-900 mb-1 tracking-tight">{entity.name}</h2>
-                    <p className="text-gray-400 font-bold text-sm mb-4 italic">{entity.description || 'Google Knowledge Graph Entry'}</p>
+
+                    <h2 className="text-3xl font-black text-slate-900 mb-2 tracking-tight group-hover:text-indigo-600 transition-colors">{entity.name}</h2>
+                    <p className="text-gray-400 font-bold text-sm mb-6 italic">{entity.description || 'Google Knowledge Graph Entry'}</p>
                     
-                    <div className="flex flex-wrap justify-center md:justify-start gap-3">
-                      <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 border border-emerald-100 text-emerald-600 rounded-xl text-xs font-black uppercase tracking-tighter">
-                        <LineChart className="w-4 h-4" /> Confidence: {entity.confidenceScore || 0}
+                    <div className="flex flex-wrap justify-center md:justify-start gap-4">
+                      <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 text-emerald-600 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-sm">
+                        <LineChart className="w-4 h-4" /> 
+                        Confidence: <span className="text-emerald-700 ml-1">{entity.confidenceScore || 0}%</span>
                       </div>
+                      
                       {entity.kgId && (
-                        <a 
-                          href={`https://www.google.com/search?kgmid=${entity.kgId}`} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 px-4 py-2 bg-gray-50 border border-indigo-100 hover:border-indigo-300 text-indigo-600 rounded-xl text-[10px] font-black uppercase tracking-tighter transition-all hover:bg-white"
-                        >
-                          <Fingerprint className="w-4 h-4" /> ID: {entity.kgId}
-                        </a>
+                        <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-50 border border-slate-100 text-slate-500 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-sm">
+                          <Fingerprint className="w-4 h-4" /> ID: <span className="text-slate-700 ml-1 truncate max-w-[80px]">{entity.kgId}</span>
+                        </div>
                       )}
                     </div>
                   </div>
                 </div>
 
                 {entity.detailedDescription && (
-                  <div className="bg-gray-50 border border-gray-100 rounded-2xl p-6 mb-6 relative z-10">
-                    <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-3">Entity Synthesis</div>
-                    <p className="text-[13px] text-gray-600 leading-relaxed font-medium">
-                      {truncate(entity.detailedDescription, 400)}
+                  <div className="bg-slate-50/50 backdrop-blur-sm border border-slate-100 rounded-3xl p-8 mb-8 relative z-10 hover:bg-white/80 transition-colors duration-300">
+                    <div className="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">
+                      <Brain className="w-3.5 h-3.5" /> Entity Synthesis
+                    </div>
+                    <p className="text-[14px] text-slate-600 leading-relaxed font-bold">
+                      {truncate(entity.detailedDescription, 500)}
                     </p>
                     {entity.descriptionUrl && (
-                      <a href={entity.descriptionUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 mt-4 text-[10px] font-black text-indigo-600 uppercase tracking-widest hover:text-indigo-800 transition-colors">
-                        Read Full Article <ExternalLink className="w-3 h-3" />
+                      <a 
+                        href={entity.descriptionUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="inline-flex items-center gap-2 mt-6 text-[10px] font-black text-indigo-600 uppercase tracking-widest hover:translate-x-1 transition-all"
+                      >
+                        Read Full Insight <ExternalLink className="w-3.5 h-3.5" />
                       </a>
                     )}
                   </div>
                 )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 relative z-10">
                   {entity.kgId && (
                     <a 
                       href={`https://www.google.com/search?kgmid=${entity.kgId}`} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="px-5 py-4 bg-white border border-gray-100 rounded-2xl hover:border-indigo-200 hover:shadow-md transition-all flex items-center gap-4 group/link shadow-sm"
+                      className="px-6 py-5 bg-white border border-slate-100 rounded-3xl hover:border-indigo-200 hover:shadow-lg transition-all duration-300 flex items-center gap-4 group/link shadow-sm"
                     >
-                      <div className="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600 group-hover/link:scale-110 transition-transform">
-                        <Globe className="w-5 h-5" />
+                      <div className="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 group-hover/link:scale-110 group-hover/link:bg-purple-100 transition-all duration-300">
+                        <Fingerprint className="w-6 h-6" />
                       </div>
-                      <div className="min-w-0">
-                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Search Result</p>
-                        <p className="text-xs font-bold text-gray-700 truncate">Google Search Node</p>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Knowledge Node</p>
+                        <p className="text-xs font-black text-slate-900 truncate">Google ID: {entity.kgId}</p>
                       </div>
-                      <ExternalLink className="w-4 h-4 ml-auto text-gray-300 group-hover/link:text-indigo-600 transition-colors" />
+                      <ExternalLink className="w-4 h-4 text-slate-300 group-hover/link:text-indigo-600 group-hover/link:translate-x-0.5 transition-all" />
                     </a>
                   )}
+
                   {entity.url && (
                     <a 
                       href={entity.url} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="px-5 py-4 bg-white border border-gray-100 rounded-2xl hover:border-indigo-200 hover:shadow-md transition-all flex items-center gap-4 group/link shadow-sm"
+                      className="px-6 py-5 bg-white border border-slate-100 rounded-3xl hover:border-emerald-200 hover:shadow-lg transition-all duration-300 flex items-center gap-4 group/link shadow-sm"
                     >
-                      <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 group-hover/link:scale-110 transition-transform">
-                        <Globe className="w-5 h-5" />
+                      <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 group-hover/link:scale-110 group-hover/link:bg-emerald-100 transition-all duration-300">
+                        <Globe className="w-6 h-6" />
                       </div>
-                      <div className="min-w-0">
-                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Official Site</p>
-                        <p className="text-xs font-bold text-gray-700 truncate">{getDomain(entity.url)}</p>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Official Domain</p>
+                        <p className="text-xs font-black text-slate-900 truncate">{getDomain(entity.url)}</p>
                       </div>
-                      <ExternalLink className="w-4 h-4 ml-auto text-gray-300 group-hover/link:text-indigo-600 transition-colors" />
+                      <ExternalLink className="w-4 h-4 text-slate-300 group-hover/link:text-emerald-600 group-hover/link:translate-x-0.5 transition-all" />
+                    </a>
+                  )}
+
+                  {entity.descriptionUrl && (
+                    <a 
+                      href={entity.descriptionUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="px-6 py-5 bg-white border border-slate-100 rounded-3xl hover:border-blue-200 hover:shadow-lg transition-all duration-300 flex items-center gap-4 group/link shadow-sm"
+                    >
+                      <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 group-hover/link:scale-110 group-hover/link:bg-blue-100 transition-all duration-300">
+                        <Info className="w-6 h-6" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Primary Source</p>
+                        <p className="text-xs font-black text-slate-900 truncate">{getDomain(entity.descriptionUrl)}</p>
+                      </div>
+                      <ExternalLink className="w-4 h-4 text-slate-300 group-hover/link:text-blue-600 group-hover/link:translate-x-0.5 transition-all" />
                     </a>
                   )}
                 </div>
@@ -286,22 +321,38 @@ const BrandAudit = () => {
           </div>
         )}
 
-        {/* Info Grid */}
-        <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { icon: User, label: 'About You', desc: 'Identity check', color: 'bg-blue-50 text-blue-600' },
-            { icon: Building, label: 'Your Brand', desc: 'Brand recognition', color: 'bg-emerald-50 text-emerald-600' },
-            { icon: LineChart, label: 'Authority', desc: 'Brand ranking', color: 'bg-purple-50 text-purple-600' },
-            { icon: Eye, label: 'Visibility', desc: 'Search presence', color: 'bg-indigo-50 text-indigo-600' }
-          ].map((item, i) => (
-            <div key={i} className="p-6 bg-white border border-gray-100 rounded-2xl text-center hover:border-indigo-200 transition-all shadow-sm group hover:-translate-y-1">
-              <div className={`w-12 h-12 mx-auto mb-4 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 ${item.color}`}>
-                <item.icon className="w-6 h-6" />
+        {/* Compact Info Grid */}
+        <div className="mt-12 bg-white border border-slate-100 rounded-[32px] p-8 shadow-sm relative overflow-hidden max-w-5xl mx-auto">
+          <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/5 rounded-full blur-[60px] -mr-24 -mt-24" />
+          
+          <div className="text-center mb-8 relative z-10">
+            <h3 className="text-lg font-black text-slate-800 flex items-center justify-center gap-2 tracking-tight">
+              <span className="text-xl">💡</span> What you'll discover about your digital presence
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 relative z-10">
+            {[
+              { icon: User, label: 'About You', desc: 'See if Google recognizes you as a person or entity', color: 'bg-blue-50 text-blue-600' },
+              { icon: Building, label: 'Your Brand', desc: 'Check how your business appears in Google\'s knowledge', color: 'bg-emerald-50 text-emerald-600' },
+              { icon: LineChart, label: 'Authority Score', desc: 'Get your digital brand authority rating', color: 'bg-purple-50 text-purple-600' },
+              { icon: Eye, label: 'Visibility', desc: 'Measure your Google search presence', color: 'bg-indigo-50 text-indigo-600' }
+            ].map((item, i) => (
+              <div key={i} className="text-center group px-2">
+                <div className={`w-12 h-12 mx-auto mb-4 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 ${item.color}`}>
+                  <item.icon className="w-6 h-6" />
+                </div>
+                <h4 className="font-black text-slate-900 mb-1 uppercase tracking-tighter text-[11px]">{item.label}</h4>
+                <p className="text-[10px] font-bold text-slate-400 leading-tight max-w-[120px] mx-auto">{item.desc}</p>
               </div>
-              <h4 className="font-black text-gray-900 mb-1 uppercase tracking-tight text-sm">{item.label}</h4>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{item.desc}</p>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          <div className="mt-8 pt-6 border-t border-slate-50 text-center relative z-10">
+            <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
+              This tool analyzes your digital footprint using authentic Google data
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -471,13 +522,7 @@ const BrandAudit = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <button 
-                    onClick={() => downloadPDF('brand-audit-results', `Brand_Audit_${pendingQuery}`)}
-                    className="p-3.5 bg-gray-50 hover:bg-white text-gray-400 hover:text-indigo-600 rounded-2xl transition-all border border-gray-100 hover:border-indigo-100 group shadow-sm"
-                    title="Download Report"
-                  >
-                    <FileDown className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                  </button>
+                 
                 </div>
               </div>
 
@@ -680,22 +725,38 @@ const BrandAudit = () => {
           )}
         </div>
 
-        {/* Info Grid */}
-        <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { icon: User, label: 'About You', desc: 'Identity check', color: 'bg-blue-50 text-blue-600' },
-            { icon: Building, label: 'Your Brand', desc: 'Brand recognition', color: 'bg-emerald-50 text-emerald-600' },
-            { icon: LineChart, label: 'Authority', desc: 'Brand ranking', color: 'bg-purple-50 text-purple-600' },
-            { icon: Eye, label: 'Visibility', desc: 'Search presence', color: 'bg-indigo-50 text-indigo-600' }
-          ].map((item, i) => (
-            <div key={i} className="p-8 bg-white border border-gray-100 rounded-[32px] text-center hover:border-indigo-200 transition-all shadow-sm group hover:-translate-y-1">
-              <div className={`w-14 h-14 mx-auto mb-5 rounded-3xl flex items-center justify-center transition-transform group-hover:scale-110 ${item.color}`}>
-                <item.icon className="w-7 h-7" />
+        {/* Compact Info Grid */}
+        <div className="mt-12 bg-white border border-slate-100 rounded-[32px] p-8 shadow-sm relative overflow-hidden max-w-5xl mx-auto">
+          <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/5 rounded-full blur-[60px] -mr-24 -mt-24" />
+          
+          <div className="text-center mb-8 relative z-10">
+            <h3 className="text-lg font-black text-slate-800 flex items-center justify-center gap-2 tracking-tight">
+              <span className="text-xl">💡</span> What you'll discover about your digital presence
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 relative z-10">
+            {[
+              { icon: User, label: 'About You', desc: 'See if Google recognizes you as a person or entity', color: 'bg-blue-50 text-blue-600' },
+              { icon: Building, label: 'Your Brand', desc: 'Check how your business appears in Google\'s knowledge', color: 'bg-emerald-50 text-emerald-600' },
+              { icon: LineChart, label: 'Authority Score', desc: 'Get your digital brand authority rating', color: 'bg-purple-50 text-purple-600' },
+              { icon: Eye, label: 'Visibility', desc: 'Measure your Google search presence', color: 'bg-indigo-50 text-indigo-600' }
+            ].map((item, i) => (
+              <div key={i} className="text-center group px-2">
+                <div className={`w-12 h-12 mx-auto mb-4 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 ${item.color}`}>
+                  <item.icon className="w-6 h-6" />
+                </div>
+                <h4 className="font-black text-slate-900 mb-1 uppercase tracking-tighter text-[11px]">{item.label}</h4>
+                <p className="text-[10px] font-bold text-slate-400 leading-tight max-w-[120px] mx-auto">{item.desc}</p>
               </div>
-              <h4 className="font-black text-gray-900 mb-1 uppercase tracking-tight text-sm">{item.label}</h4>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{item.desc}</p>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          <div className="mt-8 pt-6 border-t border-slate-50 text-center relative z-10">
+            <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
+              This tool analyzes your digital footprint using authentic Google data
+            </p>
+          </div>
         </div>
     </div>
   );

@@ -192,7 +192,7 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
         <aside className="w-[72px] h-full bg-[#0a0e1a] border-r border-white/5 flex flex-col items-stretch py-8 overflow-y-auto no-scrollbar">
           <Link to="/dashboard" className="mb-10 flex flex-col items-start pl-5 gap-2 group">
             <div className="w-11 h-11 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-all">
-               <Sparkles className="w-6 h-6 text-white" />
+               <img src="/logo.png" className="w-8 h-8 object-contain" alt="Logo" />
             </div>
           </Link>
 
