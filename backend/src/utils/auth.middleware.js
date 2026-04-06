@@ -9,20 +9,34 @@ exports.protect = async (req, res, next) => {
     }
 
     if (!token) {
+      // Diagnostic: Log which endpoint hit auth failure and whether Authorization header existed at all
+      const hasAuthHeader = !!req.headers.authorization;
+      console.warn(`⚠️ [AUTH] No valid token | ${req.method} ${req.originalUrl} | Authorization header present: ${hasAuthHeader} | Value: ${hasAuthHeader ? req.headers.authorization.substring(0, 20) + '...' : 'NONE'}`);
       return res.status(401).json({ message: 'You are not logged in! Please log in to get access.' });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-very-secure-secret');
 
+    // Diagnostic: Check if token is about to expire (within 5 minutes)
+    const now = Math.floor(Date.now() / 1000);
+    const timeLeft = decoded.exp - now;
+    if (timeLeft < 300) {
+      console.warn(`⚠️ [AUTH] Token expiring soon | ${req.method} ${req.originalUrl} | Expires in ${timeLeft}s`);
+    }
+
     const currentUser = await User.findById(decoded.id);
     if (!currentUser) {
+      console.warn(`⚠️ [AUTH] User not found in DB | ${req.method} ${req.originalUrl} | Token user ID: ${decoded.id}`);
       return res.status(401).json({ message: 'The user belonging to this token no longer exists.' });
     }
 
     req.user = currentUser;
     next();
   } catch (err) {
-    res.status(401).json({ message: 'Invalid token or session expired.' });
+    // Diagnostic: Log the specific error type (expired vs. malformed vs. other)
+    const errType = err.name === 'TokenExpiredError' ? 'EXPIRED' : (err.name === 'JsonWebTokenError' ? 'INVALID' : err.name);
+    console.warn(`⚠️ [AUTH] Token verification failed | ${req.method} ${req.originalUrl} | Reason: ${errType} — ${err.message}`);
+    return res.status(401).json({ message: 'Invalid token or session expired.' });
   }
 };
 

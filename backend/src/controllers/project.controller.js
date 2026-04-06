@@ -373,11 +373,10 @@ const internalRunProjectScan = async (project) => {
         // Authority Signals Calculation
         const allSignals = scanResults.promptRankings.map(r => r.authoritySignals).filter(Boolean);
         const trainingRecall = Math.round(allSignals.filter(s => s.recallConfidence === 'High' || s.recallConfidence === 'Medium').length / (allSignals.length || 1) * 100);
+        // FIX: Only count results that have ACTUAL citation URLs as "web grounded"
+        // Previously, ANY web-search-sourced result was counted even if brand wasn't found
         const webGroundedPercent = Math.round(
-            allSignals.filter(s => 
-                (s.citations && s.citations.length > 0) || 
-                (s.sourceType && !s.sourceType.includes('Internal'))
-            ).length / (allSignals.length || 1) * 100
+            allSignals.filter(s => s.citations && s.citations.length > 0).length / (allSignals.length || 1) * 100
         );
         const uniqueCitations = [...new Set(allSignals.flatMap(s => s.citations || []))].filter(Boolean).slice(0, 10);
 
@@ -397,7 +396,9 @@ const internalRunProjectScan = async (project) => {
                     const isFound = r.found || r.rank > 0 || snippetMatch;
                     if (isFound) foundPrompts.add(r.prompt);
                     let score = r.score || 0;
-                    if (isFound && score < 60) score = 60;
+                    // FIX: Only boost score to minimum 60 if brand has a real ranking (rank > 0)
+                    // Don't boost for snippet-only or fallback-found (rank=0, score=15-30) results
+                    if (r.rank > 0 && score < 60) score = 60;
                     return { ...r, score, isFound };
                 });
                 engineScores[engine] = Math.round(validRankings.reduce((a, b) => a + b.score, 0) / validRankings.length);
@@ -417,8 +418,9 @@ const internalRunProjectScan = async (project) => {
             const isNeg = negPhrasesOverall.some(p => snippetL.includes(p));
             const snippetMatch = snippetL.includes(brandL) && !isNeg;
             const isFound = r.found || r.rank > 0 || snippetMatch;
-            const score = isFound ? Math.max(r.score, 60) : (r.score || 0);
-            const weight = isFound ? 2 : 1; // Double weight for "wins"
+            // FIX: Only boost to min 60 if genuinely ranked (rank > 0), not snippet-only matches
+            const score = (r.rank > 0) ? Math.max(r.score, 60) : (r.score || 0);
+            const weight = (r.rank > 0) ? 2 : 1; // Double weight only for genuinely ranked wins
             
             totalWeightedScore += (score * weight);
             totalWeights += weight;
@@ -435,7 +437,16 @@ const internalRunProjectScan = async (project) => {
         const authorityScore = Math.round((trainingRecall * 0.4) + (webGroundedPercent * 0.3) + (reachPercent * 0.3));
 
         // Final Aggregate GEO Health Score (Project Overview)
-        const overallScore = Math.round((visibilityScore * 0.4) + (techScore * 0.3) + (authorityScore * 0.3));
+        // CRITICAL FIX: Scale tech & authority contribution proportionally to visibility
+        // Rationale: Having good robots.txt is meaningless if the brand is invisible to AI
+        // When visibility=0% → GEO score ≈ 0% (honest, not inflated by tech infra)
+        // When visibility=80% → tech & authority provide full bonus (rewarding good infra)
+        const visibilityRatio = visibilityScore / 100; // 0.0 to 1.0
+        const overallScore = Math.round(
+            (visibilityScore * 0.6) + 
+            (techScore * 0.2 * visibilityRatio) + 
+            (authorityScore * 0.2 * visibilityRatio)
+        );
 
         // ---------------------------------------------------------
         // PHASE 5: Save Snapshot

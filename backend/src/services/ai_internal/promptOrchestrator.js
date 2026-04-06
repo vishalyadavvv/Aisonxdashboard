@@ -49,12 +49,15 @@ TASK: Analyze the search presence of "${brandName}" (${domain}) in your model me
 
 INSTRUCTIONS:
 1. ⚠️ MARKET EXPERTISE: Identify leadership specifically based on localized training data for ${market.name}.
-2. 🚨 BREVITY: Return ONLY JSON. Snippet MUST be 1 sentence (max 15 words). NO filler.
-3. 🚨 SCORING: Provide Rank 0-10 and Score 0-100 based on localized presence.
-4. OUTPUT FORMAT (JSON):
+2. 🚨 DATA INTEGRITY: Provide a REALISTIC and FACTUAL assessment. 
+   - DO NOT fabricate ranks or snippets. 
+   - If a brand is a global leader (e.g. Nike, Apple), ensure its presence is confirmed via your internal training data before reporting it as not found.
+3. 🚨 RICH SNIPPETS: Snippets MUST be 1-2 detailed sentences (max 60 words).
+4. 🚨 SCORING: Provide Rank 0-10 and Score 0-100 based on localized presence.
+5. OUTPUT FORMAT (JSON):
 {
   "prompt": "${promptText}",
-  "brandRanking": { "rank": 0-10, "score": 0-100, "isRecommended": true/false, "linkProvided": true/false, "snippet": "1-sentence info" },
+  "brandRanking": { "rank": 0-10, "score": 0-100, "isRecommended": true/false, "linkProvided": true/false, "snippet": "Detailed factual info" },
   "authoritySignals": { "sourceType": "Expert Analysis", "recallConfidence": "High|Medium|Low", "citations": [] }
 }
 `;
@@ -105,15 +108,17 @@ USER QUERY: "${customPromptText}"
 TARGET BRAND: "${brandName}"
 WEBSITE: "${domain}"
 
-TASK: Analyze your own internal response to this user query.
+TASK: Analyze your own internal response to this user query with HIGH accuracy.
 1. Does "${brandName}" (or their website ${domain}) appear in your response to this query? (brandMentioned: true/false)
 2. What is the sentiment towards "${brandName}"? (Positive/Neutral/Negative)
+
+🚨 DATA INTEGRITY: DO NOT hallucinate. Only report a mention if you are 100% sure the brand or domain is explicitly or implicitly identified in the results.
 
 OUTPUT FORMAT (JSON ONLY):
 {
   "brandMentioned": true/false,
   "sentiment": "Positive|Neutral|Negative",
-  "reasoning": "1 sentence why, specifically checking for mentions of ${brandName} or ${domain}"
+  "reasoning": "1-2 detailed sentences explaining why, specifically identifying evidence for ${brandName} or ${domain}. Max 60 words."
 }
 `;
     try {

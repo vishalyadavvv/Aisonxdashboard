@@ -121,7 +121,17 @@ const ProjectDetail = () => {
       toast.success('Omni-Scan Complete', { id: toastId });
       await refreshData();
     } catch (err) {
-      toast.error('Intelligence sync failed.', { id: toastId });
+      const status = err.response?.status;
+      const serverMsg = err.response?.data?.message || err.response?.data?.error;
+      
+      if (status === 401) {
+        toast.error('Session expired. Please log in again.', { id: toastId });
+        navigate('/login');
+      } else if (status === 429) {
+        toast.error('AI engines at capacity. Please wait 30-60 seconds and retry.', { id: toastId });
+      } else {
+        toast.error(serverMsg || 'Intelligence sync failed. Please try again.', { id: toastId });
+      }
     } finally {
       setIsScanning(false);
     }
@@ -396,30 +406,16 @@ const ProjectDetail = () => {
                     { name: 'OpenAI', id: 'openai', color: 'bg-emerald-500' },
                     { name: 'Gemini', id: 'gemini', color: 'bg-blue-500' },
                   ].map((engine) => {
-                    // Calculate a live score for this engine based on the same logic used in the insights
+                    // Use backend-computed engine score (consistent across refreshes)
                     const engineRankings = lastSnapshot?.promptRankings?.filter(r => r.engine === engine.id) || [];
                     let score = lastSnapshot?.engineScores?.[engine.id] || 0;
                     
+                    // Only recalculate if backend returned 0 but we have individual prompt scores
                     if (score === 0 && engineRankings.length > 0) {
-                      const brandName = project?.brandName || project?.name || '';
-                      const negPhrases = ['not found', 'not visible', 'does not appear', 'does not rank', 'not organically visible', 'is not present', 'no mention'];
-                      
-                      // Step 1: Try to use actual prompt scores from the backend (real data)
                       const actualScores = engineRankings.filter(r => r.score > 0).map(r => r.score);
                       if (actualScores.length > 0) {
+                        // Average ALL rankings (including 0s) for honest representation
                         score = Math.round(actualScores.reduce((a, b) => a + b, 0) / engineRankings.length);
-                      } else {
-                        // Step 2: Fallback to found count, but filter out negative snippets
-                        const foundCount = engineRankings.filter(r => {
-                          if (r.found || r.rank > 0) return true;
-                          const snippetL = r.snippet?.toLowerCase() || '';
-                          const isNeg = negPhrases.some(p => snippetL.includes(p));
-                          return snippetL.includes(brandName.toLowerCase()) && !isNeg;
-                        }).length;
-                        
-                        if (foundCount > 0) {
-                          score = Math.round((foundCount / engineRankings.length) * 60);
-                        }
                       }
                     }
 

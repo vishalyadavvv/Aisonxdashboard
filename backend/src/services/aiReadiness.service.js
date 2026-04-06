@@ -859,14 +859,22 @@ async function getAIAnalysis(url, businessType, totalQueries, presentCount, miss
     Return ONLY a JSON object:
     {
         "score": number,
-        "summary": "string"
+        "summary": "string",
+        "brandType": "string (e.g. Enterprise B2B, Consumer Retail, SaaS Platform, etc.)",
+        "domainType": "string (e.g. Commercial, Educational, Information/Blog, etc.)"
     }
     `;
 
     try {
         const response = await fetchOpenAI(prompt, true); // true for JSON mode
         try {
-            return JSON.parse(response);
+            const parsed = JSON.parse(response);
+            return {
+                score: parsed.score || 0,
+                summary: parsed.summary || "",
+                brandType: parsed.brandType || "N/A",
+                domainType: parsed.domainType || businessType || "General"
+            };
         } catch (e) {
             const jsonMatch = response.match(/\{[\s\S]*\}/);
             if (jsonMatch) return JSON.parse(jsonMatch[0]);
@@ -1197,14 +1205,20 @@ exports.analyzeWebsite = async (url) => {
         }
     }
     
-    // Get AI Analysis
-    let summary = `This report analyzes how AI systems perceive your content. Core structure coverage: ${coverageScore}%.`;
+    let domainSynthesis = {
+        brandType: "N/A",
+        domainType: businessType || "General"
+    };
     
     try {
         const aiResult = await getAIAnalysis(url, businessType, totalQueries, presentCount, missingQueries, scrapedData, technicalSignals);
         if (aiResult) {
             coverageScore = aiResult.score;
             summary = aiResult.summary;
+            domainSynthesis = {
+                brandType: aiResult.brandType,
+                domainType: aiResult.domainType
+            };
         }
     } catch (e) {
         console.warn("AI enhancement failed, using heuristic values.");
@@ -1214,6 +1228,7 @@ exports.analyzeWebsite = async (url) => {
         businessType,
         summary,
         coverageScore,
+        domainSynthesis, // Added for frontend card display
         corePagesFound: presentCount,
         totalPages: totalQueries,
         totalMissing: missingCount,

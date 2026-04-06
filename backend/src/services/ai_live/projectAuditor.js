@@ -44,33 +44,38 @@ TASK: Analyze the search presence of "${brandName}" (${domain}) for EACH prompt,
 ${promptListStr}
 
 INSTRUCTIONS:
-1. ⚠️ ORGANIC RESEARCH: Use your web search tool. Search ONLY for the prompt text in ${market.name} (e.g. Google search the exact prompt). DO NOT include the brand name in your search query.
-2. ⚠️ OBJECTIVE ANALYSIS: Review the organic search results, top articles, and lists. See if "${brandName}" is naturally mentioned or recommended.
-     3. ⚠️ OBJECTIVITY: Only report a rank if the brand actually appears or is a known top-tier option.
-     4. ⚠️ RANKING & SCORE: Provide a Rank (1-10). If the brand is NOT found or NOT prominently mentioned, you MUST return Rank 0 and Score 0.
-     5. CITATIONS: Include the brand's domain (${domain}) as a citation only if it is actually relevant and found.
-     
-     OUTPUT FORMAT (JSON ARRAY):
-     [
-       {
-         "prompt": "prompt text",
-         "brand": "${brandName}",
-         "isRecommended": true/false,
-         "linkMentioned": true/false,
-         "recommendationRank": 1-10 (0 if not found/visible),
-         "linkRank": 1-10 (0 if not found/visible),
-         "visibilityLevel": "High|Moderate|Low|None",
-         "snippet": "1-2 sentences summarizing findings specifically for THIS prompt. If not found, say so explicitly.",
-         "score": 0-100,
-         "authoritySignals": {
-           "sourceType": "Native OpenAI Search",
-           "recallConfidence": "High|Medium|Low",
-           "citations": ["FULL URLs discovered for THIS prompt."]
-         }
-       }
-     ]
-     🚨 CRITICAL: If the brand is not in the top results, Rank MUST be 0.
-     `;
+1. ⚠️ HYBRID RESEARCH: Use your web search tool. 
+   - First, perform an "Organic Battle View" (Search ONLY for the prompt text in ${market.name}). 
+   - Second, if "${brandName}" is NOT found in the top results, you MUST perform a "Brand Verification Search" (e.g. "${brandName} ${market.name} [prompt]") to see if they have relevant high-authority pages.
+2. 🚨 DATA INTEGRITY: Provide a REALISTIC assessment. 
+   - DO NOT fabricate ranks or snippets. 
+   - If a brand is a global leader (like Apple, Nike, etc.) and is mentioned in top articles/lists, rank it logically (1-10) even if its own domain is not the #1 result.
+   - If NO search evidence exists after both searches, return Rank 0 and Score 0 with "Not Found" in the snippet.
+3. 🚨 RICH SNIPPETS: Snippet MUST be 1-2 detailed sentences (max 60 words). Explain *why* the brand ranks or what specific sentiment/content was found.
+4. RANKING: 
+   - Rank 1-10: For brands found with strong organic presence or high-authority mentions.
+   - Rank 0: ONLY if the brand is genuinely invisible or irrelevant in this market.
+
+OUTPUT FORMAT (JSON ARRAY):
+[
+  {
+    "prompt": "prompt text",
+    "brand": "${brandName}",
+    "isRecommended": true/false,
+    "linkMentioned": true/false,
+    "recommendationRank": 1-10 (0 if not found),
+    "linkRank": 1-10 (0 if not found),
+    "visibilityLevel": "High|Moderate|Low|None",
+    "snippet": "Detailed factual summary of findings.",
+    "score": 0-100,
+    "authoritySignals": {
+      "sourceType": "Native OpenAI Search",
+      "recallConfidence": "High|Medium|Low",
+      "citations": ["FULL URLs discovered."]
+    }
+  }
+]
+`;
 
     logger.info(`🔄 [PROJECT_AUDITOR] GPT Batch Audit for ${prompts.length} prompts...`);
     const res = await client.responses.create({
@@ -112,15 +117,19 @@ TARGET MARKET: "${market.name}" ${market.context ? `(${market.context})` : ''}
 TASK: Analyze if and where "${brandName}" (${domain}) appears in YOUR REAL-TIME search results for: "What are the best options for ${promptText}?" in the ${market.name} market.
 
 INSTRUCTIONS:
-1. ORGANIC SEARCH: Search ONLY for: "What are the best options for ${promptText}?" in the ${market.name} market. DO NOT include "${brandName}" in the search query itself.
-2. ⚠️ OBJECTIVE RANKING: Carefully review the search results and generated summaries. If "${brandName}" appears naturally in the top recommended lists or articles, rank it based on its actual position (Rank 1-10).
-3. ⚠️ STRICT PENALTY: If the brand is NOT found in the top organic results for this generic query, report it as "None" or "Low" visibility with Rank 0. Do NOT hallucinate presence.
-4. 🚨 CITATION FLEXIBILITY: Provide citation URLs that mention "${brandName}" or its website. If no direct link is available but knowledge confirms visibility, provide the most relevant search result link.
-🚨 BREVITY RULE: Return ONLY JSON. Snippets MUST be exactly 1 sentence (max 25 words). NO conversational filler or prologue.
+1. HYBRID SEARCH: 
+   - Search 1: Search for "${promptText} in ${market.name}". 
+   - Search 2: If result 1 is thin, search for "${brandName} ${promptText}" to verify specific presence.
+2. 🚨 DATA INTEGRITY: Provide a REALISTIC assessment. 
+   - DO NOT fabricate details. If the brand is a global leader (e.g. Nike, Apple), ensure its presence is confirmed via search before reporting it as not found.
+   - If NOT visible after both searches, Rank MUST be 0.
+3. 🚨 RICH SNIPPETS: Snippets MUST be 1-2 detailed sentences (max 60 words). No conversational filler.
+4. CITATION FLEXIBILITY: Provide citation URLs that mention "${brandName}" or its website. ONLY absolute URLs.
+
 OUTPUT FORMAT (JSON):
 {
   "prompt": "${promptText}",
-  "brandRanking": { "rank": 0-10, "score": 0-100, "isRecommended": true/false, "linkProvided": true/false, "snippet": "1-sentence info" },
+  "brandRanking": { "rank": 0-10, "score": 0-100, "isRecommended": true/false, "linkProvided": true/false, "snippet": "Detailed factual info" },
   "authoritySignals": { "sourceType": "Native OpenAI Search", "citations": ["URLs"] }
 }
 `;
@@ -163,15 +172,14 @@ TARGET BRAND (The Client): "${brandName}" (${domain})
 TASK: Use Google Search to evaluate the visibility and reputation of "${brandName}" in the ${market.name} market for the query: "${promptText}".
 
 INSTRUCTIONS:
-1. ORGANIC BATTLE VIEW: Search ONLY for "${promptText} in ${market.name}". DO NOT search for the brand name directly. We need to see if it ranks organically.
-2. ⚠️ OBJECTIVE RECOGNITION: Scan the search results. If "${brandName}" is naturally mentioned in top articles, directories, or AI summaries, assign a realistic rank (1-10) based on how prominent it is.
-3. 🚨 SCORING: 95-100 (Rank 1), 85-94 (Rank 2-3), 75-84 (Rank 4-6), 60-74 (Rank 7-10), 0 (Not Found).
-4. 🚨 PROOF RULES: You MUST return FULL, VALID 'https://' URLs for citations. Do NOT provide integers or descriptive text. ONLY absolute URLs.
-5. 🚨 BREVITY: Return ONLY JSON. Snippet MUST be 1 sentence (max 25 words). NO prologue.
-6. OUTPUT FORMAT (JSON ONLY):
+1. HYBRID SEARCH: First, search for "${promptText} in ${market.name}". If "${brandName}" is not prominent, perform a targeted second search including the brand name to verify presence.
+2. 🚨 DATA INTEGRITY: Be realistic. For global leaders (like Nike, Sony, etc.), use the search data to confirm their status even if they rank below smaller local niche sites in snippets.
+3. 🚨 RICH SNIPPETS: Snippet MUST be 1-2 factual sentences (max 60 words). Explain findings clearly.
+4. 🚨 PROOF RULES: You MUST return FULL, VALID 'https://' URLs for citations. ONLY absolute URLs.
+5. OUTPUT FORMAT (JSON ONLY):
 {
   "prompt": "${promptText}",
-  "brandRanking": { "rank": 0-10, "score": 0-100, "isRecommended": true/false, "linkProvided": true/false, "snippet": "1-sentence info" },
+  "brandRanking": { "rank": 0-10, "score": 0-100, "isRecommended": true/false, "linkProvided": true/false, "snippet": "Factual analysis summary." },
   "authoritySignals": { "sourceType": "Google Search", "citations": [] }
 }
 🚨 RETURN ONLY JSON.`;
@@ -252,28 +260,26 @@ PROMPTS TO AUDIT:
 ${promptListStr}
 
 INSTRUCTIONS:
-1. ORGANIC BATTLE VIEW: Search ONLY for the prompt text in ${market.name}. DO NOT include "${brandName}" or the competitors in the search query. We want to see who ranks naturally.
-2. ⚠️ TARGETED FALLBACK: For ANY prompt where "${brandName}" is NOT found in the organic battle view, you MUST perform a second search that INCLUDES their name (e.g., "${brandName} [the prompt]") to see if they at least have relevant content.
-3. ⚠️ OBJECTIVE MAPPING: Read the top search results. Map which of the competitors OR the target brand natively appear. Rank them based strictly on actual visibility.
-4. ⚠️ NO BIAS: Provide an objective assessment based SOLELY on live search data.
-5. 🚨 PROOF RULES: You MUST return FULL, VALID 'https://' URLs for citations. Do NOT provide descriptive text like "site name". ONLY absolute URLs.
-6. 🚨 BREVITY: Return ONLY JSON Array. ALL snippets MUST be 1 sentence (max 25 words). NO filler.
-7. 🚨 MAPPING: The "brandRanking" object MUST ONLY refer to "${brandName}".
-8. SCORING: 
-   - Found organically: Rank 1-10, Score 60-100. 
-   - Not found organically but found in fallback: Rank 0, Score 15-30 (They have content but poor SEO).
-   - Not found at all: Rank 0, Score 0.
+1. ⚠️ HYBRID BATTLE VIEW: 
+   - Step 1: Search ONLY for the prompt text in ${market.name}. Map the top 10 results.
+   - Step 2: If any major brand (target or rivals) is missing, do a targeted verification search for them.
+2. 🚨 DATA INTEGRITY: Reporting "Not Found" for a household-name brand just because it's not the #1 snippet result is WRONG. Use search grounding to find their actual position in the lists.
+3. 🚨 RICH SNIPPETS: Snippets MUST be 1-2 detailed sentences (max 60 words).
+4. 🚨 CITATIONS: You MUST return FULL, VALID 'https://' URLs.
+5. SCORING: 
+   - Strong Organic Presence: Rank 1-10, Score 60-100.
+   - Mentioned but less prominent: Rank 7-10, Score 30-60.
+   - Not found after thorough search: Rank 0, Score 0.
 
 OUTPUT FORMAT (JSON ARRAY OF OBJECTS):
     [
       {
         "prompt": "Exact prompt text",
-        "brandRanking": { "rank": 1-10 (0 if not found organically), "score": 1-100 (15-30 if found in fallback, 0 if not found at all), "isRecommended": "true/false. MUST BE false if rank is 0", "linkProvided": true/false, "snippet": "Specific findings." },
+        "brandRanking": { "rank": 0-10, "score": 0-100, "isRecommended": true/false, "linkProvided": true/false, "snippet": "Deep factual findings." },
         "competitorRankings": [ { "name": "Competitor", "domain": "domain.com", "rank": 1-10, "score": 1-100, "found": true/false } ],
         "authoritySignals": { "citations": ["URLs"] }
       }
     ]
-    🚨 CRITICAL: If the target brand "${brandName}" is not visible or not recommended organically for a prompt, its rank MUST be 0.
     `;
 
     logger.info(`🔄 [COMPETITIVE] GPT Batch Audit for ${brandName} vs rivals...`);
