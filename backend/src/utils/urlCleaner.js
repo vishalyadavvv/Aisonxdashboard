@@ -57,6 +57,11 @@ function cleanUrl(url) {
     // Remove brackets/quotes/markdown artifacts
     cleaned = cleaned.replace(/^[(\["'\[]+|[)\]"'\]/]+$/g, '');
 
+    // 0. FIX REDUNDANT PROTOCOLS (e.g. https://https:// or www.https://)
+    cleaned = cleaned.replace(/^(https?:\/\/)+/, '$1'); // Normalize multiple https:// to one
+    cleaned = cleaned.replace(/^www\.(https?:\/\/)/i, '$1'); // Fix "www.https://"
+    cleaned = cleaned.replace(/^(https?:\/\/)+/g, 'https://'); // Replace any weird repeats
+
     // Remove trailing periods often added by LLMs
     if (cleaned.endsWith('.') && !cleaned.endsWith('..')) {
       const lastSlash = cleaned.lastIndexOf('/');

@@ -111,7 +111,7 @@ async function checkListings(brandName) {
             return results;
         } catch (e) {
             if (e.response && e.response.status === 403) {
-                console.warn('Google CSE failed: Permission Denied. Please ensure "Custom Search API" is enabled in Google Cloud Console.');
+                console.warn('❌ Google CSE failed: Permission Denied (403). Action Required: Enable "Custom Search API" in Google Cloud Console and ensure your API Key is not restricted.');
             } else {
                 console.warn('Google CSE failed:', e.message);
             }

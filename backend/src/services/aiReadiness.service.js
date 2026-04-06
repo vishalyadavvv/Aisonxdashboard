@@ -3,6 +3,8 @@ const cheerio = require('cheerio');
 const xml2js = require('xml2js');
 const { URL } = require('url');
 
+const { cleanUrl } = require('../utils/urlCleaner');
+
 // Common queries database
 const COMMON_QUERIES = {
     general: [
@@ -977,10 +979,8 @@ function getDefaultTechnicalSignals() {
 
 // Main analysis function
 exports.analyzeWebsite = async (url) => {
-    // Normalize URL
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        url = 'https://' + url;
-    }
+    // Normalize and Clean URL
+    url = cleanUrl(url);
     
     const parsedUrl = new URL(url);
     const baseUrl = `${parsedUrl.protocol}//${parsedUrl.hostname}`;

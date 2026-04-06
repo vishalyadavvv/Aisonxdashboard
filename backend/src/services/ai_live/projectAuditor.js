@@ -253,7 +253,7 @@ ${promptListStr}
 
 INSTRUCTIONS:
 1. ORGANIC BATTLE VIEW: Search ONLY for the prompt text in ${market.name}. DO NOT include "${brandName}" or the competitors in the search query. We want to see who ranks naturally.
-2. ⚠️ TARGETED FALLBACK: For ANY prompt where "${brandName}" is NOT found in the organic battle view, you MUST perform a second search that INCLUDES their name (e.g., "${brandName} ${promptText}") to see if they at least have relevant content.
+2. ⚠️ TARGETED FALLBACK: For ANY prompt where "${brandName}" is NOT found in the organic battle view, you MUST perform a second search that INCLUDES their name (e.g., "${brandName} [the prompt]") to see if they at least have relevant content.
 3. ⚠️ OBJECTIVE MAPPING: Read the top search results. Map which of the competitors OR the target brand natively appear. Rank them based strictly on actual visibility.
 4. ⚠️ NO BIAS: Provide an objective assessment based SOLELY on live search data.
 5. 🚨 PROOF RULES: You MUST return FULL, VALID 'https://' URLs for citations. Do NOT provide descriptive text like "site name". ONLY absolute URLs.

@@ -265,7 +265,7 @@ const internalRunProjectScan = async (project) => {
         
         // Fix: Clean the domain for specialized services (profiler, tech audit)
         // This ensures things like fetchWebsiteContent don't try to fetch https://https://domain.com
-        const domain = project.domain.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/$/, '').split('/')[0];
+        const domain = project.domain.replace(/^(https?:\/\/)+/, '').replace(/^www\.(https?:\/\/)/i, '').replace(/^www\./, '').replace(/\/$/, '').split('/')[0];
         
         // PHASE 1: Technical & Content Infrastructure (Defensive Parallel)
         const [techResults, readinessResults, profilerContent, brandAuditResults] = await Promise.all([
