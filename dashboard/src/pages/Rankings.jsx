@@ -401,7 +401,9 @@ const Rankings = () => {
                           </div>
                         </td>
                         <td className="px-6 py-5 text-center">
-                          <div className={`text-sm font-black inline-flex items-center justify-center w-10 h-10 rounded-xl ${displayRank === 1 ? 'bg-amber-50 text-amber-600 ring-1 ring-amber-100' : displayRank <= 3 ? 'bg-blue-50 text-blue-600 ring-1 ring-blue-100' : displayRank === '-' ? 'text-slate-300' : 'bg-slate-100 text-slate-600'}`}>
+                          <div 
+                            title={displayRank === '-' ? (res?.score > 0 ? "Has Content (Unranked: Did not appear in top organic AI results)" : "Brand not found in top organic AI results or targeted fallback.") : ""}
+                            className={`text-sm font-black inline-flex items-center justify-center w-10 h-10 rounded-xl transition-all ${displayRank === 1 ? 'bg-amber-50 text-amber-600 ring-1 ring-amber-100' : displayRank <= 3 ? 'bg-blue-50 text-blue-600 ring-1 ring-blue-100' : displayRank === '-' ? (res?.score > 0 ? 'bg-amber-50/50 text-amber-500 border border-amber-100' : 'text-slate-300') : 'bg-slate-100 text-slate-600'}`}>
                             {displayRank}
                           </div>
                         </td>
@@ -473,8 +475,11 @@ const Rankings = () => {
                                           <div key={eng} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
                                             <div className="flex items-center justify-between mb-3">
                                               <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">{eng}</span>
-                                              <div className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${isFound ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-400'}`}>
-                                                {isFound ? (engRes?.rank > 0 ? `RANK #${engRes.rank}` : 'MENTIONED') : 'UNRANKED'}
+                                              <div 
+                                                title={!isFound && engRes?.score > 0 ? "Has Content (Unranked: Did not appear in top organic AI results)" : ""}
+                                                className={`text-[10px] font-bold px-1.5 py-0.5 rounded transition-all ${isFound ? 'bg-emerald-50 text-emerald-600' : (!isFound && engRes?.score > 0) ? 'bg-amber-50 text-amber-600' : 'bg-slate-100 text-slate-400'}`}
+                                              >
+                                                {isFound ? (engRes?.rank > 0 ? `RANK #${engRes.rank}` : 'MENTIONED') : (!isFound && engRes?.score > 0 ? 'CONTENT FOUND (UNRANKED)' : 'UNRANKED')}
                                               </div>
                                             </div>
                                             <p className="text-[11px] text-slate-600 leading-relaxed italic">

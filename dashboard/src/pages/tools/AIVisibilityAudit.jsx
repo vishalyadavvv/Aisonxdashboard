@@ -127,18 +127,6 @@ const AIVisibilityAudit = () => {
         if (latest.visibilityAudit) {
           const data = latest.visibilityAudit;
           setResults({ ...data, createdAt: latest.createdAt });
-          
-          const mk = {};
-          if (data.openai) mk['ChatGPT'] = data.openai;
-          if (data.gemini) mk['Gemini'] = data.gemini;
-          // if (data.groq) mk['Groq'] = data.groq;
-          
-          setModelResults(mk);
-          const firstAvailable = Object.keys(mk)[0];
-          if (firstAvailable) setActiveModel(firstAvailable);
-        } else {
-          // Fallback for older snapshots or cases where audit data is still processing
-          setResults(null);
         }
       }
       setSyncLoading(false);
@@ -627,7 +615,6 @@ const AIVisibilityAudit = () => {
   if (results) {
     const score = results.overallScore || results.score || results.averageScore || results.coverageScore || 0;
     const scoreColor = getScoreColor(score);
-    const ds = results.domainSynthesis || results; // domain synthesis data
     const circumference = 2 * Math.PI * 50;
     const strokeDashoffset = circumference * (1 - score / 100);
 
@@ -798,49 +785,12 @@ const AIVisibilityAudit = () => {
                 <div>
                   <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">AI Interpretation</h4>
                   <div>
-                    {renderFormattedContent(results.profile?.interpretation || ds.description || "Deep scanning live web results for brand authority...")}
+                    {renderFormattedContent(results.profile?.interpretation || "Deep scanning live web results for brand authority...")}
                   </div>
                 </div>
               </div>
               
-              <div className="p-8 bg-gray-50/30 space-y-8">
-                {/* Synthesis Grid */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 bg-white border border-gray-100 rounded-xl shadow-sm">
-                    <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Domain Type</div>
-                    <div className="text-xs font-bold text-[#1E293B]">{ds.domainType || results.profile?.domainType || 'Unknown'}</div>
-                  </div>
-                  <div className="p-4 bg-white border border-gray-100 rounded-xl shadow-sm">
-                    <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Sentiment</div>
-                    <div className={`text-[10px] w-fit font-black uppercase tracking-widest px-2 py-0.5 rounded ${((ds.sentiment || results.profile?.sentiment || '').toLowerCase().includes('positive')) ? 'bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100' : ((ds.sentiment || results.profile?.sentiment || '').toLowerCase().includes('negative')) ? 'bg-rose-50 text-rose-600 ring-1 ring-rose-100' : 'bg-amber-50 text-amber-600 ring-1 ring-amber-100'}`}>
-                      {ds.sentiment || results.profile?.sentiment || 'Neutral'}
-                    </div>
-                  </div>
-                  <div className="p-4 bg-white border border-gray-100 rounded-xl shadow-sm col-span-2">
-                    <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Core Offering</div>
-                    <div className="text-xs font-bold text-[#1E293B]">{ds.coreOffering || results.profile?.coreOffering || (ds.description ? ds.description : 'Unknown')}</div>
-                  </div>
-                </div>
 
-                {/* Tags */}
-                <div>
-                  <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-100 flex-1">
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center">
-                        <MessageSquare className="w-4 h-4 text-blue-600" />
-                      </div>
-                      <h4 className="text-sm font-bold text-[#1E293B]">Prompts</h4>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                       {(ds.topics || results.profile?.prompts || []).slice(0, 10).map((k, i) => (
-                        <span key={i} className="px-3 py-1.5 bg-white text-gray-700 text-[10px] font-bold rounded-lg border border-gray-200 uppercase tracking-wider shadow-sm">
-                          {k}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
             </motion.div>
 
             {/* Optimization Checklist Card */}

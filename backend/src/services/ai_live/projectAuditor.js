@@ -253,23 +253,27 @@ ${promptListStr}
 
 INSTRUCTIONS:
 1. ORGANIC BATTLE VIEW: Search ONLY for the prompt text in ${market.name}. DO NOT include "${brandName}" or the competitors in the search query. We want to see who ranks naturally.
-2. ⚠️ OBJECTIVE MAPPING: Read the top search results. Map which of the competitors OR the target brand natively appear. Rank them based strictly on actual visibility in these results.
-3. ⚠️ NO BIAS: Provide an objective assessment based SOLELY on live search data.
-4. 🚨 PROOF RULES: You MUST return FULL, VALID 'https://' URLs for citations. Do NOT provide descriptive text like "site name". ONLY absolute URLs.
-5. 🚨 BREVITY: Return ONLY JSON Array. ALL snippets MUST be 1 sentence (max 25 words). NO filler.
-6. 🚨 MAPPING: The "brandRanking" object MUST ONLY refer to "${brandName}".
-7. SCORING: 95-100 (Rank 1), 85-94 (Rank 2-3), 75-84 (Rank 4-6), 60-74 (Rank 7-10), 0 (Not Found).
+2. ⚠️ TARGETED FALLBACK: For ANY prompt where "${brandName}" is NOT found in the organic battle view, you MUST perform a second search that INCLUDES their name (e.g., "${brandName} ${promptText}") to see if they at least have relevant content.
+3. ⚠️ OBJECTIVE MAPPING: Read the top search results. Map which of the competitors OR the target brand natively appear. Rank them based strictly on actual visibility.
+4. ⚠️ NO BIAS: Provide an objective assessment based SOLELY on live search data.
+5. 🚨 PROOF RULES: You MUST return FULL, VALID 'https://' URLs for citations. Do NOT provide descriptive text like "site name". ONLY absolute URLs.
+6. 🚨 BREVITY: Return ONLY JSON Array. ALL snippets MUST be 1 sentence (max 25 words). NO filler.
+7. 🚨 MAPPING: The "brandRanking" object MUST ONLY refer to "${brandName}".
+8. SCORING: 
+   - Found organically: Rank 1-10, Score 60-100. 
+   - Not found organically but found in fallback: Rank 0, Score 15-30 (They have content but poor SEO).
+   - Not found at all: Rank 0, Score 0.
 
 OUTPUT FORMAT (JSON ARRAY OF OBJECTS):
     [
       {
         "prompt": "Exact prompt text",
-        "brandRanking": { "rank": 1-10 (0 if not found), "score": 1-100 (0 if not found), "isRecommended": "true/false. MUST BE false if rank is 0 or if brand not found", "linkProvided": true/false, "snippet": "Specific findings." },
+        "brandRanking": { "rank": 1-10 (0 if not found organically), "score": 1-100 (15-30 if found in fallback, 0 if not found at all), "isRecommended": "true/false. MUST BE false if rank is 0", "linkProvided": true/false, "snippet": "Specific findings." },
         "competitorRankings": [ { "name": "Competitor", "domain": "domain.com", "rank": 1-10, "score": 1-100, "found": true/false } ],
         "authoritySignals": { "citations": ["URLs"] }
       }
     ]
-    🚨 CRITICAL: If the target brand "${brandName}" is not visible or not recommended for a prompt, its rank MUST be 0.
+    🚨 CRITICAL: If the target brand "${brandName}" is not visible or not recommended organically for a prompt, its rank MUST be 0.
     `;
 
     logger.info(`🔄 [COMPETITIVE] GPT Batch Audit for ${brandName} vs rivals...`);
@@ -341,12 +345,16 @@ TASK: Use Google Search to evaluate the visibility of "${brandName}" AGAINST the
 
 INSTRUCTIONS:
 1. ORGANIC BATTLE VIEW: Search Google ONLY for "${promptText} in ${market.name}". DO NOT include the brand or competitors in the search string.
-2. ⚠️ OBJECTIVE MAPPING: Review the search results. Identify if "${brandName}" or any of the rivals appear organically. Rank them solely based on this unbiased search evidence.
-3. ⚠️ NO BIAS: If rivals are more prominent in ${market.name}, rank them above "${brandName}".
-4. 🚨 SCORING: 95-100 (Rank 1), 85-94 (Rank 2-3), 75-84 (Rank 4-6), 60-74 (Rank 7-10), 0 (Not Found).
-5. 🚨 PROOF RULES: You MUST return FULL, VALID 'https://' URLs for citations. Do NOT provide integers or descriptive text. ONLY absolute URLs.
-6. 🚨 BREVITY: Return ONLY JSON. Snippet MUST be 1 sentence (max 25 words). NO filler.
-7. OUTPUT FORMAT (JSON ONLY):
+2. ⚠️ TARGETED FALLBACK: If "${brandName}" is NOT found in the organic battle view, you MUST perform a second search that INCLUDES their name (e.g., "${brandName} ${promptText}") to see if they at least have relevant content.
+3. ⚠️ OBJECTIVE MAPPING: Review the search results. Identify if "${brandName}" or any of the rivals appear organically. Rank them solely based on this unbiased search evidence.
+4. ⚠️ NO BIAS: If rivals are more prominent in ${market.name}, rank them above "${brandName}".
+5. 🚨 SCORING: 
+   - Found organically: Rank 1-10, Score 60-100. 
+   - Not found organically but found in fallback: Rank 0, Score 15-30.
+   - Not found at all: Rank 0, Score 0.
+6. 🚨 PROOF RULES: You MUST return FULL, VALID 'https://' URLs for citations. Do NOT provide integers or descriptive text. ONLY absolute URLs.
+7. 🚨 BREVITY: Return ONLY JSON. Snippet MUST be 1 sentence (max 25 words). NO filler.
+8. OUTPUT FORMAT (JSON ONLY):
 {
   "prompt": "${promptText}",
   "brandRanking": { "rank": 0-10, "score": 0-100, "isRecommended": true/false, "linkProvided": true/false, "snippet": "1-sentence info" },

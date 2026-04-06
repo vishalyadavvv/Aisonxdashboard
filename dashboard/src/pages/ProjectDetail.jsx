@@ -53,11 +53,33 @@ const ProjectDetail = () => {
   const [activeMainTab, setActiveMainTab] = useState('overview'); // 'overview' or 'competitors'
   const [expandedPrompt, setExpandedPrompt] = useState(null);
   const [activeSnapshotIndex, setActiveSnapshotIndex] = useState(0);
-  const [selectedEngine, setSelectedEngine] = useState('all'); // 'all', 'openai', 'gemini'/*, 'groq'*/
+  const [selectedEngine, setSelectedEngine] = useState('all'); // 'all', 'openai', 'gemini'
+  const [scanMessageIndex, setScanMessageIndex] = useState(0);
 
   const project = contextProject;
   const history = contextHistory;
   const loading = projectLoading;
+
+  useEffect(() => {
+    let interval;
+    if (isScanning) {
+      setScanMessageIndex(0);
+      interval = setInterval(() => {
+        setScanMessageIndex(prev => (prev < 4 ? prev + 1 : prev));
+      }, 7000);
+    } else {
+      setScanMessageIndex(0);
+    }
+    return () => clearInterval(interval);
+  }, [isScanning]);
+
+  const scanMessages = [
+    "Waking AI Engines...",
+    "Deep Scanning with OpenAI...",
+    "Validating with Google Gemini...",
+    "Assembling Search Results...",
+    "Finalizing Visibility Profile..."
+  ];
 
   useEffect(() => {
     if (projectId === 'new') {
@@ -251,10 +273,10 @@ const ProjectDetail = () => {
             <button 
               onClick={handleManualScan}
               disabled={isScanning}
-              className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-sm font-black transition-all shadow-[0_4px_12px_rgba(37,99,235,0.3)] hover:shadow-[0_8px_20px_rgba(37,99,235,0.4)] hover:scale-[1.02] active:scale-95 flex items-center gap-2 group border border-blue-400/20 disabled:opacity-70 disabled:grayscale disabled:scale-100"
+              className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-[13px] font-black transition-all shadow-[0_4px_12px_rgba(37,99,235,0.3)] hover:shadow-[0_8px_20px_rgba(37,99,235,0.4)] hover:scale-[1.02] active:scale-95 flex items-center gap-2 group border border-blue-400/20 disabled:opacity-80 disabled:scale-100 min-w-[240px] justify-center"
             >
-              <RefreshCw className={`w-4 h-4 ${isScanning ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
-              <span className="shrink-0">{isScanning ? 'Syncing Intelligence...' : 'Comprehensive Scan'}</span>
+              <RefreshCw className={`w-4 h-4 shrink-0 ${isScanning ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
+              <span className="shrink-0">{isScanning ? scanMessages[scanMessageIndex] : 'Comprehensive Scan'}</span>
             </button>
             <button 
               onClick={() => downloadPDF('project-detail-report', `${project?.name || 'Project'}_Full_Report.pdf`)}
@@ -742,8 +764,11 @@ const ProjectDetail = () => {
                                         <div key={engine} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                                           <div className="flex items-center justify-between">
                                             <span className="font-bold text-slate-900 capitalize text-sm">{engine}</span>
-                                            <span className={`text-[10px] font-bold px-2 py-1 rounded-md uppercase ${res?.rank > 0 && res?.rank <= 5 ? 'bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100' : isFound ? 'bg-amber-50 text-amber-600 ring-1 ring-amber-100' : 'bg-slate-50 text-slate-400'}`}>
-                                              {res?.rank > 0 && res?.rank <= 5 ? 'Recommended' : isFound ? (res?.rank > 0 ? `Rank #${res.rank}` : 'Mentioned') : 'Not Found'}
+                                            <span 
+                                              title={!isFound && res?.score > 0 ? "Has Content (Unranked: Did not appear in top organic AI results)" : ""}
+                                              className={`text-[10px] font-bold px-2 py-1 rounded-md uppercase transition-all ${res?.rank > 0 && res?.rank <= 5 ? 'bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100' : isFound ? 'bg-amber-50 text-amber-600 ring-1 ring-amber-100' : (!isFound && res?.score > 0) ? 'bg-amber-50 text-amber-500' : 'bg-slate-50 text-slate-400'}`}
+                                            >
+                                              {res?.rank > 0 && res?.rank <= 5 ? 'Recommended' : isFound ? (res?.rank > 0 ? `Rank #${res.rank}` : 'Mentioned') : (!isFound && res?.score > 0 ? 'Content Found (Unranked)' : 'Not Found')}
                                             </span>
                                           </div>
                                           <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-3">
@@ -944,7 +969,12 @@ const ProjectDetail = () => {
                                    <span className="text-[10px] font-bold text-slate-400">{brandAvgScore}%</span>
                                  </div>
                                ) : (
-                                 <span className="text-[10px] font-black text-slate-300 uppercase">Not Found</span>
+                                 <span 
+                                   title={!brandFound && brandAvgScore > 0 ? "Has Content (Unranked: Did not appear in top organic AI results)" : ""}
+                                   className={`text-[10px] font-black uppercase ${!brandFound && brandAvgScore > 0 ? 'text-amber-500' : 'text-slate-300'}`}
+                                 >
+                                   {!brandFound && brandAvgScore > 0 ? 'Content Found (Unranked)' : 'Not Found'}
+                                 </span>
                                )}
                              </div>
                           </td>
