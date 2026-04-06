@@ -46,7 +46,9 @@ const sendEmail = async (options) => {
 
 exports.sendRegisterOTP = async (req, res) => {
   try {
-    const { name, email, phone, password } = req.body;
+    let { name, email, phone, password } = req.body;
+    if (!email) return res.status(400).json({ message: 'Email is required' });
+    email = email.toLowerCase().trim();
 
     if (!name || !email || !phone || !password) {
       return res.status(400).json({ message: 'Please provide all required fields' });
@@ -95,7 +97,9 @@ exports.sendRegisterOTP = async (req, res) => {
 
 exports.register = async (req, res) => {
   try {
-    const { email, otp } = req.body;
+    let { email, otp } = req.body;
+    if (!email) return res.status(400).json({ message: 'Email is required' });
+    email = email.toLowerCase().trim();
 
     if (!email || !otp) {
       return res.status(400).json({ message: 'Please provide email and OTP' });
@@ -153,7 +157,9 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    let { email, password } = req.body;
+    if (!email) return res.status(400).json({ message: 'Email is required' });
+    email = email.toLowerCase().trim();
 
     if (!email || !password) {
       return res.status(400).json({ message: 'Please provide email and password' });
@@ -161,7 +167,13 @@ exports.login = async (req, res) => {
 
     const user = await User.findOne({ email }).select('+password');
 
-    if (!user || !(await user.comparePassword(password))) {
+    if (!user) {
+      console.warn(`[AUTH] Login failed: User not found for email: ${email}`);
+      return res.status(401).json({ message: 'Incorrect email or password' });
+    }
+
+    if (!(await user.comparePassword(password))) {
+      console.warn(`[AUTH] Login failed: Incorrect password for user: ${email}`);
       return res.status(401).json({ message: 'Incorrect email or password' });
     }
 

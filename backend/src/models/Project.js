@@ -55,6 +55,10 @@ const ProjectSchema = new mongoose.Schema({
     }
   },
   lastScanAt: Date,
+  isScanning: {
+    type: Boolean,
+    default: false
+  },
   createdAt: {
     type: Date,
     default: Date.now

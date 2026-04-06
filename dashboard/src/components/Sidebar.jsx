@@ -263,11 +263,19 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
               <div className="relative group mb-8">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center pointer-events-none group-hover:bg-indigo-500/20 transition-colors z-10 border border-indigo-500/20">
                   {currentProject ? (
-                    <img 
-                      src={`https://www.google.com/s2/favicons?domain=${currentProject.domain}&sz=64`} 
-                      className="w-4 h-4 rounded-sm" 
-                      alt=""
-                    />
+                    <div className="relative">
+                      <img 
+                        src={`https://www.google.com/s2/favicons?domain=${currentProject.domain}&sz=64`} 
+                        className="w-4 h-4 rounded-sm" 
+                        alt=""
+                      />
+                      {currentProject.isScanning && (
+                        <>
+                          <div className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full animate-ping" />
+                          <div className="absolute -top-1 -right-1 w-2 h-2 bg-blue-600 rounded-full" />
+                        </>
+                      )}
+                    </div>
                   ) : (
                     <Database className="w-4 h-4 text-indigo-400" />
                   )}

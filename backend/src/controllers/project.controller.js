@@ -247,9 +247,24 @@ exports.runProjectScan = async (req, res) => {
             return res.status(404).json({ error: 'Project not found' });
         }
 
-        // Run scan
-        await internalRunProjectScan(project);
-        res.json({ message: 'Scan completed successfully' });
+        // Prevent overlapping scans if already in progress
+        if (project.isScanning) {
+            releaseScanSlot();
+            return res.status(400).json({ 
+                error: 'Scan in progress', 
+                message: 'A comprehensive scan is already running for this project. Please wait for it to complete.' 
+            });
+        }
+
+        // Set scanning flag IMMEDIATELY and await it before responding to client
+        // This prevents the race condition where the client refreshes before the background task saves the flag
+        project.isScanning = true;
+        await project.save();
+
+        // Start background execution (non-blocking) - flag is already set
+        internalRunProjectScan(project);
+
+        res.json({ message: 'Intelligence assembly initiated. Scan running in background.', isScanning: true });
     } catch (err) {
         logger.error('Error running project scan:', err.message);
         res.status(500).json({ error: 'Scan failed', message: 'Something went wrong during the scan. Please try again.' });
@@ -261,7 +276,9 @@ exports.runProjectScan = async (req, res) => {
 // Internal helper to run comprehensive project scans (reusable)
 const internalRunProjectScan = async (project) => {
     try {
-        logger.info(`🚀 COMPREHENSIVE scan triggered for: ${project.name}`);
+        project.isScanning = true;
+        await project.save();
+        logger.info(`🚀 [SCAN-START] COMPREHENSIVE scan triggered for: ${project.name}`);
         
         // Fix: Clean the domain for specialized services (profiler, tech audit)
         // This ensures things like fetchWebsiteContent don't try to fetch https://https://domain.com
@@ -387,18 +404,23 @@ const internalRunProjectScan = async (project) => {
         ['openai', 'gemini'].forEach(engine => {
             const engineRankings = scanResults.promptRankings.filter(r => r.engine === engine);
             if (engineRankings.length > 0) {
-                const negPhrases = ['not found', 'not visible', 'does not appear', 'does not rank', 'not organically visible', 'is not present', 'no mention'];
+                const negPhrases = ['not found at all', 'completely missing', 'no information available', 'not recognized as a brand'];
                 const validRankings = engineRankings.map(r => {
                     const snippetL = (r.snippet || '').toLowerCase();
                     const brandL = project.brandName.toLowerCase();
-                    const isNeg = negPhrases.some(p => snippetL.includes(p));
-                    const snippetMatch = snippetL.includes(brandL) && !isNeg;
-                    const isFound = r.found || r.rank > 0 || snippetMatch;
+                    
+                    // A brand is found if it has a rank, a found flag, OR is mentioned in the snippet without a definitive "not found at all" phrase
+                    const isNegTerm = negPhrases.some(p => snippetL.includes(p));
+                    const snippetMatch = snippetL.includes(brandL) && !isNegTerm;
+                    const isFound = r.found || (r.rank > 0) || snippetMatch;
+                    
                     if (isFound) foundPrompts.add(r.prompt);
+                    
                     let score = r.score || 0;
-                    // FIX: Only boost score to minimum 60 if brand has a real ranking (rank > 0)
-                    // Don't boost for snippet-only or fallback-found (rank=0, score=15-30) results
-                    if (r.rank > 0 && score < 60) score = 60;
+                    // Ensure a minimum score for any verified/ranked presence
+                    if (isFound && score < 15) score = 15; 
+                    if (r.rank > 0 && score < 60) score = 60; // Genuinely ranked wins get base 60
+                    
                     return { ...r, score, isFound };
                 });
                 engineScores[engine] = Math.round(validRankings.reduce((a, b) => a + b.score, 0) / validRankings.length);
@@ -411,16 +433,16 @@ const internalRunProjectScan = async (project) => {
         let totalWeightedScore = 0;
         let totalWeights = 0;
 
-        const negPhrasesOverall = ['not found', 'not visible', 'does not appear', 'does not rank', 'not organically visible', 'is not present', 'no mention'];
+        const negPhrasesOverall = ['not found at all', 'completely invisible'];
         scanResults.promptRankings.forEach(r => {
             const snippetL = (r.snippet || '').toLowerCase();
             const brandL = project.brandName.toLowerCase();
-            const isNeg = negPhrasesOverall.some(p => snippetL.includes(p));
-            const snippetMatch = snippetL.includes(brandL) && !isNeg;
-            const isFound = r.found || r.rank > 0 || snippetMatch;
-            // FIX: Only boost to min 60 if genuinely ranked (rank > 0), not snippet-only matches
-            const score = (r.rank > 0) ? Math.max(r.score, 60) : (r.score || 0);
-            const weight = (r.rank > 0) ? 2 : 1; // Double weight only for genuinely ranked wins
+            const isNegTerm = negPhrasesOverall.some(p => snippetL.includes(p));
+            const snippetMatch = snippetL.includes(brandL) && !isNegTerm;
+            const isFound = r.found || (r.rank > 0) || snippetMatch;
+            
+            const score = (r.rank > 0) ? Math.max(r.score, 60) : (isFound ? Math.max(r.score, 15) : 0);
+            const weight = (r.rank > 0) ? 2 : (isFound ? 1 : 1); 
             
             totalWeightedScore += (score * weight);
             totalWeights += weight;
@@ -515,11 +537,21 @@ const internalRunProjectScan = async (project) => {
                 rank: r.rank || 0,
                 linkRank: r.linkRank || 0
             })),
-            competitorRankings: (scanResults.competitorRankings || []).map(cr => ({
-                ...cr,
-                // Clean the AI result domain (remove http, www, etc.) for robust matching
-                competitorDomain: (cr.competitorDomain || '').toLowerCase().replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')
-            })),
+            competitorRankings: (scanResults.competitorRankings || []).map(cr => {
+                const cleanDomain = (cr.competitorDomain || '').toLowerCase().replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+                
+                // 🚀 COMPETITOR SCORE BOOSTING (Same as Brand)
+                // If AI found them but didn't give a score, provide a verified baseline
+                let finalScore = cr.score || 0;
+                if ((cr.found || cr.rank > 0) && finalScore < 15) finalScore = 15;
+                if (cr.rank > 0 && finalScore < 60) finalScore = 60;
+
+                return {
+                    ...cr,
+                    score: finalScore,
+                    competitorDomain: cleanDomain
+                };
+            }),
             customPromptResults: scanResults.customPromptResults,
             
             // New Tool Data
@@ -546,12 +578,50 @@ const internalRunProjectScan = async (project) => {
             brandAudit: brandAuditResults || null
         });
 
+        // 🚀 AUTO-CORRECT COMPETITOR DOMAINS
+        // If AI returns a domain that differs from our record, and that AI result had a high score, update it.
+        const competitorUpdates = [];
+        (scanResults.competitorRankings || []).forEach(cr => {
+            if (!cr.competitorDomain || cr.score < 40) return;
+            
+            const existingComp = project.competitors.find(c => 
+                c.name.toLowerCase() === cr.competitorName?.toLowerCase() ||
+                (c.domain && c.domain.toLowerCase().replace(/^https?:\/\/(www\.)?/, '') === cr.competitorDomain.toLowerCase().replace(/^https?:\/\/(www\.)?/, ''))
+            );
+
+            if (existingComp) {
+                const newD = cr.competitorDomain.toLowerCase().replace(/^https?:\/\/(www\.)?/, '').trim();
+                const oldD = existingComp.domain ? existingComp.domain.toLowerCase().replace(/^https?:\/\/(www\.)?/, '').trim() : '';
+                if (newD && newD !== oldD && !newD.includes('google.com') && !newD.includes('openai.com')) {
+                    existingComp.domain = newD;
+                    competitorUpdates.push(`${existingComp.name}: ${oldD || 'None'} -> ${newD}`);
+                }
+            }
+        });
+
+        if (competitorUpdates.length > 0) {
+            logger.info(`✅ [AUTO-CORRECT] Updated ${competitorUpdates.length} competitor domains: ${competitorUpdates.join(', ')}`);
+        }
+
         project.lastScanAt = new Date();
+        project.isScanning = false;
         await project.save();
+        logger.info(`✅ [SCAN-COMPLETE] Completed background scan for: ${project.name}`);
         return snapshot;
     } catch (err) {
-        logger.error(`Error in background project scan (${project._id}):`, err.message);
+        logger.error(`❌ [SCAN-ERROR] Background project scan failed for ${project.name}:`, err.message);
         throw err;
+    } finally {
+        // Ensure flag is reset even on crash
+        try {
+            const p = await Project.findById(project._id);
+            if (p && p.isScanning) {
+                p.isScanning = false;
+                await p.save();
+            }
+        } catch (e) {
+            logger.error(`⚠️ Failed to reset isScanning flag for ${project._id}:`, e.message);
+        }
     }
 };
 
@@ -559,23 +629,47 @@ const internalRunProjectScan = async (project) => {
 // @route   POST /api/projects/:id/sync
 // @access  Private
 exports.runProjectSync = async (req, res) => {
+    // Check if scan slots are available
+    if (!acquireScanSlot()) {
+        return res.status(429).json({ 
+            error: 'System Busy',
+            message: 'Our AI systems are currently at capacity. Please wait 30-60 seconds and try again.'
+        });
+    }
     try {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            releaseScanSlot();
             return res.status(400).json({ error: 'Invalid project ID format' });
         }
         const project = await Project.findOne({ _id: req.params.id, userId: req.user._id });
 
         if (!project) {
+            releaseScanSlot();
             return res.status(404).json({ error: 'Project not found' });
         }
         
-        logger.info(`🔄 [SYNC-TRIGGER] Starting manual comprehensive scan for: ${project.name}`);
-        const snapshot = await internalRunProjectScan(project);
+        // Prevent overlapping scans
+        if (project.isScanning) {
+            releaseScanSlot();
+            return res.status(400).json({ 
+                error: 'Scan in progress', 
+                message: 'A comprehensive scan is already running for this project. Please wait for it to complete.' 
+            });
+        }
+
+        logger.info(`🔄 [SYNC-TRIGGER] Starting manual background sync for: ${project.name}`);
         
-        res.json({ message: 'Comprehensive scan completed successfully', snapshot });
+        // Set flag and await it before response
+        project.isScanning = true;
+        await project.save();
+
+        // Start background execution (non-blocking)
+        internalRunProjectScan(project).finally(() => releaseScanSlot());
+        
+        res.json({ message: 'Intelligence assembly initiated. Scan running in background.', isScanning: true });
     } catch (err) {
-        logger.error('Error in manual comprehensive scan:', err.message);
-        res.status(500).json({ error: 'Comprehensive scan failed: ' + err.message });
+        logger.error('Error in manual background sync trigger:', err.message);
+        res.status(500).json({ error: 'Failed to initiate sync: ' + err.message });
     }
 };
 

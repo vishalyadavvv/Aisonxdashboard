@@ -46,19 +46,14 @@ const ProjectDetail = () => {
   const { projectId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { project: contextProject, history: contextHistory, loading: projectLoading, refreshData } = useProject();
-
-  const [isScanning, setIsScanning] = useState(false);
+  const { project, history, loading, refreshData } = useProject();
+  const isScanning = project?.isScanning || false;
   const [activeTab, setActiveTab] = useState('mention');
-  const [activeMainTab, setActiveMainTab] = useState('overview'); // 'overview' or 'competitors'
+  const [activeMainTab, setActiveMainTab] = useState('overview');
   const [expandedPrompt, setExpandedPrompt] = useState(null);
   const [activeSnapshotIndex, setActiveSnapshotIndex] = useState(0);
-  const [selectedEngine, setSelectedEngine] = useState('all'); // 'all', 'openai', 'gemini'
+  const [selectedEngine, setSelectedEngine] = useState('all');
   const [scanMessageIndex, setScanMessageIndex] = useState(0);
-
-  const project = contextProject;
-  const history = contextHistory;
-  const loading = projectLoading;
 
   useEffect(() => {
     let interval;
@@ -104,8 +99,7 @@ const ProjectDetail = () => {
       navigate('/dashboard/pricing');
       return;
     }
-    setIsScanning(true);
-    const toastId = toast.loading('Orchestrating AI Intelligence Suite (4 Tool Scan)...', {
+    const toastId = toast.loading('Initiating Intelligence Assembly...', {
       style: {
         background: '#0f172a',
         color: '#fff',
@@ -116,9 +110,12 @@ const ProjectDetail = () => {
         border: '1px solid rgba(255,255,255,0.1)'
       }
     });
+
     try {
-      await api.post(`/projects/${projectId}/scan`);
-      toast.success('Omni-Scan Complete', { id: toastId });
+      // Trigger background sync
+      await api.post(`/projects/${projectId}/sync`);
+      toast.success('Scan Initiated in Background', { id: toastId });
+      // The context will automatically pick up the 'isScanning' flag and start polling
       await refreshData();
     } catch (err) {
       const status = err.response?.status;
@@ -132,8 +129,6 @@ const ProjectDetail = () => {
       } else {
         toast.error(serverMsg || 'Intelligence sync failed. Please try again.', { id: toastId });
       }
-    } finally {
-      setIsScanning(false);
     }
   };
 
@@ -263,6 +258,36 @@ const ProjectDetail = () => {
             <span>&gt;</span>
             <span className="text-slate-900 font-semibold underline underline-offset-4 decoration-blue-500/30">Analytics</span>
           </div>
+
+          <AnimatePresence>
+            {isScanning && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="overflow-hidden mb-2 w-full"
+                data-html2canvas-ignore
+              >
+                <div className="bg-blue-600/10 border border-blue-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
+                  <div className="flex items-center gap-4">
+                    <div className="bg-blue-600 rounded-xl p-2.5 animate-pulse shadow-lg shadow-blue-500/20">
+                      <RefreshCw className="w-5 h-5 text-white animate-spin" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-black text-blue-900 uppercase tracking-tight">Comprehensive Scan in Progress</h4>
+                      <p className="text-[11px] text-blue-700 font-bold opacity-70 uppercase tracking-widest mt-0.5">Synchronizing All AI Module Nodes & Semantic Data (30-60s) • Live sync active</p>
+                    </div>
+                  </div>
+                  <div className="hidden md:flex items-center gap-3">
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-white/50 rounded-lg border border-blue-100">
+                      <div className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-pulse" />
+                      <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">{scanMessages[scanMessageIndex]}</span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
           
           <div className="flex items-center gap-3">
             <div className="flex bg-white border border-slate-200 rounded-xl p-1 shadow-sm">
@@ -858,14 +883,24 @@ const ProjectDetail = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {project?.competitors?.map((comp, idx) => {
                 // Domain normalization for robust matching
-                const normalize = (d) => d?.toLowerCase().replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+                const normalize = (d) => (d || '').toLowerCase().replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '').trim();
                 const targetDomain = normalize(comp.domain);
 
                 // Find latest score for this competitor from last snapshot
-                const compRankings = lastSnapshot?.competitorRankings?.filter(cr => normalize(cr.competitorDomain) === targetDomain) || [];
-                const compScore = compRankings.length > 0
+                // RELAXED MATCHING: Try domain match first, then fallback to name match
+                const compRankings = lastSnapshot?.competitorRankings?.filter(cr => {
+                  const aiDomain = normalize(cr.competitorDomain);
+                  const isDomainMatch = aiDomain && targetDomain && aiDomain === targetDomain;
+                  const isNameMatch = cr.competitorName?.toLowerCase() === comp.name?.toLowerCase();
+                  return isDomainMatch || isNameMatch;
+                }) || [];
+
+                const compScoreInput = compRankings.length > 0
                   ? Math.round(compRankings.reduce((a, b) => a + (b.score || 0), 0) / compRankings.length)
                   : 0;
+                
+                // Ensure UI reflects the new backend floor (at least 15 for found)
+                const compScore = (compRankings.some(cr => cr.found || cr.rank > 0) && compScoreInput < 15) ? 15 : compScoreInput;
                 
                 const gap = compScore - stats.overallScore;
                 
@@ -993,14 +1028,25 @@ const ProjectDetail = () => {
                              </div>
                           </td>
                            {project?.competitors?.map((comp, cIdx) => {
-                             const compResults = lastSnapshot?.competitorRankings?.filter(cr => cr.prompt === promptText && cr.competitorDomain === comp.domain) || [];
+                             const normalize = (d) => (d || '').toLowerCase().replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '').trim();
+                             const targetDomain = normalize(comp.domain);
+
+                             const compResults = lastSnapshot?.competitorRankings?.filter(cr => {
+                               const aiDomain = normalize(cr.competitorDomain);
+                               const isDomainMatch = aiDomain && targetDomain && aiDomain === targetDomain;
+                               const isNameMatch = cr.competitorName?.toLowerCase() === comp.name?.toLowerCase();
+                               return cr.prompt === promptText && (isDomainMatch || isNameMatch);
+                             }) || [];
+
                              const compAvgRank = compResults.length > 0
                                ? Math.round(compResults.filter(r => r.rank > 0).reduce((a, b) => a + b.rank, 0) / (compResults.filter(r => r.rank > 0).length || 1))
                                : 0;
-                             const compAvgScore = compResults.length > 0
+                             const compAvgScoreInput = compResults.length > 0
                                ? Math.round(compResults.reduce((a, b) => a + (b.score || 0), 0) / compResults.length)
                                : 0;
-                             const compFound = compResults.some(r => r.found) || (compAvgScore > 0 && compResults.some(r => r.citations?.length > 0));
+                             
+                             const compAvgScore = (compResults.some(r => r.found || r.rank > 0) && compAvgScoreInput < 15) ? 15 : compAvgScoreInput;
+                             const compFound = compResults.some(r => r.found || r.rank > 0) || compAvgScore > 0;
                              const isAhead = compFound && compAvgRank > 0 && (!brandFound || (brandAvgRank > 0 && compAvgRank < brandAvgRank));
 
                              return (

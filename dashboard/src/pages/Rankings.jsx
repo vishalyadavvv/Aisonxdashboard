@@ -222,6 +222,35 @@ const Rankings = () => {
       </div>
 
       <div className="max-w-[1600px] mx-auto px-6 pt-8 space-y-8" id="rankings-content">
+        <AnimatePresence>
+          {project?.isScanning && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden mb-6"
+              data-html2canvas-ignore
+            >
+              <div className="bg-blue-600/10 border border-blue-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
+                <div className="flex items-center gap-4">
+                  <div className="bg-blue-600 rounded-xl p-2.5 animate-pulse shadow-lg shadow-blue-500/20">
+                    <RefreshCw className="w-5 h-5 text-white animate-spin" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-black text-blue-900 uppercase tracking-tight">Comprehensive Scan in Progress</h4>
+                    <p className="text-[11px] text-blue-700 font-bold opacity-70 uppercase tracking-widest mt-0.5">Recalculating AI Engine Indices & Search Visibility (30-60s) • Live sync active</p>
+                  </div>
+                </div>
+                <div className="hidden md:flex items-center gap-3">
+                   <div className="flex items-center gap-2 px-3 py-1.5 bg-white/50 rounded-lg border border-blue-100">
+                    <div className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-pulse" />
+                    <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Processing Rankings</span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
         {/* KPI Grid - SEO Style */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
           <KPICard title="Total Keywords" value={metrics.total} color="slate" />
@@ -375,7 +404,7 @@ const Rankings = () => {
                   
                   const rank = res?.found ? res.rank : '-';
                   const prevRank = prevRes?.found ? prevRes.rank : null;
-                  const delta = (rank !== '-' && prevRank) ? prevRank - rank : 0;
+                  const delta = (rank !== '-' && prevRank !== null) ? prevRank - rank : (rank !== '-' && prevRank === null ? 'NEW' : 0);
 
                   const isFound = selectedEngine === 'all' ? allEngResults.some(r => r.found) : res?.found;
                   const displayRank = selectedEngine === 'all' ? (res?.found && res.rank > 0 ? res.rank : '-') : (rank > 0 ? rank : '-');
@@ -409,7 +438,11 @@ const Rankings = () => {
                         </td>
                         <td className="px-6 py-5 text-center">
                           <div className="flex items-center justify-center">
-                            {delta > 0 ? (
+                            {delta === 'NEW' ? (
+                              <div className="flex items-center gap-1 text-blue-600 font-black text-[10px] bg-blue-50 px-2.5 py-1 rounded-lg uppercase tracking-tight border border-blue-100">
+                                New
+                              </div>
+                            ) : delta > 0 ? (
                               <div className="flex items-center gap-1 text-emerald-600 font-bold text-xs bg-emerald-50 px-2 py-1 rounded-lg">
                                 <TrendingUp className="w-3 h-3" />
                                 +{delta}
@@ -513,7 +546,18 @@ const Rankings = () => {
                                            if (brandFound && domainUrl && !hasDomainAlready) {
                                              allCits.push({ url: domainUrl, engine: 'brand' });
                                            }
-                                           allCits.push(...citUrls);
+                                           // De-duplicate citUrls by their host/domain to avoid repeating the same site multi-times
+                                           const seenUrls = new Set();
+                                           if (domainUrl) seenUrls.add(domainUrl.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '').toLowerCase());
+                                           
+                                           citUrls.forEach(cit => {
+                                             const normalized = cit.url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '').toLowerCase();
+                                             if (!seenUrls.has(normalized)) {
+                                               seenUrls.add(normalized);
+                                               allCits.push(cit);
+                                             }
+                                           });
+
 
                                            return allCits
                                              .map(cit => ({ ...cit, fixedUrl: fixAIUrl(cit.url) }))

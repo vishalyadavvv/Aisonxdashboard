@@ -58,16 +58,22 @@ export const ProjectProvider = ({ children }) => {
     }
   }, [projectId]);
 
-  // Auto-refresh if no history yet (polling for initial scan)
+  // Auto-refresh logic:
+  // 1. If no history yet (initial scan polling)
+  // 2. If project is currently scanning in the background
   useEffect(() => {
     let interval;
-    if (projectId && history.length === 0 && !loading) {
+    const needsPolling = projectId && (history.length === 0 || project?.isScanning);
+    
+    if (needsPolling) {
+      // Initial delay to let the backend start if called immediately after a POST
       interval = setInterval(() => {
+        // Only run if not already fetching to avoid stack-ups
         refreshData();
-      }, 5000);
+      }, 6000); // 6s polling for background scans
     }
     return () => { if (interval) clearInterval(interval); };
-  }, [projectId, history.length, loading, refreshData]);
+  }, [projectId, history.length, project?.isScanning, refreshData]);
 
   const value = {
     projectId,

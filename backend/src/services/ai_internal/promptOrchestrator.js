@@ -37,27 +37,18 @@ async function analyzePromptRanking(brandName, domain, promptText, market = { na
         // Fallback to internal knowledge if live search fails, is disabled, or for Groq
         if (!audit) {
     const prompt = `
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-TARGET BRAND: "${brandName}"
-WEBSITE: "${domain}"
-TARGET MARKET: "${market.name}"
-TARGET PROMPT: "${promptText}"
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-ROLE: You are an EXPERT Search Visibility Auditor.
-TASK: Analyze the search presence of "${brandName}" (${domain}) in your model memory for a user in the ${market.name} market for the query: "${promptText}".
+ROLE: You are an EXPERT Search Visibility & Market Analyst.
+TASK: Analyze the presence of "${brandName}" (${domain}) in your internal knowledge/training data for the query: "${promptText}".
 
 INSTRUCTIONS:
-1. ⚠️ MARKET EXPERTISE: Identify leadership specifically based on localized training data for ${market.name}.
-2. 🚨 DATA INTEGRITY: Provide a REALISTIC and FACTUAL assessment. 
-   - DO NOT fabricate ranks or snippets. 
-   - If a brand is a global leader (e.g. Nike, Apple), ensure its presence is confirmed via your internal training data before reporting it as not found.
+1. ⚠️ KNOWLEDGE RECALL: Specifically look for ${brandName}'s association with this niche in the ${market.name} market.
+2. 🚨 DATA INTEGRITY: Provide a REALISTIC assessment. If they are an established player, recognize their status.
 3. 🚨 RICH SNIPPETS: Snippets MUST be 1-2 detailed sentences (max 60 words).
-4. 🚨 SCORING: Provide Rank 0-10 and Score 0-100 based on localized presence.
+4. 🚨 SCORING: Provide Rank 0-10 and Score 0-100.
 5. OUTPUT FORMAT (JSON):
 {
   "prompt": "${promptText}",
-  "brandRanking": { "rank": 0-10, "score": 0-100, "isRecommended": true/false, "linkProvided": true/false, "snippet": "Detailed factual info" },
+  "brandRanking": { "rank": 1-10 (0 if unknown), "score": 0-100, "isRecommended": true/false, "linkProvided": true/false, "snippet": "Detailed factual info" },
   "authoritySignals": { "sourceType": "Expert Analysis", "recallConfidence": "High|Medium|Low", "citations": [] }
 }
 `;
@@ -261,7 +252,7 @@ exports.performProjectScan = async (project) => {
                             prompt: audit.prompt,
                             engine: 'openai',
                             visibility: cr.rank > 0 ? (cr.rank <= 3 ? 'High' : 'Moderate') : 'None',
-                            found: cr.found || cr.rank > 0,
+                            found: cr.found || cr.rank > 0 || (cr.score > 0),
                             score: cr.score || 0,
                             rank: cr.rank || 0,
                             authoritySignals: audit.authoritySignals || {}
@@ -315,7 +306,7 @@ exports.performProjectScan = async (project) => {
                             prompt: audit.prompt,
                             engine: 'gemini',
                             visibility: cr.rank > 0 ? (cr.rank <= 3 ? 'High' : 'Moderate') : 'None',
-                            found: cr.found || cr.rank > 0,
+                            found: cr.found || cr.rank > 0 || (cr.score > 0),
                             score: cr.score || 0,
                             rank: cr.rank || 0,
                             authoritySignals: audit.authoritySignals || {}

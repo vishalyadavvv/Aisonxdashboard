@@ -148,6 +148,36 @@ const BrandAudit = () => {
           <span className="text-gray-600 font-medium">Brand Audit</span>
         </div>
 
+        <AnimatePresence>
+          {contextProject?.isScanning && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden mb-8"
+              data-html2canvas-ignore
+            >
+              <div className="bg-blue-600/10 border border-blue-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
+                <div className="flex items-center gap-4">
+                  <div className="bg-blue-600 rounded-xl p-2.5 animate-pulse shadow-lg shadow-blue-500/20">
+                    <RefreshCw className="w-5 h-5 text-white animate-spin" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-black text-blue-900 uppercase tracking-tight">Comprehensive Scan in Progress</h4>
+                    <p className="text-[11px] text-blue-700 font-bold opacity-70 uppercase tracking-widest mt-0.5">Updating Knowledge Graph nodes & Digital Authority (30-60s) • Live sync active</p>
+                  </div>
+                </div>
+                <div className="hidden md:flex items-center gap-3">
+                   <div className="flex items-center gap-2 px-3 py-1.5 bg-white/50 rounded-lg border border-blue-100">
+                    <Loader2 className="w-3 h-3 text-blue-600 animate-spin" />
+                    <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Processing Node</span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -4 }}

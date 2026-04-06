@@ -38,21 +38,23 @@ exports.gptBatchPromptAudit = async function gptBatchPromptAudit(brandName, doma
     const promptListStr = prompts.map((k, i) => `${i + 1}. "${k}"`).join('\n');
     
     const prompt = `
-ROLE: You are an EXPERT Search Visibility & Market Analyst specializing in the ${market.name} market.
+ROLE: You are an Expert Search Visibility & Brand Authority Analyst for the ${market.name} market.
 TARGET MARKET: "${market.name}" ${market.context ? `(${market.context})` : ''}
-TASK: Analyze the search presence and reputation of "${brandName}" (${domain}) for EACH prompt. Think like a helpful AI assistant (e.g. ChatGPT/Gemini) providing a detailed report to a user.
+TARGET BRAND: "${brandName}" (${domain})
+
+TASK: Evaluate the search presence and reputation of "${brandName}" for the following queries. Think like a helpful strategist provide a detailed report.
 
 INSTRUCTIONS:
-1. ⚠️ HYBRID RESEARCH: Perform a general search for the prompt. If "${brandName}" is not explicitly in the top few results, perform a targeted second search to verify their specific content and authority.
-2. 🚨 DATA INTEGRITY: Be fair and intelligent. For global leaders or established industry brands, recognize their authority even if they aren't the very first result in a snippet.
-3. 🚨 RICH ANALYTICS: Your snippet MUST be 2-3 detailed sentences (max 60 words). Provide context on *why* they are a good option or where they fit in the competitive landscape. Avoid robotic one-liners.
+1. ⚠️ HYBRID RESEARCH: Perform a general search. If "${brandName}" isn't in the top snippets, perform a targeted search for "${brandName} ${market.name}" to verify their depth and niche authority.
+2. 🚨 DATA INTEGRITY: Prioritize finding the client. Recognize their authority if they appear in relevant articles, listicles, or niche sites.
+3. 🚨 RICH ANALYTICS: Your snippet MUST be 2-3 detailed sentences (max 60 words). Explain *where* they fit in the landscape and why they are a valid option.
 4. RANKING & SCORING: 
-   - Assign a Rank (1-10) based on actual organic visibility.
-   - If found via targeted search but not general search, you may still assign a Rank (e.g. 6-10) to reflect "Verified Specialized Presence." 
+   - Assign Rank 1-10 based on evidence.
+   - If found via targeted search but not general search, assign Rank 6-10 to reflect "Verified Specialized Presence."
    - Score: 0-100 based on prominence and reputation.
-4. RANKING: 
-   - Rank 1-10: For brands found with strong organic presence or high-authority mentions.
-   - Rank 0: ONLY if the brand is genuinely invisible or irrelevant in this market.
+5. RANKING: 
+   - Rank 1-10: For brands with organic presence, authoritative mentions, or verified specialized content.
+   - Rank 0: ONLY if the brand is genuinely invisible or completely irrelevant.
 
 OUTPUT FORMAT (JSON ARRAY):
 [
@@ -115,11 +117,11 @@ TARGET MARKET: "${market.name}" ${market.context ? `(${market.context})` : ''}
 TASK: Evaluate if and how "${brandName}" (${domain}) appears in YOUR real-time results for: "What are the best options for ${promptText}?" in the ${market.name} market.
 
 INSTRUCTIONS:
-1. HYBRID SEARCH: Check general results first, then verify with a brand-specific search if needed.
-2. 🚨 NATURAL INTELLIGENCE: Do not be overly narrow. If "${brandName}" is a recognized authority or appears in top articles, confirm their ranking.
-3. 🚨 RICH ANALYTICS: Snippets MUST be 2-3 detailed sentences (max 60 words). Explain the findings with the same level of detail as a standard ChatGPT/Gemini response.
-4. RANKING: Assign a realistic rank based on evidence. If found only via specific search, use Rank 6-10.
-4. CITATION FLEXIBILITY: Provide citation URLs that mention "${brandName}" or its website. ONLY absolute URLs.
+1. HYBRID SEARCH: Check general results. If missing, perform a brand-specific search to verify specialized or niche rankings.
+2. 🚨 BRAND RECOGNITION: Prioritize identifying the client. If they appear in top articles, reviews, or industry guides, confirm their ranking.
+3. 🚨 RICH ANALYTICS: Snippets MUST be 2-3 detailed sentences (max 60 words). Explain findings with human-like detail.
+4. RANKING: Assign a realistic rank based on evidence. If found only via targeted search, use Rank 6-10 (Verified Presence).
+4. CITATION FLEXIBILITY: Provide valid citation URLs. ONLY absolute URLs.
 
 OUTPUT FORMAT (JSON):
 {
@@ -167,14 +169,14 @@ TARGET BRAND (The Client): "${brandName}" (${domain})
 TASK: Use Google Search to evaluate the visibility and reputation of "${brandName}" in the ${market.name} market for the query: "${promptText}".
 
 INSTRUCTIONS:
-1. HYBRID SEARCH: First, search for "${promptText} in ${market.name}". If "${brandName}" is not prominent, perform a targeted second search including the brand name to verify presence.
-2. 🚨 DATA INTEGRITY: Be realistic. For global leaders (like Nike, Sony, etc.), use the search data to confirm their status even if they rank below smaller local niche sites in snippets.
-3. 🚨 RICH SNIPPETS: Snippet MUST be 1-2 factual sentences (max 60 words). Explain findings clearly.
-4. 🚨 PROOF RULES: You MUST return FULL, VALID 'https://' URLs for citations. ONLY absolute URLs.
+1. HYBRID SEARCH: First, search for "${promptText} in ${market.name}". If "${brandName}" is not prominent, perform a targeted second search for "${brandName}" to verify its specific authority.
+2. 🚨 DATA INTEGRITY: Be realistic and persistent. Prioritize identifying the client using the provided domain (${domain}). Recognize their status even if they are in niche snippets.
+3. 🚨 RICH SNIPPETS: Snippet MUST be 1-2 factual sentences (max 60 words).
+4. 🚨 PROOF RULES: You MUST return FULL, VALID 'https://' URLs for citations.
 5. OUTPUT FORMAT (JSON ONLY):
 {
   "prompt": "${promptText}",
-  "brandRanking": { "rank": 0-10, "score": 0-100, "isRecommended": true/false, "linkProvided": true/false, "snippet": "Factual analysis summary." },
+  "brandRanking": { "rank": 1-10 (0 if invisible), "score": 0-100, "isRecommended": true/false, "linkProvided": true/false, "snippet": "Factual analysis summary." },
   "authoritySignals": { "sourceType": "Google Search", "citations": [] }
 }
 🚨 RETURN ONLY JSON.`;
@@ -244,31 +246,31 @@ exports.gptCompetitiveBatchAudit = async function gptCompetitiveBatchAudit(brand
     const compListStr = (competitors || []).map(c => `${c.name} (${c.domain})`).join(', ');
     
     const prompt = `
-ROLE: Professional ACCURATE & OBJECTIVE Search Market Research Auditor.
-TARGET MARKET: "${market.name}" ${market.context ? `(${market.context})` : ''}
+ROLE: Professional Search Market Research Auditor.
 TARGET BRAND (The Client): "${brandName}" (${domain})
 COMPETITORS (The Rivals): [${compListStr}]
 
-TASK: Analyze the search landscape for these prompts and map the visibility of "${brandName}" AGAINST the rivals in the ${market.name} market.
+TASK: Analyze visibility for these prompts and map "${brandName}" AGAINST the rivals in the ${market.name} market.
 
-PROMPTS TO AUDIT:
+PROMPTS:
 ${promptListStr}
 
 INSTRUCTIONS:
-2. ⚠️ RIVAL VERIFICATION (The "Spotlight" Step): If any of the Rivals [${compListStr}] do not appear in the top 10 organic results, you MUST perform a targeted search for each missing rival to determine their proximity to the topic (e.g., "Competitor Name ${promptText}").
-3. 🚨 DATA INTEGRITY: Do not report "Not Found" for a known rival unless they are truly irrelevant. Use search grounding to find their real rank.
+1. 🚨 NAME-FIRST SEARCH: Search for each competitor BY NAME first, not just by domain. The provided domains may be approximate or outdated. Use the company name to find them.
+2. ⚠️ SEARCH PERSISTENCE: If any Rival or the Client is missing from the top organic list, perform a targeted search: "[Company Name] [prompt topic]" to verify their actual presence.
+3. 🚨 DATA INTEGRITY: Do not report "Not Found" for a rival unless they are truly irrelevant to the topic. Search by NAME thoroughly.
 4. 🚨 RICH ANALYTICS: Snippets MUST be 2-3 detailed sentences (max 60 words).
-5. SCORING & MAPPING: 
-   - Found gracefully (Organically or via Verification): Rank 1-10, Score 60-100.
-   - Assign realistic ranks to BOTH the target brand and any rivals found.
-   - Not found after thorough research: Rank 0, Score 0.
+5. SCORING: 
+   - Found via any search method: Rank 1-10, Score 60-100.
+   - Not found after thorough name + domain search: Rank 0, Score 0.
+6. 🚨 DOMAIN CORRECTION: If you discover a competitor's actual website differs from the provided domain, return the CORRECT domain in the "domain" field.
 
-OUTPUT FORMAT (JSON ARRAY OF OBJECTS):
+OUTPUT FORMAT (JSON ARRAY):
     [
       {
         "prompt": "Exact prompt text",
-        "brandRanking": { "rank": 0-10, "score": 0-100, "isRecommended": true/false, "linkProvided": true/false, "snippet": "Deep factual findings." },
-        "competitorRankings": [ { "name": "Competitor", "domain": "domain.com", "rank": 1-10, "score": 1-100, "found": true/false } ],
+        "brandRanking": { "rank": 1-10 (0 if invisible), "score": 0-100, "isRecommended": true/false, "linkProvided": true/false, "snippet": "Deep factual findings." },
+        "competitorRankings": [ { "name": "Competitor", "domain": "correct-domain.com", "rank": 1-10, "score": 1-100, "found": true/false } ],
         "authoritySignals": { "citations": ["URLs"] }
       }
     ]
@@ -335,25 +337,26 @@ exports.geminiCompetitiveAudit = async function geminiCompetitiveAudit(brandName
     const compListStr = (competitors || []).map(c => `${c.name} (${c.domain})`).join(', ');
 
     const prompt = `ROLE: Insightful Search Market Analyst.
-TARGET MARKET: "${market.name}" ${market.context ? `(${market.context})` : ''}
 TARGET BRAND (The Client): "${brandName}" (${domain})
 COMPETITORS (The Rivals): [${compListStr}]
 
-TASK: Evaluate the visibility of "${brandName}" AGAINST the rivals for the query: "${promptText}" in the ${market.name} market. Think like a helpful AI providing a balanced comparison.
+TASK: Evaluate "${brandName}" AGAINST the rivals for: "${promptText}" in ${market.name}.
 
 INSTRUCTIONS:
-1. HYBRID BATTLE VIEW: Search for "${promptText} in ${market.name}". 
-2. ⚠️ RIVAL SPOTLIGHT: If any competitor from [${compListStr}] is missing, verify their specific presence with a targeted search for them in this niche.
-3. 🚨 NATURAL ANALYSIS: Avoid being a strict binary auditor. If a rival is mentioned in top-tier guides or niche articles, rank them appropriately (Rank 1-10).
-4. 🚨 RICH ANALYTICS: Snippet MUST be 2-3 factual sentences (max 60 words).
-5. SCORING & MAPPING: 
-   - Found organically or via specialized search: Rank 1-10, Score 60-100.
+1. HYBRID BATTLE VIEW: Search for "${promptText}". 
+2. 🚨 NAME-FIRST SEARCH: Search for each competitor BY THEIR NAME (not just domain). The provided domains may be approximate.
+3. ⚠️ PERSISTENT SEARCH: If any competitor or the Client is missing, search: "[Company Name] [prompt topic]" to verify their presence.
+4. 🚨 NATURAL ANALYSIS: If a brand is mentioned in guides, niche articles, or listicles, rank them appropriately (Rank 1-10).
+5. 🚨 RICH ANALYTICS: Snippet MUST be 2-3 factual sentences.
+6. DOMAIN CORRECTION: If you find a competitor's actual website differs from the provided domain, return the CORRECT domain.
+7. SCORING: 
+   - Found via any search method: Rank 1-10, Score 60-100.
    - Not found at all: Rank 0, Score 0.
 8. OUTPUT FORMAT (JSON ONLY):
 {
   "prompt": "${promptText}",
-  "brandRanking": { "rank": 0-10, "score": 0-100, "isRecommended": true/false, "linkProvided": true/false, "snippet": "1-sentence info" },
-  "competitorRankings": [ { "name": "X", "domain": "x.com", "rank": 0-10, "score": 0-100, "found": true/false } ],
+  "brandRanking": { "rank": 1-10 (0 if invisible), "score": 0-100, "isRecommended": true/false, "linkProvided": true/false, "snippet": "1-sentence info" },
+  "competitorRankings": [ { "name": "X", "domain": "correct-domain.com", "rank": 1-10, "score": 0-100, "found": true/false } ],
   "authoritySignals": { "sourceType": "Google Search Comparison", "citations": [] }
 }
 🚨 RETURN ONLY JSON.`;

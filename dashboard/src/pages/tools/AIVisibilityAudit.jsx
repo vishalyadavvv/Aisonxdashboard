@@ -407,12 +407,48 @@ const AIVisibilityAudit = () => {
         </AnimatePresence>
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-gray-400 mb-6 pt-6">
-          <Link to="/dashboard" className="hover:text-gray-600 transition-colors">Dashboard</Link>
-          <span>›</span>
-          <span className="text-gray-400">AI Module</span>
-          <span>›</span>
-          <span className="text-gray-600 font-medium">AI Visibility Audit</span>
+          <Link to="/dashboard" className="hover:text-gray-600 transition-colors border-b border-transparent hover:border-gray-200">Dashboard</Link>
+          <span className="opacity-40">/</span>
+          <span className="text-gray-400 font-medium">AI Module</span>
+          <span className="opacity-40">/</span>
+          <span className="text-gray-600 font-bold bg-gray-100 px-2 py-0.5 rounded-md">AI Visibility Audit</span>
+          <span className="opacity-40">/</span>
+          <span className="text-gray-400">{project?.name}</span>
         </div>
+
+        <AnimatePresence>
+          {project?.isScanning && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden mb-8"
+            >
+              <div className="bg-blue-600/10 border border-blue-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
+                <div className="flex items-center gap-4">
+                  <div className="bg-blue-600 rounded-xl p-2.5 animate-pulse shadow-lg shadow-blue-500/20">
+                    <RefreshCw className="w-5 h-5 text-white animate-spin" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-black text-blue-900 uppercase tracking-tight">Comprehensive Scan in Progress</h4>
+                    <p className="text-[11px] text-blue-700 font-bold opacity-70 uppercase tracking-widest mt-0.5">Gathering latest AI visibility intelligence (30-60s) • Don't close this page</p>
+                  </div>
+                </div>
+                <div className="hidden md:flex items-center gap-3">
+                   <div className="flex -space-x-2">
+                     <div className="w-6 h-6 rounded-full bg-blue-500 border-2 border-white flex items-center justify-center text-[8px] font-black text-white">GPT</div>
+                     <div className="w-6 h-6 rounded-full bg-cyan-500 border-2 border-white flex items-center justify-center text-[8px] font-black text-white">GEM</div>
+                   </div>
+                   <div className="h-8 w-px bg-blue-200 mx-2" />
+                   <div className="flex items-center gap-2 px-3 py-1.5 bg-white/50 rounded-lg border border-blue-100">
+                    <Loader2 className="w-3 h-3 text-blue-600 animate-spin" />
+                    <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Active nodes</span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Dark Header */}
         <motion.div
@@ -622,17 +658,17 @@ const AIVisibilityAudit = () => {
       <div className="max-w-6xl mx-auto" id="report-content">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-gray-400 mb-6 pt-6" data-html2canvas-ignore>
-          <Link to="/dashboard" className="hover:text-gray-600 transition-colors">Dashboard</Link>
-          <span>›</span>
-          <span className="text-gray-400">AI Module</span>
-          {!projectId && (
-            <>
-              <span>›</span>
-              <button onClick={() => setResults(null)} className="hover:text-gray-600 transition-colors">AI Visibility Audit</button>
-            </>
+          <Link to="/dashboard" className="hover:text-gray-600 transition-colors border-b border-transparent hover:border-gray-200">Dashboard</Link>
+          <span className="opacity-40">/</span>
+          <span className="text-gray-400 font-medium">AI Module</span>
+          <span className="opacity-40">/</span>
+          {!projectId ? (
+            <button onClick={() => setResults(null)} className="text-gray-400 hover:text-gray-600 transition-colors font-medium border-b border-transparent hover:border-gray-200">AI Visibility Audit</button>
+          ) : (
+            <span className="text-gray-400 font-medium">AI Visibility Audit</span>
           )}
-          <span>›</span>
-          <span className="text-gray-600 font-medium">Report</span>
+          <span className="opacity-40">/</span>
+          <span className="text-gray-600 font-bold bg-gray-100 px-2 py-0.5 rounded-md">Report</span>
         </div>
 
         {/* Report Header */}

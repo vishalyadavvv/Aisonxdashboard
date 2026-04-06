@@ -332,30 +332,18 @@ exports.startScan = async (req, res) => {
         const coverage = (modelResult.entityRecognition?.trainingDataCoverage || '').toLowerCase();
         
         const genericPhrases = [
-            'does not appear in my training',
-            'not found in my training',
-            'no specific information',
-            'no verifiable',
-            'was not found',
-            'not found in my training',
-            'was not found in my training',
-            'do not have specific',
-            'cannot confirm',
-            'no concrete',
-            'insufficient information',
-            'no record of this brand',
-            'limited or no knowledge',
-            'not able to find',
-            'not recognized as a distinct entity'
+            'not found in my training data',
+            'no record of this brand at all',
+            'not recognized as a distinct entity in any context',
+            'insufficient information to identify the brand'
         ];
         
         for (const phrase of genericPhrases) {
             if (interpretation.includes(phrase) || summary.includes(phrase) || coverage.includes(phrase)) return true;
         }
         
-        // 3. Heuristic: If summary is very short and just repeats the brand name
-        if (summary.length < 50 && summary.toLowerCase().includes(brandName.toLowerCase()) && 
-           (summary.includes('not recognized') || summary.includes('unknown'))) return true;
+        // 3. Heuristic: If summary is extremely short and explicitly says unknown
+        if (summary.length < 30 && (summary.includes('unknown') || summary.includes('not found'))) return true;
         
         return false;
     };

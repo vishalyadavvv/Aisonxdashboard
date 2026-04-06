@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Link, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../../api/axios';
-import { Search, Loader2, Globe, Sparkles, AlertCircle, ArrowLeft, Terminal, FileText, ExternalLink, Target, Eye, Tag, CheckCircle2, FileDown, AlertTriangle, ChevronDown, RefreshCw,Filter } from 'lucide-react';
+import { Search, Loader2, Globe, Sparkles, AlertCircle, ArrowLeft, Terminal, FileText, ExternalLink, Target, Eye, Tag, CheckCircle2, FileDown, AlertTriangle, ChevronDown, RefreshCw, Filter } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useProject } from '../../context/ProjectContext';
 import { downloadPDF } from '../../utils/downloadPDF';
@@ -235,11 +235,11 @@ const WebSearch = () => {
       <div className="max-w-6xl mx-auto">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-gray-400 mb-6 pt-6">
-          <Link to="/dashboard" className="hover:text-gray-600 transition-colors">Dashboard</Link>
-          <span>›</span>
-          <span className="text-gray-400">AI Module</span>
-          <span>›</span>
-          <span className="text-gray-600 font-medium">Web Visibility</span>
+          <Link to="/dashboard" className="hover:text-gray-600 transition-colors border-b border-transparent hover:border-gray-200">Dashboard</Link>
+          <span className="opacity-40">/</span>
+          <span className="text-gray-400 font-medium">AI Module</span>
+          <span className="opacity-40">/</span>
+          <span className="text-gray-600 font-bold bg-gray-100 px-2 py-0.5 rounded-md">Web Visibility</span>
         </div>
         <AnimatePresence>
           {isLimitReached && (
@@ -334,20 +334,20 @@ const WebSearch = () => {
             </div>
           </form>
           ) : (
-            <div className={`mt-5 bg-blue-500/10 border border-blue-500/30 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 ${!syncLoading && 'bg-slate-50 border-slate-200'}`}>
-              <div className="flex items-center gap-4">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${syncLoading ? 'bg-blue-500/20' : 'bg-slate-200'}`}>
+            <div className={`mt-5 transition-all duration-500 overflow-hidden ${!syncLoading ? 'bg-amber-50 border-amber-200 shadow-amber-100 shadow-md' : 'bg-blue-500/10 border-blue-500/30'} border rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6`}>
+              <div className="flex items-center gap-5">
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm ${syncLoading ? 'bg-blue-500/20' : 'bg-amber-100'}`}>
                   {syncLoading ? (
-                    <RefreshCw className="w-5 h-5 text-blue-400 animate-spin" />
+                    <RefreshCw className="w-6 h-6 text-blue-400 animate-spin" />
                   ) : (
-                    <Search className="w-5 h-5 text-slate-400" />
+                    <AlertTriangle className="w-6 h-6 text-amber-600" />
                   )}
                 </div>
                 <div>
-                  <h4 className={`text-sm font-black uppercase tracking-widest ${syncLoading ? 'text-blue-100' : 'text-slate-400'}`}>
+                  <h4 className={`text-sm font-black uppercase tracking-widest ${syncLoading ? 'text-blue-100' : 'text-amber-700'}`}>
                     {syncLoading ? 'Synchronizing Intelligence' : 'No Web Mentions Data'}
                   </h4>
-                  <p className={`text-xs font-medium tracking-tight ${syncLoading ? 'text-blue-300' : 'text-slate-500'}`}>
+                  <p className={`text-xs font-medium tracking-tight mt-1 ${syncLoading ? 'text-blue-300' : 'text-amber-600/80'}`}>
                     {syncLoading 
                       ? `Syncing live nodes for ${project?.brandName || 'project'}...`
                       : `No live brand mentions data has been found for ${project?.brandName} yet.`}
@@ -355,15 +355,18 @@ const WebSearch = () => {
                 </div>
               </div>
               {syncLoading ? (
-                <div className="px-4 py-2 bg-blue-500/20 rounded-lg text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] animate-pulse">
+                <div className="px-5 py-2.5 bg-blue-500/20 rounded-xl text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] animate-pulse border border-blue-400/20">
                    Syncing...
                 </div>
               ) : (
-                <div className="flex flex-col items-end gap-1">
-                  <span className="px-4 py-1.5 bg-slate-900/10 text-slate-500 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-200">
-                    Awaiting Project Sync
-                  </span>
-                  <p className="text-[9px] text-slate-400 font-bold">Trigger scan from dashboard</p>
+                <div className="flex flex-col items-end gap-2">
+                  <Link 
+                    to={`/dashboard/projects/${projectId}`}
+                    className="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-amber-600/20 hover:scale-105 active:scale-95"
+                  >
+                    Go to Dashboard & Scan
+                  </Link>
+                  <p className="text-[9px] text-amber-500 font-bold uppercase tracking-tighter opacity-60">Full Sync Required</p>
                 </div>
               )}
             </div>
@@ -495,16 +498,49 @@ const WebSearch = () => {
     return (
       <div className="max-w-6xl mx-auto pb-20" id="report-content">
         {/* Breadcrumb */}
-        {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-gray-400 mb-6 pt-6" data-html2canvas-ignore>
-          <Link to="/dashboard" className="hover:text-gray-600 transition-colors">Dashboard</Link>
-          <span>›</span>
-          <span className="text-gray-400">AI Module</span>
-          <span>›</span>
-          <button onClick={() => setResults(null)} className="text-gray-400 hover:text-gray-600 transition-colors font-medium">Web Visibility</button>
-          <span>›</span>
-          <span className="text-gray-600 font-medium tracking-tight">Report</span>
+          <Link to="/dashboard" className="hover:text-gray-600 transition-colors border-b border-transparent hover:border-gray-200">Dashboard</Link>
+          <span className="opacity-40">/</span>
+          <span className="text-gray-400 font-medium">AI Module</span>
+          <span className="opacity-40">/</span>
+          {!projectId ? (
+            <button onClick={() => setResults(null)} className="text-gray-400 hover:text-gray-600 transition-colors font-medium border-b border-transparent hover:border-gray-200">Web Visibility</button>
+          ) : (
+            <span className="text-gray-400 font-medium">Web Visibility</span>
+          )}
+          <span className="opacity-40">/</span>
+          <span className="text-gray-600 font-bold bg-gray-100 px-2 py-0.5 rounded-md">Report</span>
         </div>
+
+        <AnimatePresence>
+          {contextProject?.isScanning && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden mb-8"
+              data-html2canvas-ignore
+            >
+              <div className="bg-blue-600/10 border border-blue-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
+                <div className="flex items-center gap-4">
+                  <div className="bg-blue-600 rounded-xl p-2.5 animate-pulse shadow-lg shadow-blue-500/20">
+                    <RefreshCw className="w-5 h-5 text-white animate-spin" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-black text-blue-900 uppercase tracking-tight">Comprehensive Scan in Progress</h4>
+                    <p className="text-[11px] text-blue-700 font-bold opacity-70 uppercase tracking-widest mt-0.5">Crawling live LLM nodes & Web Mentions (30-60s) • Live sync active</p>
+                  </div>
+                </div>
+                <div className="hidden md:flex items-center gap-3">
+                   <div className="flex items-center gap-2 px-3 py-1.5 bg-white/50 rounded-lg border border-blue-100">
+                    <Loader2 className="w-3 h-3 text-blue-600 animate-spin" />
+                    <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Crawling Node</span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Report Header */}
         <motion.div
