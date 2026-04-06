@@ -423,26 +423,22 @@ const AIVisibilityAudit = () => {
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               className="overflow-hidden mb-8"
+              data-html2canvas-ignore
             >
-              <div className="bg-blue-600/10 border border-blue-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
-                <div className="flex items-center gap-4">
-                  <div className="bg-blue-600 rounded-xl p-2.5 animate-pulse shadow-lg shadow-blue-500/20">
-                    <RefreshCw className="w-5 h-5 text-white animate-spin" />
+              <div className="bg-blue-600/5 border-y border-blue-100/50 py-3 px-4 flex items-center justify-between shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+                <div className="flex items-center gap-3">
+                  <div className="bg-blue-600 rounded-lg p-1.5 animate-pulse shadow-sm">
+                    <RefreshCw className="w-3.5 h-3.5 text-white animate-spin" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-black text-blue-900 uppercase tracking-tight">Comprehensive Scan in Progress</h4>
-                    <p className="text-[11px] text-blue-700 font-bold opacity-70 uppercase tracking-widest mt-0.5">Gathering latest AI visibility intelligence (30-60s) • Don't close this page</p>
+                    <h4 className="text-[11px] font-black text-blue-900 uppercase tracking-tight leading-none">Comprehensive Scan in Progress</h4>
+                    <p className="text-[9px] text-blue-600/70 font-bold uppercase tracking-widest mt-1">Gathering latest AI visibility intelligence (30-60s) • Don't close this page</p>
                   </div>
                 </div>
-                <div className="hidden md:flex items-center gap-3">
-                   <div className="flex -space-x-2">
-                     <div className="w-6 h-6 rounded-full bg-blue-500 border-2 border-white flex items-center justify-center text-[8px] font-black text-white">GPT</div>
-                     <div className="w-6 h-6 rounded-full bg-cyan-500 border-2 border-white flex items-center justify-center text-[8px] font-black text-white">GEM</div>
-                   </div>
-                   <div className="h-8 w-px bg-blue-200 mx-2" />
-                   <div className="flex items-center gap-2 px-3 py-1.5 bg-white/50 rounded-lg border border-blue-100">
-                    <Loader2 className="w-3 h-3 text-blue-600 animate-spin" />
-                    <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Active nodes</span>
+                <div className="hidden lg:flex items-center gap-2">
+                  <div className="flex items-center gap-2 px-2.5 py-1 bg-white/80 rounded-lg border border-blue-100/50 backdrop-blur-sm">
+                    <Loader2 className="w-2.5 h-2.5 text-blue-600 animate-spin" />
+                    <span className="text-[9px] font-black text-blue-600 uppercase tracking-widest">Active nodes</span>
                   </div>
                 </div>
               </div>

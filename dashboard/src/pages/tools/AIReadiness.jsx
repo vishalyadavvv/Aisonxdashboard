@@ -146,6 +146,7 @@ const AIReadiness = () => {
   const remaining = totalScans - scansUsed;
   const isLimitReached = remaining <= 0 || user?.subscription?.status === 'expired';
   const percentage = (scansUsed / totalScans) * 100;
+  const hasValidData = results && results.totalSitemapUrls > 0;
 
   useEffect(() => {
     if (projectId) {
@@ -376,24 +377,49 @@ const AIReadiness = () => {
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className="overflow-hidden mb-8"
+              className="overflow-hidden mb-6"
               data-html2canvas-ignore
             >
-              <div className="bg-blue-600/10 border border-blue-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
-                <div className="flex items-center gap-4">
-                  <div className="bg-blue-600 rounded-xl p-2.5 animate-pulse shadow-lg shadow-blue-500/20">
-                    <RefreshCw className="w-5 h-5 text-white animate-spin" />
+              <div className="bg-blue-600/5 border-y border-blue-100/50 py-3 px-4 flex items-center justify-between shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+                <div className="flex items-center gap-3">
+                  <div className="bg-blue-600 rounded-lg p-1.5 animate-pulse shadow-sm">
+                    <RefreshCw className="w-3.5 h-3.5 text-white animate-spin" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-black text-blue-900 uppercase tracking-tight">Comprehensive Scan in Progress</h4>
-                    <p className="text-[11px] text-blue-700 font-bold opacity-70 uppercase tracking-widest mt-0.5">Updating technical readiness signals & AI intents (30-60s) • Live sync active</p>
+                    <h4 className="text-[11px] font-black text-blue-900 uppercase tracking-tight leading-none">Comprehensive Scan in Progress</h4>
+                    <p className="text-[9px] text-blue-600/70 font-bold uppercase tracking-widest mt-1">Updating technical readiness signals & AI intents (30-60s) • Live sync active</p>
                   </div>
                 </div>
-                <div className="hidden md:flex items-center gap-3">
-                   <div className="flex items-center gap-2 px-3 py-1.5 bg-white/50 rounded-lg border border-blue-100">
-                    <Loader2 className="w-3 h-3 text-blue-600 animate-spin" />
-                    <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Processing</span>
+                <div className="hidden md:flex items-center gap-2">
+                  <div className="flex items-center gap-2 px-2.5 py-1 bg-white/80 rounded-lg border border-blue-100/50 backdrop-blur-sm">
+                    <Loader2 className="w-2.5 h-2.5 text-blue-600 animate-spin" />
+                    <span className="text-[9px] font-black text-blue-600 uppercase tracking-widest">Processing Node</span>
                   </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {!hasValidData && !project?.isScanning && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-8"
+              data-html2canvas-ignore
+            >
+              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 flex items-start gap-4 shadow-sm">
+                <div className="bg-amber-500 rounded-xl p-2.5 shrink-0 shadow-lg shadow-amber-500/20">
+                  <AlertTriangle className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h4 className="text-[13px] font-black text-amber-900 uppercase tracking-tight">Technical Analysis Incomplete</h4>
+                  <p className="text-[11px] text-amber-700 font-bold opacity-80 mt-1 leading-relaxed">
+                    Our scanner was unable to retrieve a full architectural map for <span className="underline decoration-amber-500/30">{project?.domain}</span>. 
+                    This usually happens due to strict firewall settings, SSL issues, or missing sitemaps. 
+                    AI models may have similar difficulty crawling your site for training.
+                  </p>
                 </div>
               </div>
             </motion.div>
@@ -625,15 +651,21 @@ const AIReadiness = () => {
             <h3 className="text-lg font-bold text-[#1E293B] mb-6">Sitemap Breakdown</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="bg-green-50 border border-green-100 rounded-xl p-5">
-                <p className="text-2xl font-bold text-green-600">{results.totalSitemapUrls || 0}</p>
+                <p className={`text-2xl font-bold ${results.totalSitemapUrls === 0 ? 'text-slate-400' : 'text-green-600'}`}>
+                  {results.totalSitemapUrls || (hasValidData ? 0 : 'N/A')}
+                </p>
                 <p className="text-xs text-gray-500 font-medium">Total URLs</p>
               </div>
               <div className="bg-blue-50 border border-blue-100 rounded-xl p-5">
-                <p className="text-2xl font-bold text-blue-600">{results.pageUrls || results.corePagesFound || 0}</p>
+                <p className={`text-2xl font-bold ${results.totalSitemapUrls === 0 ? 'text-slate-400' : 'text-blue-600'}`}>
+                  {results.pageUrls || results.corePagesFound || (hasValidData ? 0 : 'N/A')}
+                </p>
                 <p className="text-xs text-gray-500 font-medium">Page URLs</p>
               </div>
               <div className="bg-purple-50 border border-purple-100 rounded-xl p-5">
-                <p className="text-2xl font-bold text-purple-600">{results.postUrls || (results.totalSitemapUrls - (results.corePagesFound || 0)) || 0}</p>
+                <p className={`text-2xl font-bold ${results.totalSitemapUrls === 0 ? 'text-slate-400' : 'text-purple-600'}`}>
+                  {results.postUrls || (results.totalSitemapUrls - (results.corePagesFound || 0)) || (hasValidData ? 0 : 'N/A')}
+                </p>
                 <p className="text-xs text-gray-500 font-medium">Post URLs</p>
               </div>
             </div>

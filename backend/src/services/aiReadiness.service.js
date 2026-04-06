@@ -43,38 +43,46 @@ const COMMON_QUERIES = {
 };
 
 // Fetch URL with error handling - Returns full response for header checks
-async function fetchUrlResponse(url, timeout = 10000) {
+async function fetchUrlResponse(url, timeout = 15000) {
+    const commonHeaders = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': 'https://www.google.com/',
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache',
+        'Upgrade-Insecure-Requests': '1'
+    };
+
     try {
+        // First Attempt: Strict SSL
         const response = await axios.get(url, {
             timeout,
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-                'Accept-Language': 'en-US,en;q=0.9',
-                'Referer': 'https://www.google.com/',
-                'Cache-Control': 'no-cache',
-                'Pragma': 'no-cache',
-                'Sec-Ch-Ua': '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
-                'Sec-Ch-Ua-Mobile': '?0',
-                'Sec-Ch-Ua-Platform': '"Windows"',
-                'Sec-Fetch-Dest': 'document',
-                'Sec-Fetch-Mode': 'navigate',
-                'Sec-Fetch-Site': 'cross-site',
-                'Sec-Fetch-User': '?1',
-                'Upgrade-Insecure-Requests': '1',
-                'DNT': '1'
-            },
-            validateStatus: status => status < 600 // Capture all status codes for better error reporting
+            headers: commonHeaders,
+            validateStatus: status => status < 600
         });
         return response;
     } catch (error) {
-        // console.error(`Error fetching ${url}:`, error.message);
-        return { 
-            status: error.response?.status || 0, 
-            data: null, 
-            error: error.message,
-            code: error.code // Capture 'ECONNRESET', 'ETIMEDOUT', etc.
-        };
+        // Second Attempt: More lenient SSL/Agent configuration
+        try {
+            const https = require('https');
+            const agent = new https.Agent({ rejectUnauthorized: false });
+            
+            const response = await axios.get(url, {
+                timeout: timeout + 5000, // Extra time for retry
+                headers: commonHeaders,
+                httpsAgent: agent,
+                validateStatus: status => status < 600
+            });
+            return response;
+        } catch (retryError) {
+            return { 
+                status: error.response?.status || 0, 
+                data: null, 
+                error: error.message,
+                code: error.code 
+            };
+        }
     }
 }
 

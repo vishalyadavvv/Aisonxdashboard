@@ -521,20 +521,20 @@ const WebSearch = () => {
               className="overflow-hidden mb-8"
               data-html2canvas-ignore
             >
-              <div className="bg-blue-600/10 border border-blue-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
-                <div className="flex items-center gap-4">
-                  <div className="bg-blue-600 rounded-xl p-2.5 animate-pulse shadow-lg shadow-blue-500/20">
-                    <RefreshCw className="w-5 h-5 text-white animate-spin" />
+              <div className="bg-blue-600/5 border-y border-blue-100/50 py-3 px-4 flex items-center justify-between shadow-[inset_0_1px_2px_rgba(0,0,0,0.01)]">
+                <div className="flex items-center gap-3">
+                  <div className="bg-blue-600 rounded-lg p-1.5 animate-pulse shadow-sm">
+                    <RefreshCw className="w-3.5 h-3.5 text-white animate-spin" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-black text-blue-900 uppercase tracking-tight">Comprehensive Scan in Progress</h4>
-                    <p className="text-[11px] text-blue-700 font-bold opacity-70 uppercase tracking-widest mt-0.5">Crawling live LLM nodes & Web Mentions (30-60s) • Live sync active</p>
+                    <h4 className="text-[11px] font-black text-blue-900 uppercase tracking-tight leading-none">Comprehensive Intelligence Scan</h4>
+                    <p className="text-[9px] text-blue-600/70 font-bold uppercase tracking-widest mt-1">Crawling live LLM nodes & Web Mentions (30-60s) • Live sync active</p>
                   </div>
                 </div>
-                <div className="hidden md:flex items-center gap-3">
-                   <div className="flex items-center gap-2 px-3 py-1.5 bg-white/50 rounded-lg border border-blue-100">
-                    <Loader2 className="w-3 h-3 text-blue-600 animate-spin" />
-                    <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Crawling Node</span>
+                <div className="hidden md:flex items-center gap-2">
+                  <div className="flex items-center gap-2 px-2.5 py-1 bg-white/80 rounded-lg border border-blue-100/50 backdrop-blur-sm">
+                    <Loader2 className="w-2.5 h-2.5 text-blue-600 animate-spin" />
+                    <span className="text-[9px] font-black text-blue-600 uppercase tracking-widest">Crawling Node</span>
                   </div>
                 </div>
               </div>
