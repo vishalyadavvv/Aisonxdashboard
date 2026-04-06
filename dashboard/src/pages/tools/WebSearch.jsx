@@ -87,7 +87,7 @@ const WebSearch = () => {
       fetchReports();
     }
     return () => { if (eventSourceRef.current) eventSourceRef.current.close(); };
-  }, [projectId, contextHistory]);
+  }, [projectId, contextHistory, user]);
 
   const handleAnalyze = async (e) => {
     if (e) e.preventDefault();

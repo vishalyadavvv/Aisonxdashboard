@@ -140,7 +140,7 @@ const AIVisibilityAudit = () => {
       fetchReports();
     }
     return () => { if (eventSourceRef.current) eventSourceRef.current.close(); };
-  }, [projectId, contextHistory]);
+  }, [projectId, contextHistory, user]);
 
   const getScoreColor = (score) => {
     if (score >= 80) return '#22c55e';
@@ -425,20 +425,22 @@ const AIVisibilityAudit = () => {
               className="overflow-hidden mb-8"
               data-html2canvas-ignore
             >
-              <div className="bg-blue-600/5 border-y border-blue-100/50 py-3 px-4 flex items-center justify-between shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
-                <div className="flex items-center gap-3">
-                  <div className="bg-blue-600 rounded-lg p-1.5 animate-pulse shadow-sm">
-                    <RefreshCw className="w-3.5 h-3.5 text-white animate-spin" />
+              <div className="bg-blue-600/5 border border-blue-100/50 rounded-2xl py-4 px-6 flex items-center justify-between shadow-sm">
+                <div className="flex items-center gap-4">
+                  <div className="bg-blue-600 rounded-xl p-2 animate-pulse shadow-lg shadow-blue-600/20">
+                    <RefreshCw className="w-4 h-4 text-white animate-spin" />
                   </div>
-                  <div>
-                    <h4 className="text-[11px] font-black text-blue-900 uppercase tracking-tight leading-none">Comprehensive Scan in Progress</h4>
-                    <p className="text-[9px] text-blue-600/70 font-bold uppercase tracking-widest mt-1">Gathering latest AI visibility intelligence (30-60s) • Don't close this page</p>
+                  <div className="text-left">
+                    <h4 className="text-[14px] font-black text-blue-900 uppercase tracking-tight leading-none">Comprehensive Intelligence Scan</h4>
+                    <p className="text-[10px] text-blue-600 font-bold uppercase tracking-widest mt-1.5 opacity-80">
+                      Updating Architectural Map & Perceived Nodes (30-60s) • Live sync active
+                    </p>
                   </div>
                 </div>
-                <div className="hidden lg:flex items-center gap-2">
-                  <div className="flex items-center gap-2 px-2.5 py-1 bg-white/80 rounded-lg border border-blue-100/50 backdrop-blur-sm">
-                    <Loader2 className="w-2.5 h-2.5 text-blue-600 animate-spin" />
-                    <span className="text-[9px] font-black text-blue-600 uppercase tracking-widest">Active nodes</span>
+                <div className="hidden md:flex items-center gap-3">
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-white/80 rounded-lg border border-blue-100/50 backdrop-blur-sm shadow-sm">
+                    <Loader2 className="w-3 h-3 text-blue-600 animate-spin" />
+                    <span className="text-[10px] font-black text-blue-600 uppercase tracking-[0.15em]">Processing</span>
                   </div>
                 </div>
               </div>
@@ -574,13 +576,11 @@ const AIVisibilityAudit = () => {
             </div>
           )}
         </motion.div>
-
-        {!projectId && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm"
-          >
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm"
+        >
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-xl font-black text-slate-900 tracking-tight">Recent Audits</h2>
               {reports.length > 0 && (
@@ -629,7 +629,7 @@ const AIVisibilityAudit = () => {
                         </td>
                         <td className="py-4 px-4 text-sm text-gray-400">{new Date(r.createdAt).toLocaleDateString()}</td>
                         <td className="py-4 px-4 text-right">
-                          <button onClick={() => setResults(r)} className="text-blue-600 hover:text-blue-800 font-bold text-xs uppercase tracking-widest">View Results</button>
+                          <button onClick={() => viewReport(r)} className="text-blue-600 hover:text-blue-800 font-bold text-xs uppercase tracking-widest">View Results</button>
                         </td>
                       </tr>
                     ))}
@@ -638,7 +638,7 @@ const AIVisibilityAudit = () => {
               </div>
             )}
           </motion.div>
-        )}
+        
       </div>
     );
   }
@@ -666,6 +666,38 @@ const AIVisibilityAudit = () => {
           <span className="opacity-40">/</span>
           <span className="text-gray-600 font-bold bg-gray-100 px-2 py-0.5 rounded-md">Report</span>
         </div>
+
+        <AnimatePresence>
+          {project?.isScanning && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden mb-8"
+              data-html2canvas-ignore
+            >
+              <div className="bg-blue-600/5 border border-blue-100/50 rounded-2xl py-4 px-6 flex items-center justify-between shadow-sm">
+                <div className="flex items-center gap-4">
+                  <div className="bg-blue-600 rounded-xl p-2 animate-pulse shadow-lg shadow-blue-600/20">
+                    <RefreshCw className="w-4 h-4 text-white animate-spin" />
+                  </div>
+                  <div className="text-left">
+                    <h4 className="text-[14px] font-black text-blue-900 uppercase tracking-tight leading-none">Comprehensive Intelligence Scan</h4>
+                    <p className="text-[10px] text-blue-600 font-bold uppercase tracking-widest mt-1.5 opacity-80">
+                      Updating Architectural Map & Perceived Nodes (30-60s) • Live sync active
+                    </p>
+                  </div>
+                </div>
+                <div className="hidden md:flex items-center gap-3">
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-white/80 rounded-lg border border-blue-100/50 backdrop-blur-sm shadow-sm">
+                    <Loader2 className="w-3 h-3 text-blue-600 animate-spin" />
+                    <span className="text-[10px] font-black text-blue-600 uppercase tracking-[0.15em]">Processing</span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Report Header */}
         <motion.div

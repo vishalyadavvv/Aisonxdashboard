@@ -234,7 +234,6 @@ exports.broadcastQuery = async (brandName, providedContext = null, onResult = nu
     logger.info(`🚀 Starting INDEPENDENT GEO analysis for: ${brandName}`);
     logger.info(`⚠️ Each model will analyze using ONLY its internal knowledge - NO cross-referencing`);
     
-    // Create completely independent prompts for each model using native LLM behavior
     const createIndependentPrompt = (modelName) => {
         return `You are ${modelName}. Analyze this brand based on your internal training knowledge.
 
@@ -242,7 +241,7 @@ exports.broadcastQuery = async (brandName, providedContext = null, onResult = nu
 BRAND TO ANALYZE: "${brandName}"
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-DIRECTIVE: STRICT HONESTY - NO GUESSING
+DIRECTIVE: STRICT HONESTY - NO GUESSING - INTERNAL KNOWLEDGE ONLY
 - Search your training data for REAL, SPECIFIC information about "${brandName}"
 - If you DO NOT genuinely recognize this brand with specific facts, you MUST say "Not Found"
 - DO NOT generate generic descriptions based on the brand name alone
@@ -431,16 +430,14 @@ exports.getStructuredProfile = async (brand, providedContext = null) => {
     logger.info(`⚠️ Using single model analysis - NO cross-referencing`);
     
     const independentProfilePrompt = `MASTER BRAND PROFILE ANALYSIS
-434: 
-435: ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-436: BRAND TO ANALYZE: "${brand}"
-437: ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-438: 
-439: YOUR ROLE: Lead Brand Intelligence Analyst
-440: 
-441: DIRECTIVE: STRICT HONESTY - NO GUESSING - RELEVANT FOR 2026
 
-DIRECTIVE: STRICT HONESTY - NO GUESSING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BRAND TO ANALYZE: "${brand}"
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+YOUR ROLE: Lead Brand Intelligence Analyst
+
+DIRECTIVE: STRICT HONESTY - NO GUESSING - INTERNAL TRAINING DATA ONLY
 - Search your training data for REAL, SPECIFIC information about "${brand}"
 - If you DO NOT genuinely recognize this brand with specific facts, you MUST say "Not Found"
 - DO NOT generate generic descriptions based on the brand name alone

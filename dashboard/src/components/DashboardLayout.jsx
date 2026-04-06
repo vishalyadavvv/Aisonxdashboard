@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import Sidebar from './Sidebar';
 import { Outlet, useLocation, Link } from 'react-router-dom';
-import { Menu, AlertTriangle, ArrowRight, Star, Shield } from 'lucide-react';
+import { Menu, AlertTriangle, ArrowRight, Star, Shield, MoreVertical } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const DashboardLayout = () => {
@@ -21,13 +21,18 @@ const DashboardLayout = () => {
         setIsOpen={setIsMobileMenuOpen} 
       />
       <main className="flex-1 overflow-y-auto w-full">
-        <header className="h-16 border-b border-gray-200/80 flex items-center justify-between px-4 md:px-8 sticky top-0 bg-white/80 backdrop-blur-xl z-20">
+        <header className="h-16 border-b border-gray-200/80 flex items-center justify-between px-4 md:px-5 sticky top-0 bg-white/80 backdrop-blur-xl z-20">
           <div className="flex items-center gap-3">
             <button 
               onClick={() => setIsMobileMenuOpen(true)}
               className="p-2 -ml-2 rounded-xl text-gray-500 hover:bg-gray-100 md:hidden transition-colors"
             >
               <Menu className="w-5 h-5" />
+            </button>
+            <button 
+              className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 md:hidden transition-colors"
+            >
+              <MoreVertical className="w-4 h-4" />
             </button>
             <h2 className="text-sm font-medium text-gray-600 hidden sm:block">Welcome back, <span className="text-[#1E293B] font-semibold">{user?.name}</span></h2>
           </div>
@@ -51,7 +56,7 @@ const DashboardLayout = () => {
             </div>
           </div>
         </header>
-        <div className="p-4 md:px-10 md:pt-8 md:pb-10 max-w-full overflow-x-hidden relative">
+        <div className="p-4 md:px-4 md:pt-8 md:pb-10 max-w-full overflow-x-auto relative">
           {isExpired && !isPricingPage && (
             <motion.div 
               initial={{ opacity: 0, y: -20 }}

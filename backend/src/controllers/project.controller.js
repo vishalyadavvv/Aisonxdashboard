@@ -427,29 +427,34 @@ const internalRunProjectScan = async (project) => {
             }
         });
 
-        // 🟢 WEIGHTED VISIBILITY CALCULATION (Fix: Avoid Blind Average Dilution)
-        // We give 2x weight to prompts where the brand is actually FOUND.
-        // This rewards discovery while still acknowledging gaps.
-        let totalWeightedScore = 0;
-        let totalWeights = 0;
-
-        const negPhrasesOverall = ['not found at all', 'completely invisible'];
-        scanResults.promptRankings.forEach(r => {
-            const snippetL = (r.snippet || '').toLowerCase();
-            const brandL = project.brandName.toLowerCase();
-            const isNegTerm = negPhrasesOverall.some(p => snippetL.includes(p));
-            const snippetMatch = snippetL.includes(brandL) && !isNegTerm;
-            const isFound = r.found || (r.rank > 0) || snippetMatch;
-            
-            const score = (r.rank > 0) ? Math.max(r.score, 60) : (isFound ? Math.max(r.score, 15) : 0);
-            const weight = (r.rank > 0) ? 2 : (isFound ? 1 : 1); 
-            
-            totalWeightedScore += (score * weight);
-            totalWeights += weight;
+        // 🟢 CONSENSUS VISIBILITY CALCULATION (Fix: Avoid Inflated Scores)
+        // Instead of weighting "Found" results, we now calculate a strict average 
+        // across all models to ensure that failures (0%) are accurately reflected.
+        const modelScores = [];
+        const engines = ['openai', 'gemini'];
+        
+        engines.forEach(engine => {
+            const engineRankings = scanResults.promptRankings.filter(r => r.engine === engine);
+            if (engineRankings.length > 0) {
+                const totalModelScore = engineRankings.reduce((sum, r) => {
+                    const snippetL = (r.snippet || '').toLowerCase();
+                    const brandL = project.brandName.toLowerCase();
+                    const negPhrases = ['not found at all', 'completely missing', 'no information available', 'not recognized as a brand'];
+                    const isNegTerm = negPhrases.some(p => snippetL.includes(p));
+                    const snippetMatch = snippetL.includes(brandL) && !isNegTerm;
+                    const isFound = r.found || (r.rank > 0) || snippetMatch;
+                    
+                    if (isFound) foundPrompts.add(r.prompt);
+                    
+                    let score = (r.rank > 0) ? Math.max(r.score, 60) : (isFound ? Math.max(r.score, 15) : 0);
+                    return sum + score;
+                }, 0);
+                modelScores.push(Math.round(totalModelScore / engineRankings.length));
+            }
         });
 
-        const visibilityScore = totalWeights > 0 
-            ? Math.round(totalWeightedScore / totalWeights) 
+        const visibilityScore = modelScores.length > 0 
+            ? Math.round(modelScores.reduce((a, b) => a + b, 0) / modelScores.length) 
             : 0;
 
         const techScore = (robotsJson.found ? 50 : 0) + (sitemapJson.found ? 50 : 0);

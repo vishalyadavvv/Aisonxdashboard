@@ -122,18 +122,30 @@ const analyzeWithOpenAI = async (domain, content) => {
 const analyzeWithGemini = async (domain, content) => {
     try {
         const response = await axios.post(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
             {
                 contents: [{
                     parts: [{
-                        text: `You are a Brand Architect. Analyze domain "${domain}" for Brand Profiling. Context: ${content}\n\nDefine the Brand Type as a [Target Audience: B2B/B2C/D2C] [Business Model] in a [Specific Niche]. Extract exhaustive tags and topics. Output JSON.`
+                        text: `You are a Brand Architect. Analyze domain "${domain}" for Brand Profiling. Context: ${content}\n\nDefine the Brand Type as a [Target Audience: B2B/B2C/D2C] [Business Model] in a [Specific Niche]. Extract exhaustive tags, topics, and machine-perceived prompts (the 5-8 search queries someone would use to find this brand). Output JSON with these keys: brandType, brandFocus, description, presenceTags, topics, prompts.`
                     }]
                 }]
             }
         );
         const text = response.data.candidates?.[0]?.content?.parts?.[0]?.text;
         const match = text?.match(/\{[\s\S]*\}/);
-        return match ? JSON.parse(match[0]) : null;
+        const data = match ? JSON.parse(match[0]) : null;
+        
+        if (data) {
+            return {
+                ...data,
+                brandType: data.brandType || 'B2C',
+                brandFocus: data.brandFocus || 'General Market',
+                description: data.description || `Digital platform for ${domain}`,
+                presenceTags: data.presenceTags || [],
+                topics: data.topics || []
+            };
+        }
+        return null;
     } catch (e) { 
         logger.error(`Gemini Error: ${e.response?.data?.error?.message || e.message}`); 
         return null; 
@@ -168,9 +180,9 @@ const synthesizeResults = async (domain, results, websiteContent) => {
     1. BRAND TYPE: Strictly identify the Audience Model only (MUST be B2B, B2C, or D2C).
     2. DOMAIN TYPE: Strictly identify the Core Architecture only (e.g., "Marketplace", "SaaS Platform", "Digital Agency", "E-commerce").
     3. BRAND FOCUS: A concise 2-3 word label combining audience and architecture (e.g., "B2B Marketplace" or "B2C SaaS").
-    4. DESCRIPTION: One powerful, high-impact sentence defining their mission.
-    5. SENTIMENT: Must be a descriptive, professional sentence explaining the AI's perspective (e.g., "Likely positive sentiment due to the facilitation of creative collaborations and providing a platform for freelancers.").
-    6. INTERPRETATION: Focus on the "Value Hypothesis"—what specific problem they solve and their market differentiator.
+    4. DESCRIPTION: Use **Bold Typography** for the brand name. Use one powerful, high-impact sentence defining their mission (STRICT MAX 25 WORDS).
+    5. SENTIMENT: One professional sentence explaining the AI's perspective (STRICT MAX 20 WORDS).
+    6. INTERPRETATION: Use **Bold Typography** for key differentiators. Focus on the "Value Hypothesis"—what specific problem they solve. (STRICT MAX 20 WORDS).
     
     OUTPUT SCHEMA (Strictly JSON):
     {
@@ -188,7 +200,27 @@ const synthesizeResults = async (domain, results, websiteContent) => {
 
     EVERY key must be present. Do not use generic results like 'No data found'.`;
 
+    // Helper to run synthesis through Gemini
+    const runGeminiSynthesis = async (prompt) => {
+        try {
+            const geminiRes = await axios.post(
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+                {
+                    contents: [{ parts: [{ text: prompt + "\n\nOutput only the valid JSON object." }] }]
+                }
+            );
+            const geminiText = geminiRes.data.candidates?.[0]?.content?.parts?.[0]?.text;
+            const geminiMatch = geminiText?.match(/\{[\s\S]*\}/);
+            if (!geminiMatch) throw new Error('Gemini synthesis produced no JSON');
+            return JSON.parse(geminiMatch[0]);
+        } catch (err) {
+            logger.error(`Gemini Synthesis Error: ${err.message}`);
+            throw err;
+        }
+    };
+
     try {
+        // Attempt Synthesis with OpenAI (Preferred Master)
         const res = await axios.post('https://api.openai.com/v1/chat/completions', {
             model: 'gpt-4o',
             messages: [{ role: 'user', content: synthesisPrompt }],
@@ -198,24 +230,46 @@ const synthesizeResults = async (domain, results, websiteContent) => {
             headers: { 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}` }
         });
         const finalized = JSON.parse(res.data.choices[0].message.content);
-        logger.info(`Successfully synthesized consensus for ${domain}`);
+        
+        // Post-processing: Ensure brevity and limit arrays for premium UI
+        finalized.presenceTags = (finalized.presenceTags || []).slice(0, 10);
+        finalized.topics = (finalized.topics || []).slice(0, 12);
+        finalized.competitors = (finalized.competitors || []).slice(0, 5);
+        
+        logger.info(`Successfully synthesized consensus for ${domain} via OpenAI`);
         return finalized;
-    } catch (e) { 
-        logger.error(`Synthesis failed: ${e.message}`);
-        // Ensure fallback has all required fields
-        const fallback = valid[0].d;
-        return {
-            brandType: fallback.brandType || 'Digital Asset',
-            brandFocus: fallback.brandFocus || 'General Market',
-            description: fallback.description || '',
-            sentiment: fallback.sentiment || 'Neutral market sentiment.',
-            domainType: fallback.domainType || 'Digital Property',
-            coreOffering: fallback.coreOffering || '',
-            presenceTags: fallback.presenceTags || [],
-            topics: fallback.topics || [],
-            competitors: fallback.competitors || [],
-            prompts: fallback.prompts || []
-        };
+    } catch (openaiError) { 
+        logger.warn(`OpenAI Synthesis failed for ${domain} (${openaiError.message}). Attempting Gemini Fallback...`);
+        
+        try {
+            // Attempt Synthesis with Gemini (Secondary Master)
+            const finalized = await runGeminiSynthesis(synthesisPrompt);
+            
+            // Post-processing: Ensure brevity and limit arrays for premium UI (Gemini Fallback)
+            finalized.presenceTags = (finalized.presenceTags || []).slice(0, 10);
+            finalized.topics = (finalized.topics || []).slice(0, 12);
+            finalized.competitors = (finalized.competitors || []).slice(0, 5);
+
+            logger.info(`Successfully synthesized consensus for ${domain} via Gemini (Fallback)`);
+            return finalized;
+        } catch (geminiError) {
+            logger.error(`Critical: Both synthesis models failed for ${domain}. Using raw data fallback.`);
+            
+            // Final raw data fallback
+            const fallback = valid[0].d;
+            return {
+                brandType: fallback.brandType || 'Digital Asset',
+                brandFocus: fallback.brandFocus || 'General Market',
+                description: fallback.description || '',
+                sentiment: fallback.sentiment || 'Neutral market sentiment.',
+                domainType: fallback.domainType || 'Digital Property',
+                coreOffering: fallback.coreOffering || '',
+                presenceTags: (fallback.presenceTags || []).slice(0, 10),
+                topics: (fallback.topics || []).slice(0, 12),
+                competitors: (fallback.competitors || []).slice(0, 5),
+                prompts: (fallback.prompts || []).slice(0, 8)
+            };
+        }
     }
 };
 
@@ -225,19 +279,21 @@ const synthesizeResults = async (domain, results, websiteContent) => {
 const analyzeDomainMulti = async (domain, content) => {
     logger.info(`Starting Multi-Agent Analysis for ${domain}`);
 
+    let context = content;
     if (content && (content.isBlocked || content.isNotFound)) {
-        return content;
+        logger.warn(`[Profiler] Domain ${domain} is blocked/not found. Switching to Independent Intelligence Analysis (IIA)...`);
+        context = `This domain (${domain}) was unreachable by our live scraper. Perform an internal intelligence lookup using only the brand/domain name to determine its likely architecture, audience, and industry position.`;
     }
 
     const startTime = Date.now();
     
     // 1. Run base agents in parallel
     const results = await Promise.allSettled([
-        analyzeWithOpenAI(domain, content),
-        analyzeWithGemini(domain, content)
-        // analyzeWithGroq(domain, content)
+        analyzeWithOpenAI(domain, context),
+        analyzeWithGemini(domain, context)
+        // analyzeWithGroq(domain, context)
     ]);
-    return await synthesizeResults(domain, results, content);
+    return await synthesizeResults(domain, results, context);
 };
 
 module.exports = {

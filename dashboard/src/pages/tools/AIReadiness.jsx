@@ -172,7 +172,7 @@ const AIReadiness = () => {
       };
       fetchReports();
     }
-  }, [projectId, contextProject, contextHistory]);
+  }, [projectId, contextProject, contextHistory, user]);
 
   // Step progress simulation during analysis
   useEffect(() => {

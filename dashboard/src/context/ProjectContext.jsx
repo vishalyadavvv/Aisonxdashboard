@@ -20,7 +20,7 @@ export const ProjectProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
   const fetchProjectData = useCallback(async (id) => {
-    if (!id) return;
+    if (!id || id === 'new') return;
     setLoading(true);
     setError(null);
     try {
@@ -41,7 +41,7 @@ export const ProjectProvider = ({ children }) => {
   }, []);
 
   const refreshData = useCallback(async (showLoading = false) => {
-    if (projectId) {
+    if (projectId && projectId !== 'new') {
       if (showLoading) setLoading(true);
       try {
         const [projRes, histRes] = await Promise.all([

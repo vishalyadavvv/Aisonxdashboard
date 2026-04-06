@@ -145,23 +145,56 @@ const ProjectDetail = () => {
       : rankings.filter(r => r.engine === selectedEngine);
     
     const total = filteredRankings.length || 1;
-    const mentions = filteredRankings.filter(r => r.found).length || 0;
-    const links = filteredRankings.filter(r => r.linkFound).length || 0;
-    const top3 = filteredRankings.filter(r => 
-      (r.found && r.rank > 0 && r.rank <= 3) || 
-      (r.linkFound && r.linkRank > 0 && r.linkRank <= 3)
-    ).length || 0;
     
+    // Calculate consensus-based averages
+    let mentions = 0;
+    let links = 0;
+    let top3 = 0;
+
+    if (selectedEngine === 'all') {
+      const engines = ['openai', 'gemini'];
+      engines.forEach(eng => {
+        const engRankings = rankings.filter(r => r.engine === eng);
+        if (engRankings.length > 0) {
+          const engMentions = engRankings.filter(r => r.found).length;
+          const engLinks = engRankings.filter(r => r.linkFound).length;
+          const engTop3 = engRankings.filter(r => 
+            (r.found && r.rank > 0 && r.rank <= 3) || 
+            (r.linkFound && r.linkRank > 0 && r.linkRank <= 3)
+          ).length;
+          
+          mentions += (engMentions / engRankings.length);
+          links += (engLinks / engRankings.length);
+          top3 += (engTop3 / engRankings.length);
+        }
+      });
+      // Average across active engines
+      mentions = (mentions / 2) * 100;
+      links = (links / 2) * 100;
+      top3 = (top3 / 2) * 100;
+    } else {
+      const mCount = filteredRankings.filter(r => r.found).length;
+      const lCount = filteredRankings.filter(r => r.linkFound).length;
+      const t3Count = filteredRankings.filter(r => 
+        (r.found && r.rank > 0 && r.rank <= 3) || 
+        (r.linkFound && r.linkRank > 0 && r.linkRank <= 3)
+      ).length;
+      
+      mentions = (mCount / total) * 100;
+      links = (lCount / total) * 100;
+      top3 = (t3Count / total) * 100;
+    }
+
     // Recalculate overall score for filtered view if specific engine
     let overallScore = lastSnapshot.overallScore || 0;
     if (selectedEngine !== 'all') {
-      overallScore = Math.round(((mentions + links) / (total * 2)) * 100);
+      overallScore = Math.round((mentions + links) / 2);
     }
     
     return {
-      mention: Math.round((mentions / total) * 100),
-      link: Math.round((links / total) * 100),
-      top3: Math.round((top3 / total) * 100),
+      mention: Math.round(mentions),
+      link: Math.round(links),
+      top3: Math.round(top3),
       sources: lastSnapshot.authoritySignals?.webGroundedRecency || 0,
       overallScore
     };

@@ -302,7 +302,17 @@ Return ONLY a raw JSON array of objects. Do not wrap in markdown tags like \`\`\
             console.log(`Successfully generated ${queriesToCheck.length} dynamic queries.`);
         }
     } catch (e) {
-        console.warn(`Failed to generate dynamic queries, falling back to static lists. Error: ${e.message}`);
+        console.warn(`Failed to generate dynamic queries with OpenAI, attempting Gemini fallback. Error: ${e.message}`);
+        try {
+            const geminiResponse = await fetchGemini(prompt, true);
+            if (geminiResponse && !geminiResponse.includes('Error:')) {
+                const parsed = JSON.parse(geminiResponse.replace(/```json/g, '').replace(/```/g, '').trim());
+                queriesToCheck = Array.isArray(parsed) ? parsed : (parsed.queries || parsed.data || []);
+                console.log(`Successfully generated ${queriesToCheck.length} dynamic queries via Gemini fallback.`);
+            }
+        } catch (geminiError) {
+            console.error(`Gemini fallback also failed: ${geminiError.message}`);
+        }
     }
 
     // Fallback to static if dynamic failed or returned empty
@@ -339,6 +349,7 @@ Return ONLY a raw JSON array of objects. Do not wrap in markdown tags like \`\`\
 }
 
 const { fetchOpenAI } = require('./ai_internal/openai.service');
+const { fetchGemini } = require('./ai_internal/gemini.service');
 
 // Helper to scrape content from a URL
 async function scrapeContent(url) {
@@ -889,7 +900,21 @@ async function getAIAnalysis(url, businessType, totalQueries, presentCount, miss
             throw e;
         }
     } catch (error) {
-        console.error("AI Analysis failed, falling back to heuristic:", error);
+        console.warn("OpenAI Analysis failed, attempting Gemini Fallback:", error.message);
+        try {
+            const geminiResponse = await fetchGemini(prompt, true);
+            if (geminiResponse && !geminiResponse.includes('Error:')) {
+                const parsed = JSON.parse(geminiResponse.replace(/```json/g, '').replace(/```/g, '').trim());
+                return {
+                    score: parsed.score || 0,
+                    summary: parsed.summary || "",
+                    brandType: parsed.brandType || (businessType === 'SaaS' ? 'B2B SaaS' : 'Digital Brand'),
+                    domainType: parsed.domainType || (businessType === 'SaaS' ? 'SaaS Platform' : 'Digital Property')
+                };
+            }
+        } catch (geminiErr) {
+            console.error("Gemini Fallback also failed:", geminiErr.message);
+        }
         return null;
     }
 }
@@ -1030,52 +1055,51 @@ exports.analyzeWebsite = async (url) => {
         
         if (testRes) {
             const isBlocked = (testRes.status === 403 || testRes.status === 503 || testRes.code === 'ECONNRESET' || testRes.code === 'ETIMEDOUT' || (testRes.error && testRes.error.toLowerCase().includes('abort')));
-            
-            if (isBlocked) {
+                        if (isBlocked) {
                 const statusMsg = testRes.status === 403 ? 'Forbidden (403)' : 
                                  testRes.status === 503 ? 'Service Unavailable (503)' : 
                                  testRes.code || 'Connection Blocked';
                 
-                // Use default object and override robot status
-                const blockedSignals = getDefaultTechnicalSignals();
-                blockedSignals.robots = { 
-                    exists: true, 
-                    status: testRes.status || 0, 
-                    gptBot: 'Blocked', 
-                    googleExtended: 'Blocked', 
-                    claudeBot: 'Blocked', 
-                    ccBot: 'Blocked', 
-                    perplexityBot: 'Blocked', 
-                    appleBot: 'Blocked', 
-                    amazonBot: 'Allowed', // Amazon is usually allowed
-                    byteSpider: 'Blocked', 
-                    metaBot: 'Blocked', 
-                    contentSignals: { 
-                        search: 'Blocked', 
-                        aiInput: 'Blocked', 
-                        aiTrain: 'Blocked', 
-                        aiTrainFine: 'Blocked', 
-                        aiTrainBase: 'Blocked' 
-                    }, 
-                    globalDisallow: true, 
-                    xRobotsTag: 'None' 
-                };
-                blockedSignals.crawlability.isNoindex = true;
-                // Return a "Blocked" or "Inaccessible" state object instead of throwing
+                console.log(`[Readiness] Domain ${baseUrl} is blocking scraper (${statusMsg}). Switching to Predictive AI Analysis Fallback...`);
+                
+                // 1. Infer Business Type & Generate Estimated Queries
+                const nicheInf = await fetchOpenAI(`Analyze the domain name "${baseUrl}" and its TLD. Predict its Business Type (SaaS, E-commerce, or General) and its primary industry niche. Return JSON: { "type": "string", "niche": "string" }`, true);
+                let predictedType = 'General';
+                try {
+                    const p = JSON.parse(nicheInf.replace(/```json/g, '').replace(/```/g, '').trim());
+                    predictedType = p.type || 'General';
+                } catch(err) {}
+
+                // 2. Generate Predicted Queries
+                const predictedQueries = await generateAndCheckQueries(baseUrl, [], predictedType);
+                
+                // 3. Mark all as "Incomplete/Unknown" instead of "Missing" for predictive mode
+                const adjustedQueries = predictedQueries.map(q => ({
+                    ...q,
+                    status: 'potential',
+                    action: 'Verify manually (Domain blocked automated check)'
+                }));
+
+                // 4. Synthesize Predictive Report
+                const technicalSignals = getDefaultTechnicalSignals();
+                // Set robots to "Unknown - Likely Guarded"
+                technicalSignals.robots.gptBot = 'Guarded';
+                technicalSignals.robots.perplexityBot = 'Guarded';
+
                 return {
-                    businessType: 'General',
-                    summary: `Analysis of ${baseUrl} was unavailable (Status: ${statusMsg}). Our scanner was unable to retrieve technical signals or content depth.`,
-                    coverageScore: 0,
+                    businessType: predictedType,
+                    summary: `Direct technical analysis of ${baseUrl} was restricted by the server (${statusMsg}). We have generated this PREDICTIVE readiness model based on your industry niche and domain architecture. High-fidelity scan will require whitelisting our IP.`,
+                    coverageScore: 15, // Low but not 0 (Heuristic for "existing domain but unknown structure")
                     corePagesFound: 0,
-                    totalPages: 0,
-                    totalMissing: 0,
-                    queries: [],
-                    sitemapUrl: 'Inaccessible',
+                    totalPages: adjustedQueries.length,
+                    totalMissing: adjustedQueries.length,
+                    queries: adjustedQueries,
+                    sitemapUrl: 'Restricted (Server Block)',
                     totalSitemapUrls: 0,
-                    method: 'error',
-                    isBlocked: true,
-                    blockReason: statusMsg,
-                    technicalSignals: blockedSignals
+                    method: 'predictive', // New method type
+                    isBlocked: false, // Set to false so frontend renders it as a valid (but low-score) report
+                    isPredictive: true,
+                    technicalSignals
                 };
             } else if (testRes.status === 200) {
                  // SPA or single-page site where crawler found 0 links, but site is up
@@ -1102,6 +1126,7 @@ exports.analyzeWebsite = async (url) => {
     const missingQueries = queryResults.filter(q => q.status === 'missing');
     const missingCount = totalQueries - presentCount;
     let coverageScore = totalQueries > 0 ? Math.round((presentCount / totalQueries) * 100) : 0;
+    let summary = "Generating website analysis...";
     
     
     // Scrape Content for Real-Time AI Analysis
@@ -1214,8 +1239,8 @@ exports.analyzeWebsite = async (url) => {
     }
     
     let domainSynthesis = {
-        brandType: "N/A",
-        domainType: businessType || "General"
+        brandType: businessType === 'SaaS' ? 'B2B SaaS/Service' : (businessType === 'E-commerce' ? 'B2C E-commerce' : 'Digital Brand'),
+        domainType: businessType === 'SaaS' ? 'SaaS Platform' : (businessType === 'E-commerce' ? 'E-commerce Store' : 'Digital Property')
     };
     
     try {

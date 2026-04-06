@@ -218,10 +218,31 @@ exports.performProjectScan = async (project) => {
     // 1. Competitive Audits — OpenAI & Gemini (The "Battle View")
     // These calls evaluate the brand and rivals in the same search context.
     
-    // 1.1 OpenAI Competitive Audit
+    // 1.1 OpenAI Competitive Audit (with Smart Fallback)
     if (engines.includes('openai')) {
         logger.info(`🔄 [COMPETITIVE] Running OpenAI Battle View for ${project.prompts.length} prompts in ${market.name}...`);
-        const compResults = await gptCompetitiveBatchAudit(brandName, domain, project.competitors, project.prompts, market);
+        
+        let compResults = await gptCompetitiveBatchAudit(brandName, domain, project.competitors, project.prompts, market);
+        
+        // --- FALLBACK: If OpenAI is exhausted, use Gemini to simulate the OpenAI perspective ---
+        if (!compResults || compResults.length === 0) {
+            logger.warn(`⚠️ [COMPETITIVE] OpenAI failed for ${project.name}. Initiating Gemini-Surrogate for OpenAI slot...`);
+            const tasks = project.prompts.map(promptText => () => 
+                geminiCompetitiveAudit(brandName, domain, project.competitors, promptText, market)
+            );
+            const surrogateResults = (await runWithLimit(tasks, 3)).filter(Boolean);
+            
+            if (surrogateResults.length > 0) {
+                compResults = surrogateResults.map(r => ({
+                    ...r,
+                    authoritySignals: { 
+                        ...r.authoritySignals, 
+                        sourceType: 'Gemini (OpenAI Surrogate)',
+                        isSurrogate: true 
+                    }
+                }));
+            }
+        }
         
         if (compResults && Array.isArray(compResults) && compResults.length > 0) {
             for (const audit of compResults) {
@@ -239,7 +260,7 @@ exports.performProjectScan = async (project) => {
                     score: audit.brandRanking.score || 0,
                     snippet: audit.brandRanking.snippet || '',
                     citations: audit.authoritySignals?.citations || [],
-                    authoritySource: audit.authoritySignals?.sourceType || 'OpenAI Search',
+                    authoritySource: audit.authoritySignals?.sourceType || 'OpenAI Search (Fallback)',
                     authoritySignals: audit.authoritySignals || { sourceType: 'Comparison', citations: [] }
                 });
 
@@ -260,9 +281,7 @@ exports.performProjectScan = async (project) => {
                     }
                 }
             }
-            logger.info(`✅ [COMPETITIVE] OpenAI Battle View complete with ${compResults.length} results`);
-        } else {
-            logger.warn(`⚠️ [COMPETITIVE] OpenAI Battle View returned NO results for ${project.name}`);
+            logger.info(`✅ [COMPETITIVE] OpenAI Battle View (with Fallback) complete with ${compResults.length} results`);
         }
     }
 

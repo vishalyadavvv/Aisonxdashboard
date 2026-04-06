@@ -151,12 +151,13 @@ function getNumericScore(aiVisibilityAssessment) {
     const level = (aiVisibilityAssessment.overallLevel || '').toLowerCase();
     
     // Using granular defaults to avoid "round number" feel (85, 12, etc.)
+    if (level.includes('not found') || level.includes('none')) return 0;
     if (level.includes('very low')) return 12 + Math.floor(Math.random() * 5); 
     if (level.includes('low') && !level.includes('very')) return 28 + Math.floor(Math.random() * 8);
     if (level.includes('moderate')) return 52 + Math.floor(Math.random() * 10);
     if (level.includes('high')) return 88 + Math.floor(Math.random() * 8);
     
-    return 15; // Default to Very Low if unclear
+    return 0; // Default to 0 if not found or unknown
 }
 
 // Helper: Aggregate insights from all models
@@ -359,18 +360,24 @@ exports.startScan = async (req, res) => {
                 result.aiVisibilityAssessment = { criteria: [] };
             }
             
-            result.aiVisibilityAssessment.overallLevel = 'Very Low';
+            result.aiVisibilityAssessment.overallLevel = 'Not Found';
             result.aiVisibilityAssessment.visibilityScore = 0;
-            result.aiVisibilityAssessment.interpretation = `Entity "${brandName}" was not found in ${modelId} training data.`;
+            result.aiVisibilityAssessment.interpretation = `Entity "${brandName}" was not identified within the internal training knowledge base of ${modelId}.`;
             
             if (Array.isArray(result.aiVisibilityAssessment.criteria)) {
                 result.aiVisibilityAssessment.criteria = result.aiVisibilityAssessment.criteria.map(c => ({
-                    ...c, assessment: 'Very Low', score: 0, evidence: 'No training data match'
+                    ...c, assessment: 'None', score: 0, evidence: 'No training data match'
                 }));
                 // If it was empty, add at least one to ensure averaging works
                 if (result.aiVisibilityAssessment.criteria.length === 0) {
-                    result.aiVisibilityAssessment.criteria.push({ name: 'Direct training match', assessment: 'Very Low', score: 0 });
+                    result.aiVisibilityAssessment.criteria.push({ name: 'Direct training match', assessment: 'None', score: 0 });
                 }
+            }
+            // Also clear all individual prompt rankings to ensure consistency in scores
+            if (Array.isArray(result.promptRankings)) {
+                result.promptRankings = result.promptRankings.map(r => ({
+                    ...r, found: false, linkFound: false, rank: 0, score: 0, snippet: 'Brand not found in training data.'
+                }));
             }
         }
     });
@@ -464,12 +471,12 @@ exports.startScan = async (req, res) => {
         } else if (score >= 46) {
             levelLabel = 'Moderate';
             criteriaAssessment = 'Moderate';
-        } else if (score >= 16) {
+        } else if (score >= 1) {
             levelLabel = 'Low';
             criteriaAssessment = 'Low';
         } else {
-            levelLabel = 'Very Low';
-            criteriaAssessment = 'Very Low';
+            levelLabel = 'Not Found';
+            criteriaAssessment = 'None';
         }
         
         aggregatedProfile.aiVisibilityAssessment.overallLevel = levelLabel;

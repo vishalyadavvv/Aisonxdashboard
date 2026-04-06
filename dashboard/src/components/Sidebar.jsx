@@ -27,6 +27,7 @@ import {
   Shield,
   Target,
   Clock,
+  MoreVertical,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx } from 'clsx';
@@ -38,11 +39,12 @@ function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
-const RailItem = ({ to, icon: Icon, label, badge, active }) => (
+const RailItem = ({ to, icon: Icon, label, badge, active, onClick }) => (
   <Link
     to={to}
+    onClick={onClick}
     className={cn(
-      "group relative flex flex-col items-start w-full py-4 pl-5 transition-all duration-300",
+      "group relative flex flex-col items-start w-full py-4 pl-2.5 transition-all duration-300",
       active ? "text-white" : "text-gray-500 hover:text-gray-300"
     )}
   >
@@ -62,10 +64,11 @@ const RailItem = ({ to, icon: Icon, label, badge, active }) => (
   </Link>
 );
 
-const ContextItem = ({ to, icon: Icon, label, badge, isChild, end }) => (
+const ContextItem = ({ to, icon: Icon, label, badge, isChild, end, onClick }) => (
   <NavLink
     to={to}
     end={end}
+    onClick={onClick}
     className={({ isActive }) => cn(
       "flex items-center justify-between px-2 py-3 rounded-xl transition-all duration-300 group text-[13px] font-medium",
       isActive 
@@ -101,11 +104,12 @@ const SidebarSection = ({ title, children }) => (
   </div>
 );
 
-const NavItem = ({ to, icon: Icon, label, badge, hasDropdown, isChild, end }) => {
+const NavItem = ({ to, icon: Icon, label, badge, hasDropdown, isChild, end, onClick }) => {
   return (
     <NavLink
       to={to}
       end={end}
+      onClick={onClick}
       className={({ isActive }) => cn(
         "flex items-center justify-between px-2 py-2.5 rounded-xl transition-all duration-300 group text-sm font-medium",
         isActive 
@@ -190,7 +194,7 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
       )}>
         {/* Primary Rail */}
         <aside className="w-[72px] h-full bg-[#0a0e1a] border-r border-white/5 flex flex-col items-stretch py-8 overflow-y-auto no-scrollbar">
-          <Link to="/dashboard" className="mb-10 flex flex-col items-start pl-5 gap-2 group">
+          <Link to="/dashboard" className="mb-10 flex flex-col items-start pl-4 gap-2 group">
             <div className="w-11 h-11 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-all">
                <img src="/logo.png" className="w-8 h-8 object-contain" alt="Logo" />
             </div>
@@ -202,11 +206,12 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
               icon={Home} 
               label="Projects" 
               active={category === 'projects'}
+              onClick={() => setIsOpen(false)}
             />
 
             {/* AI MODULE DIVIDER */}
-            <div className="w-full h-px bg-white/5 my-4 max-w-[40px] ml-5" />
-            <div className="w-full flex justify-start pl-5 mb-1">
+            <div className="w-full h-px bg-white/5 my-4 max-w-[40px] ml-4" />
+            <div className="w-full flex justify-start pl-4 mb-1">
               <span className="text-[7px] text-blue-500/80 font-black uppercase tracking-[0.1em] select-none text-left">AI MODULE</span>
             </div>
 
@@ -216,12 +221,14 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
               label="AI Module" 
               active={category === 'ai_module'}
               badge
+              onClick={() => setIsOpen(false)}
             />
           </div>
 
           <div className="mt-auto w-full space-y-4">
             <Link 
               to="/dashboard/settings"
+              onClick={() => setIsOpen(false)}
               className={cn(
                 "w-full flex justify-center py-2 transition-colors",
                 location.pathname === '/dashboard/settings' ? "text-blue-400" : "text-gray-500 hover:text-white"
@@ -230,7 +237,10 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
               <Settings className="w-6 h-6" />
             </Link>
             <button 
-              onClick={logout}
+              onClick={() => {
+                setIsOpen(false);
+                logout();
+              }}
               className="w-full flex justify-center text-gray-500 hover:text-red-400 transition-colors pb-4"
             >
               <LogOut className="w-6 h-6" />
@@ -238,10 +248,17 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
           </div>
         </aside>
 
-        {/* Secondary Context Panel - STATIC WIDTH TO PREVENT JITTER */}
+        {/* Secondary Context Panel - RESPONSIVE WIDTH ON MOBILE */}
         <aside
-          className="w-[260px] h-full bg-[#0f172a] border-r border-white/5 flex flex-col overflow-y-auto no-scrollbar"
+          className="w-[210px] md:w-[260px] h-full bg-[#0f172a] border-r border-white/5 flex flex-col overflow-y-auto no-scrollbar relative"
         >
+          {/* Mobile Close Button */}
+          <button 
+            onClick={() => setIsOpen(false)}
+            className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white md:hidden z-50 bg-white/5 rounded-lg border border-white/10"
+          >
+            <X className="w-5 h-5" />
+          </button>
           <div className="p-6">
             <AnimatePresence mode="wait">
               <motion.div
@@ -305,17 +322,20 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
                     </option>
                   ))}
                 </select>
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none flex flex-col gap-0.5 opacity-40 group-hover:opacity-100 transition-opacity z-10">
-                  <ChevronDown className="w-4 h-4 text-indigo-400" />
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1 z-10">
+                  <ChevronDown className="w-4 h-4 text-indigo-400 pointer-events-none opacity-40 group-hover:opacity-100" />
+                  <button className="md:hidden p-1 hover:bg-white/10 rounded-md text-indigo-400 transition-colors">
+                    <MoreVertical className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
 
               {isProjectContext ? (
                 <div className="space-y-6">
                   <SidebarSection title="PROJECT">
-                     <NavItem to="/dashboard/projects" icon={Folder} label="All Projects" end />
-                     <ContextItem to={`/dashboard/projects/${projectId}`} icon={Home} label="Project Overview" end />
-                     <ContextItem to={`/dashboard/projects/${projectId}/rankings`} icon={LineChart} label="Professional Rankings" />
+                     <NavItem to="/dashboard/projects" icon={Folder} label="All Projects" end onClick={() => setIsOpen(false)} />
+                     <ContextItem to={`/dashboard/projects/${projectId}`} icon={Home} label="Project Overview" end onClick={() => setIsOpen(false)} />
+                     <ContextItem to={`/dashboard/projects/${projectId}/rankings`} icon={LineChart} label="Professional Rankings" onClick={() => setIsOpen(false)} />
                   </SidebarSection>
 
                   <SidebarSection title="AI MODULES">
@@ -325,21 +345,21 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
                       <ChevronDown className="w-3 h-3 ml-auto" />
                     </div>
                     <div className="space-y-1">
-                      <ContextItem to={`/dashboard/projects/${projectId}/audit`} label="AI Visibility Audit" isChild />
-                      <ContextItem to={`/dashboard/projects/${projectId}/profiler`} label="Domain Profiler" isChild />
-                      <ContextItem to={`/dashboard/projects/${projectId}/readiness`} label="Readiness Analyzer" isChild />
-                      <ContextItem to={`/dashboard/projects/${projectId}/search`} label="Web Visibility" isChild />
-                      <ContextItem to={`/dashboard/projects/${projectId}/brand-audit`} label="Brand Audit" isChild />
+                      <ContextItem to={`/dashboard/projects/${projectId}/audit`} label="AI Visibility Audit" isChild onClick={() => setIsOpen(false)} />
+                      <ContextItem to={`/dashboard/projects/${projectId}/profiler`} label="Domain Profiler" isChild onClick={() => setIsOpen(false)} />
+                      <ContextItem to={`/dashboard/projects/${projectId}/readiness`} label="Readiness Analyzer" isChild onClick={() => setIsOpen(false)} />
+                      <ContextItem to={`/dashboard/projects/${projectId}/search`} label="Web Visibility" isChild onClick={() => setIsOpen(false)} />
+                      <ContextItem to={`/dashboard/projects/${projectId}/brand-audit`} label="Brand Audit" isChild onClick={() => setIsOpen(false)} />
                     </div>
                   </SidebarSection>
 
 
                   <div className="pt-4 border-t border-white/5">
                     <SidebarSection title="GENERAL">
-                      <ContextItem to="/dashboard/orders" icon={DollarSign} label="My Orders" />
-                      <ContextItem to="/dashboard/inquiries" icon={Mail} label="My Inquiries" />
-                      <ContextItem to="/dashboard/pricing" icon={CreditCard} label="Pricing & Plans" />
-                      <ContextItem to="/dashboard/help" icon={HelpCircle} label="Help" />
+                      <ContextItem to="/dashboard/orders" icon={DollarSign} label="My Orders" onClick={() => setIsOpen(false)} />
+                      <ContextItem to="/dashboard/inquiries" icon={Mail} label="My Inquiries" onClick={() => setIsOpen(false)} />
+                      <ContextItem to="/dashboard/pricing" icon={CreditCard} label="Pricing & Plans" onClick={() => setIsOpen(false)} />
+                      <ContextItem to="/dashboard/help" icon={HelpCircle} label="Help" onClick={() => setIsOpen(false)} />
                     </SidebarSection>
                   </div>
 
@@ -351,7 +371,10 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
                     </div>
                     <div className="px-4 py-2">
                        <button 
-                         onClick={() => navigate('/dashboard/settings')}
+                         onClick={() => {
+                           setIsOpen(false);
+                           navigate('/dashboard/settings');
+                         }}
                          className="w-full bg-blue-600/10 text-blue-400 text-[11px] font-black uppercase tracking-widest py-3 rounded-xl border border-blue-500/20 hover:bg-blue-600/20 transition-all font-bold"
                        >
                          Profile Settings
@@ -361,8 +384,8 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <NavItem to="/dashboard/projects" icon={Folder} label="My Projects" end />
-                  <NavItem to="/dashboard/projects/new" icon={Edit3} label="Add New Project" badge="NEW" />
+                  <NavItem to="/dashboard/projects" icon={Folder} label="My Projects" end onClick={() => setIsOpen(false)} />
+                  <NavItem to="/dashboard/projects/new" icon={Edit3} label="Add New Project" badge="NEW" onClick={() => setIsOpen(false)} />
                 </div>
               )}
             </div>
@@ -387,15 +410,15 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
             </div>
           )}
 
-          {/* Bottom Common Sections */}
+          {/* Management (Global) */}
           {!location.pathname.startsWith('/dashboard/projects/') && (
             <div className="mt-6 pt-6 border-t border-white/5 space-y-4">
                <SidebarSection title="Management">
                 {user?.role === 'admin' && (
-                  <ContextItem to="/dashboard/admin/stats" icon={LineChart} label="Admin Panel" badge="Admin" />
+                  <ContextItem to="/dashboard/admin/stats" icon={LineChart} label="Admin Panel" badge="Admin" onClick={() => setIsOpen(false)} />
                 )}
-                <ContextItem to="/dashboard/orders" icon={DollarSign} label="My Orders" />
-                <ContextItem to="/dashboard/pricing" icon={CreditCard} label="Subscription" />
+                <ContextItem to="/dashboard/orders" icon={DollarSign} label="My Orders" onClick={() => setIsOpen(false)} />
+                <ContextItem to="/dashboard/pricing" icon={CreditCard} label="Subscription" onClick={() => setIsOpen(false)} />
               </SidebarSection>
             </div>
           )}
