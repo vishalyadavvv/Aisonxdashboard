@@ -81,7 +81,11 @@ const DashboardLayout = () => {
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <button 
-                  onClick={logout}
+                  onClick={() => {
+                    if (window.confirm("Are you sure you want to logout?")) {
+                      logout();
+                    }
+                  }}
                   className="flex-1 md:flex-none px-6 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all"
                 >
                   Sign Out

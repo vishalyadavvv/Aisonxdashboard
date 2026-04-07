@@ -238,8 +238,10 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
             </Link>
             <button 
               onClick={() => {
-                setIsOpen(false);
-                logout();
+                if (window.confirm("Are you sure you want to logout?")) {
+                  setIsOpen(false);
+                  logout();
+                }
               }}
               className="w-full flex justify-center text-gray-500 hover:text-red-400 transition-colors pb-4"
             >

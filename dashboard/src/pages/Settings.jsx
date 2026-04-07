@@ -124,16 +124,7 @@ const Settings = () => {
                 animate={{ opacity: 1, x: 0 }}
                 className="space-y-6"
               >
-                <div className="flex items-center gap-6 pb-6 border-b border-slate-100">
-                  <div className="w-20 h-20 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-2xl text-slate-400 overflow-hidden">
-                    {user?.name?.substring(0, 2).toUpperCase()}
-                  </div>
-                  <div className="space-y-1">
-                    <h3 className="text-lg font-bold text-slate-900">Profile Picture</h3>
-                    <p className="text-xs text-slate-500 font-medium">PNG, JPG under 10MB</p>
-                    <button className="text-xs font-bold text-blue-600 hover:underline">Upload new</button>
-                  </div>
-                </div>
+
 
                 <form onSubmit={handleProfileUpdate} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
