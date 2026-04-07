@@ -97,10 +97,6 @@ const Orders = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <button className="px-4 py-3 bg-white border border-slate-200 rounded-2xl text-slate-600 hover:bg-slate-50 transition-all flex items-center gap-2 font-bold text-sm">
-          <Filter className="w-4 h-4" />
-          Filters
-        </button>
       </div>
 
       {/* Orders Table */}
