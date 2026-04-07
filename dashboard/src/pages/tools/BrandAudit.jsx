@@ -704,8 +704,8 @@ const BrandAudit = () => {
                        </thead>
                        <tbody>
                          {reports
-                           .filter(r => r.query.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                                       r.topEntity?.toLowerCase().includes(searchQuery.toLowerCase()))
+                           .filter(r => (r.query || '').toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                       (r.topEntity || '').toLowerCase().includes(searchQuery.toLowerCase()))
                            .map((report) => (
                            <tr key={report.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors group">
                              <td className="py-4 px-4">

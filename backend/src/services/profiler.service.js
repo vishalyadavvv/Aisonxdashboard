@@ -122,7 +122,7 @@ const analyzeWithOpenAI = async (domain, content) => {
 const analyzeWithGemini = async (domain, content) => {
     try {
         const response = await axios.post(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
             {
                 contents: [{
                     parts: [{
@@ -204,7 +204,7 @@ const synthesizeResults = async (domain, results, websiteContent) => {
     const runGeminiSynthesis = async (prompt) => {
         try {
             const geminiRes = await axios.post(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
                 {
                     contents: [{ parts: [{ text: prompt + "\n\nOutput only the valid JSON object." }] }]
                 }

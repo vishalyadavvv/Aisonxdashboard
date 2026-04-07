@@ -16,7 +16,7 @@ const VisibilityAssessmentTable = ({ data }) => {
   const va = data.aiVisibilityAssessment;
 
   const getVisibilityLabelAndColor = (level = '') => {
-    const l = level.toLowerCase();
+    const l = (level || '').toString().toLowerCase();
     if (l.includes('very low')) return { label: '🔴 Very Low AI visibility', color: 'text-red-500' };
     if (l.includes('high') || l.includes('strong') || l.includes('stable') || l.includes('universal') || l.includes('standard')) 
       return { label: '🟢 High AI visibility', color: 'text-green-500' };
@@ -26,7 +26,7 @@ const VisibilityAssessmentTable = ({ data }) => {
   };
   
   const getBadgeStyle = (assessment = '') => {
-    const a = assessment.toLowerCase();
+    const a = (assessment || '').toString().toLowerCase();
     if (a.includes('very low')) return 'bg-red-50 text-red-600 border-red-100';
     if (a.includes('high') || a.includes('strong') || a.includes('stable') || a.includes('universal') || a.includes('established') || (a.includes('likely') && !a.includes('unlikely'))) 
       return 'bg-green-50 text-green-600 border-green-100';
@@ -38,7 +38,7 @@ const VisibilityAssessmentTable = ({ data }) => {
   };
 
   const getCleanAssessment = (a = '') => {
-    const lowA = a.toLowerCase();
+    const lowA = (a || '').toString().toLowerCase();
     if (lowA.includes('very low')) return '🔴 Very Low';
     if (lowA.includes('high') || lowA.includes('strong') || lowA.includes('stable') || lowA.includes('universal') || lowA.includes('established') || (lowA.includes('likely') && !lowA.includes('unlikely'))) return '🟢 High';
     if (lowA.includes('moderate') || lowA.includes('possible')) return '🔵 Moderate';
@@ -127,6 +127,10 @@ const AIVisibilityAudit = () => {
         if (latest.visibilityAudit) {
           const data = latest.visibilityAudit;
           setResults({ ...data, createdAt: latest.createdAt });
+          setModelResults({
+            ChatGPT: data.openai,
+            Gemini: data.gemini,
+          });
         }
       }
       setSyncLoading(false);
@@ -822,8 +826,8 @@ const AIVisibilityAudit = () => {
                   <div className="flex flex-col items-end gap-1">
                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Overall Level</span>
                     <span className={`px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-widest border 
-                      ${results.profile.aiVisibilityAssessment.overallLevel?.toLowerCase().includes('high') ? 'bg-green-50 text-green-700 border-green-100' : 
-                        results.profile.aiVisibilityAssessment.overallLevel?.toLowerCase().includes('moderate') ? 'bg-blue-50 text-blue-700 border-blue-100' : 
+                      ${(results.profile.aiVisibilityAssessment.overallLevel || '').toLowerCase().includes('high') ? 'bg-green-50 text-green-700 border-green-100' : 
+                        (results.profile.aiVisibilityAssessment.overallLevel || '').toLowerCase().includes('moderate') ? 'bg-blue-50 text-blue-700 border-blue-100' : 
                         'bg-amber-50 text-amber-700 border-amber-100'}`}>
                       {results.profile.aiVisibilityAssessment.overallLevel || 'Developing'}
                     </span>

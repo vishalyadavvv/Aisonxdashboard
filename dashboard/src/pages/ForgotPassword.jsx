@@ -15,7 +15,6 @@ const ForgotPassword = () => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-    
     try {
       await api.post('/auth/forgot-password', { email });
       setIsSent(true);
@@ -30,14 +29,12 @@ const ForgotPassword = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Animated Background Elements */}
+      {/* Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-30%] left-[-20%] w-[80%] h-[80%] bg-blue-600/20 rounded-full blur-[120px] animate-pulse" />
         <div className="absolute bottom-[-30%] right-[-20%] w-[80%] h-[80%] bg-purple-600/20 rounded-full blur-[120px] animate-pulse" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] bg-cyan-500/10 rounded-full blur-[100px]" />
-        
-        {/* Grid Pattern */}
-        <div 
+        <div
           className="absolute inset-0 opacity-20"
           style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='grid' width='60' height='60' patternUnits='userSpaceOnUse'%3E%3Cpath d='M 60 0 L 0 0 0 60' fill='none' stroke='rgba(59,130,246,0.3)' stroke-width='1'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23grid)'/%3E%3C/svg%3E")`,
@@ -47,8 +44,8 @@ const ForgotPassword = () => {
       </div>
 
       <div className="w-full max-w-6xl flex flex-col lg:flex-row gap-8 items-center z-10">
-        {/* Left Side - Brand & Security Info */}
-        <motion.div 
+        {/* Left Side */}
+        <motion.div
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6 }}
@@ -78,30 +75,8 @@ const ForgotPassword = () => {
             </p>
           </div>
 
-          {/* Security Features
-          <div className="space-y-3">
-            <div className="flex items-center gap-3 text-sm text-gray-300">
-              <div className="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              </div>
-              <span>256-bit encrypted reset link</span>
-            </div>
-            <div className="flex items-center gap-3 text-sm text-gray-300">
-              <div className="w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center">
-                <Key className="w-4 h-4 text-blue-400" />
-              </div>
-              <span>Secure one-time use token</span>
-            </div>
-            <div className="flex items-center gap-3 text-sm text-gray-300">
-              <div className="w-8 h-8 rounded-full bg-purple-500/20 border border-purple-500/30 flex items-center justify-center">
-                <Zap className="w-4 h-4 text-purple-400" />
-              </div>
-              <span>Link expires in 1 hour</span>
-            </div>
-          </div> */}
-
           {/* Help Card */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -115,59 +90,58 @@ const ForgotPassword = () => {
                 </div>
                 <div>
                   <h3 className="text-white font-semibold text-sm mb-1">Need immediate help?</h3>
-                 <p className="text-gray-400 text-xs">
-  Contact our support team at{" "}
-  <a
-    href="mailto:contact@dgtlmart.com"
-    className="text-blue-400 underline"
-  >
-    contact@dgtlmart.com
-  </a>
-</p>
+                  <p className="text-gray-400 text-xs">
+                    Contact our support team at{" "}
+                    <a href="mailto:contact@dgtlmart.com" className="text-blue-400 underline">
+                      contact@dgtlmart.com
+                    </a>
+                  </p>
                 </div>
               </div>
             </div>
           </motion.div>
         </motion.div>
 
-        {/* Right Side - Reset Form Card */}
-        <motion.div 
+        {/* Right Side - White Form Card */}
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
           className="flex-1 w-full max-w-md"
         >
           <div className="relative">
-            <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/30 to-purple-500/30 rounded-2xl blur-xl opacity-75" />
-            
-            <div className="relative bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-white/10 p-6 md:p-8">
-              <div className="text-center mb-6">
-                <div className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4 transition-all ${
-                  isSent 
-                    ? 'bg-gradient-to-br from-emerald-500 to-teal-500 shadow-lg shadow-emerald-500/25' 
+            <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur-xl opacity-75" />
+
+            <div className="relative bg-white rounded-2xl shadow-2xl p-5 md:p-6">
+              {/* Header */}
+              <div className="text-center mb-4">
+                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl mb-3 transition-all ${
+                  isSent
+                    ? 'bg-gradient-to-br from-emerald-500 to-teal-500 shadow-lg shadow-emerald-500/25'
                     : 'bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg shadow-blue-500/25'
                 }`}>
                   {isSent ? (
-                    <CheckCircle className="w-7 h-7 text-white" />
+                    <CheckCircle className="w-6 h-6 text-white" />
                   ) : (
-                    <Key className="w-7 h-7 text-white" />
+                    <Key className="w-6 h-6 text-white" />
                   )}
                 </div>
-                <h2 className="text-2xl font-bold text-white mb-2">
+                <h2 className="text-xl font-bold text-gray-900 mb-1">
                   {isSent ? 'Check Your Email' : 'Reset Password'}
                 </h2>
-                <p className="text-gray-400 text-sm">
-                  {isSent 
-                    ? `We've sent a reset link to ${email}` 
+                <p className="text-gray-500 text-sm">
+                  {isSent
+                    ? `We've sent a reset link to ${email}`
                     : 'Enter your email to receive a reset link'}
                 </p>
               </div>
 
+              {/* Error */}
               {error && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl mb-5 text-sm text-center"
+                  className="bg-red-50 border border-red-200 text-red-600 px-3 py-2 rounded-xl mb-4 text-sm text-center"
                 >
                   {error}
                 </motion.div>
@@ -181,18 +155,18 @@ const ForgotPassword = () => {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
                     onSubmit={handleSubmit}
-                    className="space-y-5"
+                    className="space-y-3"
                   >
-                    <div className="space-y-2">
-                      <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1">
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1">
                         Email Address
                       </label>
                       <div className="relative">
-                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
+                        <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                         <input
                           type="email"
                           required
-                          className="w-full bg-gray-700/50 border border-gray-600 rounded-xl py-3.5 pl-12 pr-4 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                          className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 transition-all text-sm"
                           placeholder="name@company.com"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
@@ -203,17 +177,17 @@ const ForgotPassword = () => {
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 group mt-6 disabled:opacity-70 disabled:cursor-not-allowed"
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-2.5 rounded-xl transition-all shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 mt-2 disabled:opacity-70 disabled:cursor-not-allowed text-sm"
                     >
                       {isLoading ? (
                         <div className="flex items-center gap-2">
-                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                           <span>Sending Link...</span>
                         </div>
                       ) : (
                         <>
                           Send Reset Link
-                          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                          <ArrowRight className="w-4 h-4" />
                         </>
                       )}
                     </button>
@@ -224,13 +198,14 @@ const ForgotPassword = () => {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20 }}
-                    className="space-y-5"
+                    className="space-y-4"
                   >
-                    <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 text-center">
-                      <p className="text-emerald-400 text-sm font-medium">
+                    {/* Success Box */}
+                    <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center">
+                      <p className="text-emerald-700 text-sm font-medium">
                         Password reset link sent successfully!
                       </p>
-                      <p className="text-gray-400 text-xs mt-2">
+                      <p className="text-emerald-600 text-xs mt-1">
                         Please check your inbox and spam folder.
                       </p>
                     </div>
@@ -241,19 +216,20 @@ const ForgotPassword = () => {
                         setEmail('');
                         setError('');
                       }}
-                      className="w-full bg-gray-700/50 hover:bg-gray-600/50 text-white font-bold py-3.5 rounded-xl transition-all border border-gray-600 flex items-center justify-center gap-2 group"
+                      className="w-full bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold py-2.5 rounded-xl transition-all border border-gray-200 flex items-center justify-center gap-2 text-sm"
                     >
-                      <Mail className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                      <Mail className="w-4 h-4" />
                       Try another email address
                     </button>
                   </motion.div>
                 )}
               </AnimatePresence>
 
-              <div className="mt-6 pt-5 border-t border-white/10 text-center">
-                <Link 
-                  to="/login" 
-                  className="inline-flex items-center justify-center gap-2 text-gray-400 text-sm font-medium hover:text-blue-400 transition-colors group"
+              {/* Footer */}
+              <div className="mt-4 pt-4 border-t border-gray-100 text-center">
+                <Link
+                  to="/login"
+                  className="inline-flex items-center justify-center gap-2 text-gray-500 text-sm font-medium hover:text-blue-500 transition-colors group"
                 >
                   <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                   Back to login
@@ -261,7 +237,7 @@ const ForgotPassword = () => {
               </div>
 
               {/* Trust Badges */}
-              <div className="mt-5 flex justify-center items-center gap-3 text-xs text-gray-500">
+              <div className="mt-3 flex justify-center items-center gap-3 text-xs text-gray-400">
                 <div className="flex items-center gap-1">
                   <ShieldCheck className="w-3 h-3" />
                   <span>Secure Reset</span>

@@ -243,8 +243,8 @@ const AIReadiness = () => {
   };
 
   const filteredReports = (reports || []).filter(r =>
-    r.domain?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    r.businessType?.toLowerCase().includes(searchQuery.toLowerCase())
+    (r.domain || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (r.businessType || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });

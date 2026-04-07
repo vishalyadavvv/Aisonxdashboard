@@ -17,7 +17,6 @@ const Register = () => {
   const { user, register, loading } = useAuth();
   const navigate = useNavigate();
 
-  // OTP states
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [sendingOtp, setSendingOtp] = useState(false);
@@ -26,12 +25,9 @@ const Register = () => {
   const otpRefs = useRef([]);
 
   useEffect(() => {
-    if (!loading && user) {
-      navigate('/dashboard');
-    }
+    if (!loading && user) navigate('/dashboard');
   }, [user, loading, navigate]);
 
-  // Countdown timer for resend
   useEffect(() => {
     if (countdown <= 0) return;
     const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
@@ -47,7 +43,6 @@ const Register = () => {
       setOtpSent(true);
       setCountdown(60);
       toast.success('OTP sent to your email!');
-      // Focus first OTP input
       setTimeout(() => otpRefs.current[0]?.focus(), 100);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to send OTP');
@@ -58,14 +53,10 @@ const Register = () => {
 
   const handleOtpChange = (index, value) => {
     if (!/^\d*$/.test(value)) return;
-
     const newOtp = [...otp];
     newOtp[index] = value.slice(-1);
     setOtp(newOtp);
-
-    if (value && index < 5) {
-      otpRefs.current[index + 1]?.focus();
-    }
+    if (value && index < 5) otpRefs.current[index + 1]?.focus();
   };
 
   const handleOtpKeyDown = (index, e) => {
@@ -78,8 +69,7 @@ const Register = () => {
     e.preventDefault();
     const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
     if (pastedData.length === 6) {
-      const newOtp = pastedData.split('');
-      setOtp(newOtp);
+      setOtp(pastedData.split(''));
       otpRefs.current[5]?.focus();
     }
   };
@@ -90,7 +80,6 @@ const Register = () => {
       setError('Please enter the complete 6-digit OTP');
       return;
     }
-
     setError('');
     setVerifying(true);
     try {
@@ -130,13 +119,12 @@ const Register = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Animated Background Elements */}
+      {/* Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-30%] left-[-20%] w-[80%] h-[80%] bg-blue-600/20 rounded-full blur-[120px] animate-pulse" />
         <div className="absolute bottom-[-30%] right-[-20%] w-[80%] h-[80%] bg-purple-600/20 rounded-full blur-[120px] animate-pulse" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] bg-cyan-500/10 rounded-full blur-[100px]" />
-        
-        <div 
+        <div
           className="absolute inset-0 opacity-20"
           style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='grid' width='60' height='60' patternUnits='userSpaceOnUse'%3E%3Cpath d='M 60 0 L 0 0 0 60' fill='none' stroke='rgba(59,130,246,0.3)' stroke-width='1'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23grid)'/%3E%3C/svg%3E")`,
@@ -146,8 +134,8 @@ const Register = () => {
       </div>
 
       <div className="w-full max-w-6xl flex flex-col lg:flex-row gap-8 items-center z-10">
-        {/* Left Side - Brand Section */}
-        <motion.div 
+        {/* Left Side */}
+        <motion.div
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6 }}
@@ -177,7 +165,6 @@ const Register = () => {
             </p>
           </div>
 
-          {/* Benefits List */}
           <div className="space-y-3">
             {[
               '7-day free trial on all features',
@@ -194,8 +181,7 @@ const Register = () => {
             ))}
           </div>
 
-          {/* Stats Card */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -228,44 +214,46 @@ const Register = () => {
           </motion.div>
         </motion.div>
 
-        {/* Right Side - Registration Card */}
-        <motion.div 
+        {/* Right Side - White Form Card */}
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
           className="flex-1 w-full max-w-md"
         >
           <div className="relative">
-            <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/30 to-purple-500/30 rounded-2xl blur-xl opacity-75" />
-            
-            <div className="relative bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-white/10 p-6 md:p-8">
-              <div className="text-center mb-6">
-                <div className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4 transition-all ${
-                  otpSent 
-                    ? 'bg-gradient-to-br from-emerald-500 to-teal-500 shadow-lg shadow-emerald-500/25' 
+            <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur-xl opacity-75" />
+
+            <div className="relative bg-white rounded-2xl shadow-2xl p-5 md:p-6">
+              {/* Header */}
+              <div className="text-center mb-4">
+                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl mb-3 transition-all ${
+                  otpSent
+                    ? 'bg-gradient-to-br from-emerald-500 to-teal-500 shadow-lg shadow-emerald-500/25'
                     : 'bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg shadow-blue-500/25'
                 }`}>
                   {otpSent ? (
-                    <ShieldCheck className="w-7 h-7 text-white" />
+                    <ShieldCheck className="w-6 h-6 text-white" />
                   ) : (
-                    <Sparkles className="w-7 h-7 text-white" />
+                    <Sparkles className="w-6 h-6 text-white" />
                   )}
                 </div>
-                <h2 className="text-2xl font-bold text-white mb-2">
+                <h2 className="text-xl font-bold text-gray-900 mb-1">
                   {otpSent ? 'Verify Your Email' : 'Create Account'}
                 </h2>
                 {otpSent && (
-                  <p className="text-gray-400 text-sm">
-                    OTP sent to <span className="text-blue-400 font-semibold">{email}</span>
+                  <p className="text-gray-500 text-sm">
+                    OTP sent to <span className="text-blue-500 font-semibold">{email}</span>
                   </p>
                 )}
               </div>
 
+              {/* Error */}
               {error && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl mb-5 text-sm text-center"
+                  className="bg-red-50 border border-red-200 text-red-600 px-3 py-2 rounded-xl mb-4 text-sm text-center"
                 >
                   {error}
                 </motion.div>
@@ -279,19 +267,19 @@ const Register = () => {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
                     onSubmit={handleSendOTP}
-                    className="space-y-4"
+                    className="space-y-3"
                   >
-                    {/* Name Field */}
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1">
+                    {/* Name */}
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1">
                         Full Name
                       </label>
                       <div className="relative">
-                        <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
+                        <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                         <input
                           type="text"
                           required
-                          className="w-full bg-gray-700/50 border border-gray-600 rounded-xl py-3.5 pl-12 pr-4 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                          className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 transition-all text-sm"
                           placeholder="John Doe"
                           value={name}
                           onChange={(e) => setName(e.target.value)}
@@ -299,17 +287,17 @@ const Register = () => {
                       </div>
                     </div>
 
-                    {/* Email Field */}
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1">
+                    {/* Email */}
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1">
                         Email Address
                       </label>
                       <div className="relative">
-                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
+                        <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                         <input
                           type="email"
                           required
-                          className="w-full bg-gray-700/50 border border-gray-600 rounded-xl py-3.5 pl-12 pr-4 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                          className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 transition-all text-sm"
                           placeholder="name@company.com"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
@@ -317,19 +305,19 @@ const Register = () => {
                       </div>
                     </div>
 
-                    {/* Phone Field */}
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1">
+                    {/* Phone */}
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1">
                         Phone Number
                       </label>
                       <div className="relative">
-                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
+                        <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                         <input
                           type="tel"
                           required
                           pattern="[0-9]{10}"
                           title="Please enter a valid 10-digit phone number"
-                          className="w-full bg-gray-700/50 border border-gray-600 rounded-xl py-3.5 pl-12 pr-4 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                          className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 transition-all text-sm"
                           placeholder="10-digit mobile number"
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
@@ -337,17 +325,17 @@ const Register = () => {
                       </div>
                     </div>
 
-                    {/* Password Field */}
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1">
+                    {/* Password */}
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1">
                         Password
                       </label>
                       <div className="relative">
-                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
+                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                         <input
                           type={showPassword ? "text" : "password"}
                           required
-                          className="w-full bg-gray-700/50 border border-gray-600 rounded-xl py-3.5 pl-12 pr-12 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                          className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-10 pr-10 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 transition-all text-sm"
                           placeholder="••••••••"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
@@ -355,9 +343,9 @@ const Register = () => {
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                         >
-                          {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
                     </div>
@@ -365,12 +353,12 @@ const Register = () => {
                     <button
                       type="submit"
                       disabled={sendingOtp}
-                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 mt-4 disabled:opacity-70 disabled:cursor-not-allowed"
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-2.5 rounded-xl transition-all shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 mt-2 disabled:opacity-70 disabled:cursor-not-allowed text-sm"
                     >
                       {sendingOtp ? (
-                        <><Loader2 className="w-5 h-5 animate-spin" /> Sending OTP...</>
+                        <><Loader2 className="w-4 h-4 animate-spin" /> Sending OTP...</>
                       ) : (
-                        <>Send OTP <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" /></>
+                        <>Send OTP <ArrowRight className="w-4 h-4" /></>
                       )}
                     </button>
                   </motion.form>
@@ -380,13 +368,13 @@ const Register = () => {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20 }}
-                    className="space-y-6"
+                    className="space-y-5"
                   >
                     <div className="space-y-3">
-                      <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1 block text-center">
+                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block text-center">
                         Enter 6-digit OTP
                       </label>
-                      <div className="flex justify-center gap-2 sm:gap-3" onPaste={handleOtpPaste}>
+                      <div className="flex justify-center gap-2" onPaste={handleOtpPaste}>
                         {otp.map((digit, index) => (
                           <input
                             key={index}
@@ -397,10 +385,10 @@ const Register = () => {
                             value={digit}
                             onChange={(e) => handleOtpChange(index, e.target.value)}
                             onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                            className={`w-10 h-12 sm:w-12 sm:h-14 text-center text-xl font-bold rounded-xl border-2 transition-all outline-none
-                              ${digit 
-                                ? 'border-blue-500 bg-blue-500/20 text-blue-400' 
-                                : 'border-gray-600 bg-gray-700/50 text-white'
+                            className={`w-10 h-12 text-center text-lg font-bold rounded-xl border-2 transition-all outline-none
+                              ${digit
+                                ? 'border-blue-500 bg-blue-50 text-blue-600'
+                                : 'border-gray-200 bg-gray-50 text-gray-900'
                               }
                               focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20`}
                           />
@@ -411,26 +399,26 @@ const Register = () => {
                     <button
                       onClick={handleVerifyOTP}
                       disabled={verifying || otp.join('').length !== 6}
-                      className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                      className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-2.5 rounded-xl transition-all shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed text-sm"
                     >
                       {verifying ? (
-                        <><Loader2 className="w-5 h-5 animate-spin" /> Verifying...</>
+                        <><Loader2 className="w-4 h-4 animate-spin" /> Verifying...</>
                       ) : (
-                        <><ShieldCheck className="w-5 h-5" /> Verify & Create Account</>
+                        <><ShieldCheck className="w-4 h-4" /> Verify & Create Account</>
                       )}
                     </button>
 
                     <div className="flex items-center justify-between text-sm">
                       <button
                         onClick={handleEditDetails}
-                        className="text-gray-400 hover:text-blue-400 font-medium transition-colors"
+                        className="text-gray-500 hover:text-blue-500 font-medium transition-colors"
                       >
                         ← Edit Details
                       </button>
                       <button
                         onClick={handleResendOTP}
                         disabled={countdown > 0 || sendingOtp}
-                        className={`font-bold transition-colors ${countdown > 0 ? 'text-gray-500 cursor-not-allowed' : 'text-blue-400 hover:text-blue-300'}`}
+                        className={`font-bold transition-colors ${countdown > 0 ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-600'}`}
                       >
                         {sendingOtp ? 'Sending...' : countdown > 0 ? `Resend in ${countdown}s` : 'Resend OTP'}
                       </button>
@@ -439,22 +427,21 @@ const Register = () => {
                 )}
               </AnimatePresence>
 
-              <div className="mt-6 pt-5 border-t border-white/10 text-center">
-                <p className="text-gray-400 text-sm">
+              {/* Footer */}
+              <div className="mt-4 pt-4 border-t border-gray-100 text-center">
+                <p className="text-gray-500 text-sm">
                   Already have an account?{' '}
-                  <Link to="/login" className="text-blue-400 font-semibold hover:text-blue-300 transition-colors">
+                  <Link to="/login" className="text-blue-500 font-semibold hover:text-blue-600 transition-colors">
                     Log in instead
                   </Link>
                 </p>
               </div>
 
-              {/* Trust Badges */}
-              <div className="mt-5 flex justify-center items-center gap-3 text-xs text-gray-500">
+              <div className="mt-3 flex justify-center items-center text-xs text-gray-400">
                 <div className="flex items-center gap-1">
                   <ShieldCheck className="w-3 h-3" />
                   <span>Secure Registration</span>
                 </div>
-                <div>•</div>
               </div>
             </div>
           </div>

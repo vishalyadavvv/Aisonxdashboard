@@ -482,7 +482,7 @@ const internalRunProjectScan = async (project) => {
         // *** INTERNAL AUDIT PROFILE RECONCILIATION ***
         // Detect hallucinations in the audit profile
         const isInternalAuditFound = (model) => {
-            if (!model) return false;
+            if (!model || model.status === 'failed' || model.error) return false;
             const status = (model.brandStatus || '').toLowerCase();
             const foundFlag = model.entityRecognition?.found;
             return !status.includes('not found') && foundFlag !== false;
@@ -492,8 +492,14 @@ const internalRunProjectScan = async (project) => {
         const auditScores = [];
         Object.keys(auditModelResults).forEach(key => {
             const m = auditModelResults[key];
+            if (!m || m.status === 'failed' || m.error) {
+                return; // Skip failed models completely so they don't drag the average down
+            }
             if (isInternalAuditFound(m)) {
-                auditScores.push(m.aiVisibilityAssessment?.visibilityScore || 15);
+                let score = m.aiVisibilityAssessment?.visibilityScore;
+                if (score === undefined || score === null) score = m.visibilityScore;
+                if (score === undefined || score === null) score = m.sentimentScore;
+                auditScores.push(Number(score) || 15);
             } else {
                 auditScores.push(0);
             }

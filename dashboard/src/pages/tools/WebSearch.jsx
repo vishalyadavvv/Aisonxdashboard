@@ -664,12 +664,12 @@ const WebSearch = () => {
                   <div className="flex flex-col items-end gap-1">
                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Overall Level</span>
                     <span className={`px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-widest border 
-                      ${profile.aiVisibilityAssessment.overallLevel?.toLowerCase().includes('high') ? 'bg-green-50 text-green-700 border-green-100' : 
-                        profile.aiVisibilityAssessment.overallLevel?.toLowerCase().includes('moderate') ? 'bg-blue-50 text-blue-700 border-blue-100' : 
+                      ${(profile.aiVisibilityAssessment.overallLevel || '').toLowerCase().includes('high') ? 'bg-green-50 text-green-700 border-green-100' : 
+                        (profile.aiVisibilityAssessment.overallLevel || '').toLowerCase().includes('moderate') ? 'bg-blue-50 text-blue-700 border-blue-100' : 
                         'bg-amber-50 text-amber-700 border-amber-100'}`}>
-                      {profile.aiVisibilityAssessment.overallLevel?.toLowerCase().includes('high') ? '🟢 High AI visibility' : 
-                       profile.aiVisibilityAssessment.overallLevel?.toLowerCase().includes('moderate') ? '🔵 Moderate AI visibility' : 
-                       profile.aiVisibilityAssessment.overallLevel?.toLowerCase().includes('low') ? '🟡 Low AI visibility' : '🔴 Very Low AI visibility'}
+                      {(profile.aiVisibilityAssessment.overallLevel || '').toLowerCase().includes('high') ? '🟢 High AI visibility' : 
+                       (profile.aiVisibilityAssessment.overallLevel || '').toLowerCase().includes('moderate') ? '🔵 Moderate AI visibility' : 
+                       (profile.aiVisibilityAssessment.overallLevel || '').toLowerCase().includes('low') ? '🟡 Low AI visibility' : '🔴 Very Low AI visibility'}
                     </span>
                   </div>
                 </div>

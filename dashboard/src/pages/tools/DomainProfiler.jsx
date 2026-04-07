@@ -114,9 +114,9 @@ const DomainProfiler = () => {
   };
 
   const filteredReports = reports.filter(r =>
-    r.domain?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    r.domainType?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    r.brandType?.toLowerCase().includes(searchQuery.toLowerCase())
+    (r.domain || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (r.domainType || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (r.brandType || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const formatDate = (dateStr) => {

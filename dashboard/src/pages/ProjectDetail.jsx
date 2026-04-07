@@ -185,10 +185,14 @@ const ProjectDetail = () => {
       top3 = (t3Count / total) * 100;
     }
 
-    // Recalculate overall score for filtered view if specific engine
     let overallScore = lastSnapshot.overallScore || 0;
     if (selectedEngine !== 'all') {
       overallScore = Math.round((mentions + links) / 2);
+    }
+    
+    let rawVisibility = 0;
+    if (filteredRankings.length > 0) {
+      rawVisibility = Math.round(filteredRankings.reduce((a, b) => a + (b.score || 0), 0) / filteredRankings.length);
     }
     
     return {
@@ -196,7 +200,8 @@ const ProjectDetail = () => {
       link: Math.round(links),
       top3: Math.round(top3),
       sources: lastSnapshot.authoritySignals?.webGroundedRecency || 0,
-      overallScore
+      overallScore,
+      rawVisibility
     };
   }, [lastSnapshot, selectedEngine]);
 
@@ -421,8 +426,8 @@ const ProjectDetail = () => {
                     <Info className="w-3 h-3 text-slate-300" />
                   </h3>
                 </div>
-                <div className="flex flex-col items-center justify-center pt-2">
-                  <div className="relative w-28 h-28 group">
+                <div className="flex items-center justify-between pt-2 gap-4">
+                  <div className="relative w-24 h-24 shrink-0 group">
                     <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
                       <defs>
                         <linearGradient id="scoreGaugeGradient" x1="0" y1="0" x2="1" y2="1">
@@ -440,9 +445,13 @@ const ProjectDetail = () => {
                       />
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <span className="text-3xl font-black text-slate-900 leading-none tracking-tight">{stats.overallScore}%</span>
+                      <span className="text-2xl font-black text-slate-900 leading-none tracking-tight">{stats.overallScore}%</span>
                       <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1">Health</span>
                     </div>
+                  </div>
+                  <div className="w-full h-24 bg-slate-50/80 border border-slate-100 rounded-xl p-3 flex flex-col items-center justify-center text-center">
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-tight">True Search<br/>Visibility</span>
+                    <span className="text-2xl font-black text-blue-600 leading-none mt-2">{stats.rawVisibility}%</span>
                   </div>
                 </div>
               </motion.div>
@@ -913,38 +922,44 @@ const ProjectDetail = () => {
         ) : (
           /* Competitor Comparison Tab */
           <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {project?.competitors?.map((comp, idx) => {
-                // Domain normalization for robust matching
-                const normalize = (d) => (d || '').toLowerCase().replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '').trim();
-                const targetDomain = normalize(comp.domain);
+            {(() => {
+              const userRawVisibility = stats.rawVisibility;
 
-                // Find latest score for this competitor from last snapshot
-                // RELAXED MATCHING: Try domain match first, then fallback to name match
-                const compRankings = lastSnapshot?.competitorRankings?.filter(cr => {
-                  const aiDomain = normalize(cr.competitorDomain);
-                  const isDomainMatch = aiDomain && targetDomain && aiDomain === targetDomain;
-                  const isNameMatch = cr.competitorName?.toLowerCase() === comp.name?.toLowerCase();
-                  return isDomainMatch || isNameMatch;
-                }) || [];
+              return (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {project?.competitors?.map((comp, idx) => {
+                      // Domain normalization for robust matching
+                      const normalize = (d) => (d || '').toLowerCase().replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '').trim();
+                      const targetDomain = normalize(comp.domain);
 
-                const compScoreInput = compRankings.length > 0
-                  ? Math.round(compRankings.reduce((a, b) => a + (b.score || 0), 0) / compRankings.length)
-                  : 0;
-                
-                // Ensure UI reflects the new backend floor (at least 15 for found)
-                const compScore = (compRankings.some(cr => cr.found || cr.rank > 0) && compScoreInput < 15) ? 15 : compScoreInput;
-                
-                const gap = compScore - stats.overallScore;
-                
-                // Dynamic market status labels
-                const getMarketStatus = (score) => {
-                  if (score === 0) return 'N/A';
-                  if (score < 20) return 'Nascent Presence';
-                  if (score < 50) return 'Growing Rival';
-                  if (score < 80) return 'Core Competitor';
-                  return 'Dominant Authority';
-                };
+                      // Find latest score for this competitor from last snapshot
+                      // RELAXED MATCHING: Try domain match first, then fallback to name match
+                      const compRankings = lastSnapshot?.competitorRankings?.filter(cr => {
+                        const aiDomain = normalize(cr.competitorDomain);
+                        const isDomainMatch = aiDomain && targetDomain && aiDomain === targetDomain;
+                        const isNameMatch = cr.competitorName?.toLowerCase() === comp.name?.toLowerCase();
+                        return isDomainMatch || isNameMatch;
+                      }) || [];
+
+                      const compScoreInput = compRankings.length > 0
+                        ? Math.round(compRankings.reduce((a, b) => a + (b.score || 0), 0) / compRankings.length)
+                        : 0;
+                      
+                      // Ensure UI reflects the new backend floor (at least 15 for found)
+                      const compScore = (compRankings.some(cr => cr.found || cr.rank > 0) && compScoreInput < 15) ? 15 : compScoreInput;
+                      
+                      // Fair comparison using raw visibility, not the penalized health score
+                      const gap = compScore - userRawVisibility;
+                      
+                      // Dynamic market status labels
+                      const getMarketStatus = (score) => {
+                        if (score === 0) return 'N/A';
+                        if (score < 20) return 'Nascent Presence';
+                        if (score < 50) return 'Growing Rival';
+                        if (score < 80) return 'Core Competitor';
+                        return 'Dominant Authority';
+                      };
 
                 return (
                   <motion.div 
@@ -952,11 +967,17 @@ const ProjectDetail = () => {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: idx * 0.1 }}
-                    className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm relative overflow-hidden group"
+                    className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm relative overflow-visible group cursor-default"
                   >
-                    <div className="absolute top-0 right-0 p-4">
+                    <div className="absolute top-0 right-0 p-4 z-20">
                       <div className={`text-[10px] font-black uppercase px-2 py-1 rounded-full ${gap > 0 ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600'}`}>
-                         {gap > 0 ? `+${gap}% LEAD` : `${gap}% GAP`}
+                         {gap > 0 ? `+${gap}% LEAD` : `${Math.abs(gap)}% GAP`}
+                      </div>
+                      <div className="absolute top-full right-4 mt-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 w-48 text-right bg-slate-900 rounded-lg p-2 shadow-xl whitespace-normal break-words">
+                        <p className="text-[9px] font-bold text-white uppercase tracking-widest leading-relaxed">
+                           Fair Comparison:<br/>
+                           Their Visibility ({compScore}%) <br/>vs<br/> YOUR Raw Visibility ({userRawVisibility}%)
+                        </p>
                       </div>
                     </div>
                     
@@ -1016,7 +1037,7 @@ const ProjectDetail = () => {
                     <thead>
                       <tr className="bg-slate-50/50">
                         <th className="px-8 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Prompt / Entity</th>
-                        <th className="px-8 py-4 text-[10px] font-bold text-blue-600 uppercase tracking-widest">YOU ({stats.overallScore}%)</th>
+                        <th className="px-8 py-4 text-[10px] font-bold text-blue-600 uppercase tracking-widest">YOU ({userRawVisibility}%)</th>
                         {project?.competitors?.map((comp, idx) => (
                            <th key={idx} className="px-8 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                              {comp.name}
@@ -1112,6 +1133,9 @@ const ProjectDetail = () => {
                 </div>
               </div>
             )}
+            </>
+            );
+            })()}
           </div>
         )}
       </div>

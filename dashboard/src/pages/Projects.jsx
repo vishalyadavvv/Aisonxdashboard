@@ -631,7 +631,7 @@ const Projects = () => {
                       <input
                         required
                         type="text"
-                        placeholder="e.g. nike.com"
+                        placeholder="e.g. nike.in"
                         value={newProject.domain}
                         onChange={(e) => setNewProject({...newProject, domain: e.target.value})}
                         className="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-50 transition-all outline-none"

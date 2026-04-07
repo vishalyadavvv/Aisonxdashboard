@@ -364,22 +364,7 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
                   </div>
 
                   <SidebarSection title="ACCOUNT">
-                    <div className="px-4 py-2 flex items-center gap-3 text-white/70">
-                      <Settings className="w-4 h-4" />
-                      <span className="text-[13px] font-bold">Settings</span>
-                      <ChevronDown className="w-3 h-3 ml-auto" />
-                    </div>
-                    <div className="px-4 py-2">
-                       <button 
-                         onClick={() => {
-                           setIsOpen(false);
-                           navigate('/dashboard/settings');
-                         }}
-                         className="w-full bg-blue-600/10 text-blue-400 text-[11px] font-black uppercase tracking-widest py-3 rounded-xl border border-blue-500/20 hover:bg-blue-600/20 transition-all font-bold"
-                       >
-                         Profile Settings
-                       </button>
-                    </div>
+                    <ContextItem to="/dashboard/settings" icon={Settings} label="Profile Settings" onClick={() => setIsOpen(false)} />
                   </SidebarSection>
                 </div>
               ) : (

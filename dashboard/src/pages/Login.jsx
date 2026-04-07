@@ -178,130 +178,132 @@ const Login = () => {
           </motion.div>
         </motion.div>
 
-        {/* Right Side - Login Card */}
+       {/* Right Side - Login Card */}
+<motion.div 
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.6, delay: 0.1 }}
+  className="flex-1 w-full max-w-md"
+>
+  <div className="relative">
+    {/* Card Glow Effect */}
+    <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur-xl opacity-75" />
+    
+    {/* ✅ Changed: bg-white, text colors updated for light bg */}
+    <div className="relative bg-white rounded-2xl shadow-2xl p-6 md:p-8">
+      
+      {/* Header */}
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl mb-5 shadow-lg shadow-blue-500/25">
+          <Sparkles className="w-7 h-7 text-white" />
+        </div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back</h2>
+        <p className="text-gray-500 text-sm">Login to access your GEO dashboard</p>
+      </div>
+
+      {/* Error Message */}
+      {error && (
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="flex-1 w-full max-w-md"
+          className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl mb-6 text-sm text-center"
         >
-          <div className="relative">
-            {/* Card Glow Effect */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/30 to-purple-500/30 rounded-2xl blur-xl opacity-75" />
-            
-            <div className="relative bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-white/10 p-6 md:p-8">
-              {/* Header */}
-              <div className="text-center mb-8">
-                <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl mb-5 shadow-lg shadow-blue-500/25">
-                  <Sparkles className="w-7 h-7 text-white" />
-                </div>
-                <h2 className="text-2xl font-bold text-white mb-2">Welcome Back</h2>
-                <p className="text-gray-400 text-sm">Login to access your GEO dashboard</p>
-              </div>
-
-              {/* Error Message */}
-              {error && (
-                <motion.div 
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl mb-6 text-sm text-center"
-                >
-                  {error}
-                </motion.div>
-              )}
-
-              {/* Login Form */}
-              <form onSubmit={handleSubmit} className="space-y-5">
-                {/* Email Field */}
-                <div className="space-y-2">
-                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1">
-                    Email Address
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
-                    <input
-                      type="email"
-                      required
-                      className="w-full bg-gray-700/50 border border-gray-600 rounded-xl py-3.5 pl-12 pr-4 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
-                      placeholder="name@company.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                {/* Password Field */}
-                <div className="space-y-2">
-                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1">
-                    Password
-                  </label>
-                  <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      required
-                      className="w-full bg-gray-700/50 border border-gray-600 rounded-xl py-3.5 pl-12 pr-12 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
-                    >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                    </button>
-                  </div>
-                  <div className="flex justify-end mt-1">
-                    <Link to="/forgot-password" className="text-xs font-semibold text-blue-400 hover:text-blue-300 transition-colors">
-                      Forgot Password?
-                    </Link>
-                  </div>
-                </div>
-
-                {/* Submit Button */}
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 group mt-6 disabled:opacity-70 disabled:cursor-not-allowed"
-                >
-                  {isLoading ? (
-                    <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      <span>Verifying...</span>
-                    </div>
-                  ) : (
-                    <>
-                      Continue
-                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    </>
-                  )}
-                </button>
-              </form>
-
-              {/* Sign Up Link */}
-              <div className="mt-8 pt-6 border-t border-white/10 text-center">
-                <p className="text-gray-400 text-sm">
-                  Don't have an account?{' '}
-                  <Link to="/register" className="text-blue-400 font-semibold hover:text-blue-300 transition-colors">
-                    Create an account
-                  </Link>
-                </p>
-              </div>
-
-              {/* Trust Badges */}
-              <div className="mt-6 flex justify-center items-center gap-4 text-xs text-gray-500">
-                <div className="flex items-center gap-1">
-                  <Shield className="w-3 h-3" />
-                  <span>Enterprise Grade</span>
-                </div>
-                <div>•</div>
-                <div>24/7 Support</div>
-              </div>
-            </div>
-          </div>
+          {error}
         </motion.div>
+      )}
+
+      {/* Login Form */}
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Email Field */}
+        <div className="space-y-2">
+          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1">
+            Email Address
+          </label>
+          <div className="relative">
+            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="email"
+              required
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 pl-12 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 transition-all"
+              placeholder="name@company.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+        </div>
+
+        {/* Password Field */}
+        <div className="space-y-2">
+          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1">
+            Password
+          </label>
+          <div className="relative">
+            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type={showPassword ? "text" : "password"}
+              required
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 pl-12 pr-12 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 transition-all"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            </button>
+          </div>
+          <div className="flex justify-end mt-1">
+            <Link to="/forgot-password" className="text-xs font-semibold text-blue-500 hover:text-blue-600 transition-colors">
+              Forgot Password?
+            </Link>
+          </div>
+        </div>
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 group mt-6 disabled:opacity-70 disabled:cursor-not-allowed"
+        >
+          {isLoading ? (
+            <div className="flex items-center gap-2">
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <span>Verifying...</span>
+            </div>
+          ) : (
+            <>
+              Continue
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </>
+          )}
+        </button>
+      </form>
+
+      {/* Sign Up Link */}
+      <div className="mt-8 pt-6 border-t border-gray-100 text-center">
+        <p className="text-gray-500 text-sm">
+          Don't have an account?{' '}
+          <Link to="/register" className="text-blue-500 font-semibold hover:text-blue-600 transition-colors">
+            Create an account
+          </Link>
+        </p>
+      </div>
+
+      {/* Trust Badges */}
+      <div className="mt-6 flex justify-center items-center gap-4 text-xs text-gray-400">
+        <div className="flex items-center gap-1">
+          <Shield className="w-3 h-3" />
+          <span>Enterprise Grade</span>
+        </div>
+        <div>•</div>
+        <div>24/7 Support</div>
+      </div>
+    </div>
+  </div>
+</motion.div>
       </div>
     </div>
   );
