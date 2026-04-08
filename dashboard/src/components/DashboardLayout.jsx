@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import Sidebar from './Sidebar';
 import { Outlet, useLocation, Link } from 'react-router-dom';
@@ -9,6 +9,14 @@ const DashboardLayout = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  const mainRef = useRef(null);
+
+  useEffect(() => {
+    if (mainRef.current) {
+      mainRef.current.scrollTo(0, 0);
+    }
+  }, [location.pathname]);
 
   const isExpired = user?.subscription?.status === 'expired';
   const isPricingPage = location.pathname === '/dashboard/pricing';
@@ -20,7 +28,7 @@ const DashboardLayout = () => {
         isOpen={isMobileMenuOpen} 
         setIsOpen={setIsMobileMenuOpen} 
       />
-      <main className="flex-1 overflow-y-auto w-full">
+      <main ref={mainRef} className="flex-1 overflow-y-auto w-full">
         <header className="h-16 border-b border-gray-200/80 flex items-center justify-between px-4 md:px-5 sticky top-0 bg-white/80 backdrop-blur-xl z-20">
           <div className="flex items-center gap-3">
             <button 

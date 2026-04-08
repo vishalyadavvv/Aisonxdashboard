@@ -687,8 +687,16 @@ const AIReadiness = () => {
           {results.queries?.length > 0 && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}
               className="bg-white border border-gray-200/60 rounded-2xl p-8 mb-6">
-              <h3 className="text-lg font-bold text-[#1E293B] mb-1">Visibility Prediction Results</h3>
-              <p className="text-sm text-gray-400 mb-6">Comparison of AI-expected pages vs actual sitemap content</p>
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-lg font-bold text-[#1E293B] mb-1">Visibility Prediction Results</h3>
+                  <p className="text-sm text-gray-400">Comparison of AI-expected pages vs actual sitemap content</p>
+                </div>
+                <div className="bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-lg flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-blue-500" />
+                  <span className="text-[10px] font-bold text-blue-700 uppercase">AI-Predicted Opportunities</span>
+                </div>
+              </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
@@ -730,8 +738,15 @@ const AIReadiness = () => {
           {results.queries?.length > 0 && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}
               className="bg-white border border-gray-200/60 rounded-2xl p-8 mb-6">
-              <h3 className="text-lg font-bold text-[#1E293B] mb-1">Fan-Out Query Mappings</h3>
-              <p className="text-sm text-gray-400 mb-6">AI-predicted queries and expected URL paths ({results.queries.length} queries generated)</p>
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-lg font-bold text-[#1E293B] mb-1">Fan-Out Query Mappings</h3>
+                  <p className="text-sm text-gray-400">These are typical queries AI models use to find your business. We recommend having specific pages for each.</p>
+                </div>
+                <div className="hidden md:flex items-center gap-2">
+                  <div className="text-[10px] bg-gray-100 text-gray-500 font-bold px-2 py-1 rounded">Aware of {results.totalSitemapUrls} existing pages</div>
+                </div>
+              </div>
               
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">

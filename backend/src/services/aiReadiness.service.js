@@ -165,7 +165,7 @@ async function parseSitemap(sitemapUrl, discoveredSubSitemaps = []) {
         // Check if it's a sitemap index
         if (result.sitemapindex && result.sitemapindex.sitemap) {
             const sitemaps = result.sitemapindex.sitemap;
-            for (let i = 0; i < Math.min(sitemaps.length, 10); i++) { // Increased to 10
+            for (let i = 0; i < sitemaps.length; i++) { // Process ALL sub-sitemaps
                 const subUrl = sitemaps[i].loc[0];
                 if (!discoveredSubSitemaps.includes(subUrl)) {
                     discoveredSubSitemaps.push(subUrl);
@@ -277,11 +277,24 @@ function normalizePath(path) {
 async function generateAndCheckQueries(baseUrl, sitemapUrls, businessType) {
     let queriesToCheck = [];
     
+    // Provide a sample of existing pages to the AI for better context
+    const sitemapSample = sitemapUrls.slice(0, 50).map(u => extractPath(u)).join(', ');
+    
     try {
         console.log(`Generating Dynamic Fan-Out Queries for ${baseUrl} (${businessType}) using OpenAI...`);
-        const prompt = `You are an expert AI Search optimization engine. Analyze what queries users would ask AI systems (like ChatGPT or Perplexity) to find pages on a ${businessType} website like ${baseUrl}.
-Generate exactly 9 high-intent Fan-Out Sub-Queries that a well-structured website in this niche MUST have.
-Return ONLY a raw JSON array of objects. Do not wrap in markdown tags like \`\`\`json. Each object must have:
+        const prompt = `You are an expert AI Search optimization engine.
+Analyze what queries users would ask AI systems (like ChatGPT or Perplexity) to find pages on a ${businessType} website: ${baseUrl}.
+
+EXISTING PAGES (Sitemap Sample):
+${sitemapSample || "No pages found in sitemap yet."}
+
+TASK:
+1. Review the existing pages above.
+2. Generate exactly 9 high-intent Fan-Out Sub-Queries that a well-structured website in this niche MUST have.
+3. If an existing page already satisfies a query perfectly, use its path.
+4. If a query is NOT satisfied by an existing page, suggest the BEST SEO-friendly path for it.
+
+Return ONLY a raw JSON array of objects. Each object must have:
 - "parentQuery": A broad category query (e.g. "Content Creation Strategies")
 - "query": The specific sub-query someone might ask an AI (e.g. "What are the latest tools for content creation?")
 - "path": The expected URL slug/path where the answer should live (e.g., "/blog/content-tools/")
@@ -325,15 +338,31 @@ Return ONLY a raw JSON array of objects. Do not wrap in markdown tags like \`\`\
         }
     }
 
-    // Check each unique query against sitemap
-    console.log(`Checking ${queriesToCheck.length} queries against sitemap...`);
+    // Check each unique query against sitemap AND fallback to direct check
+    console.log(`Checking ${queriesToCheck.length} queries against sitemap and live site...`);
     const sitemapPaths = sitemapUrls.map(url => normalizePath(extractPath(url)));
     
-    return queriesToCheck.map(queryInfo => {
+    const results = await Promise.all(queriesToCheck.map(async (queryInfo) => {
         const expectedPath = normalizePath(queryInfo.path);
-        const isPresent = sitemapPaths.some(path => 
-            path.includes(expectedPath) || path.startsWith(expectedPath)
+        
+        // 1. Check Sitemap First
+        let isPresent = sitemapPaths.some(path => 
+            path === expectedPath || path.startsWith(expectedPath + '/') || (expectedPath !== '/' && path.includes(expectedPath))
         );
+        
+        // 2. Fallback: Direct Live Verification (if sitemap check fails)
+        if (!isPresent && expectedPath !== '/') {
+            try {
+                const fullUrl = new URL(queryInfo.path, baseUrl).href;
+                const checkRes = await fetchUrlResponse(fullUrl, 5000); // Quick check
+                if (checkRes && checkRes.status === 200) {
+                    isPresent = true;
+                    console.log(`[Readiness] Direct check confirmed page exists: ${fullUrl}`);
+                }
+            } catch (err) {
+                // Ignore errors, stay "missing"
+            }
+        }
         
         return {
             parentQuery: queryInfo.parentQuery || 'General Query',
@@ -345,7 +374,9 @@ Return ONLY a raw JSON array of objects. Do not wrap in markdown tags like \`\`\
             status: isPresent ? 'present' : 'missing',
             action: isPresent ? 'No Action Needed' : 'Create Page'
         };
-    });
+    }));
+
+    return results;
 }
 
 const { fetchOpenAI } = require('./ai_internal/openai.service');

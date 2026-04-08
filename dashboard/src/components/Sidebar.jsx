@@ -324,9 +324,9 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
                     </option>
                   ))}
                 </select>
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1 z-10">
-                  <ChevronDown className="w-4 h-4 text-indigo-400 pointer-events-none opacity-40 group-hover:opacity-100" />
-                  <button className="md:hidden p-1 hover:bg-white/10 rounded-md text-indigo-400 transition-colors">
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1 z-10 pointer-events-none">
+                  <ChevronDown className="w-4 h-4 text-indigo-400 opacity-40 group-hover:opacity-100" />
+                  <button className="md:hidden p-1 hover:bg-white/10 rounded-md text-indigo-400 transition-colors pointer-events-auto">
                     <MoreVertical className="w-3.5 h-3.5" />
                   </button>
                 </div>

@@ -297,33 +297,33 @@ const ProjectDetail = () => {
             <span className="text-slate-900 font-semibold underline underline-offset-4 decoration-blue-500/30">Analytics</span>
           </div>
           
-          <div className="flex items-center gap-3">
-            <div className="flex bg-white border border-slate-200 rounded-xl p-1 shadow-sm">
+          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+            <div className="flex bg-white border border-slate-200 rounded-xl p-1 shadow-sm w-full sm:w-auto justify-center">
               <button 
                 onClick={() => setActiveMainTab('overview')}
-                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeMainTab === 'overview' ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'text-slate-500 hover:text-slate-700'}`}
+                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex-1 sm:flex-none ${activeMainTab === 'overview' ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'text-slate-500 hover:text-slate-700'}`}
               >
                 Overview
               </button>
               <button 
                 onClick={() => setActiveMainTab('competitors')}
-                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeMainTab === 'competitors' ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'text-slate-500 hover:text-slate-700'}`}
+                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex-1 sm:flex-none ${activeMainTab === 'competitors' ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'text-slate-500 hover:text-slate-700'}`}
               >
                 Competitors
               </button>
             </div>
-            <div className="h-8 w-px bg-slate-200 mx-1" />
+            <div className="hidden sm:block h-8 w-px bg-slate-200 mx-1" />
             <button 
               onClick={handleManualScan}
               disabled={isScanning}
-              className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-[13px] font-black transition-all shadow-[0_4px_12px_rgba(37,99,235,0.3)] hover:shadow-[0_8px_20px_rgba(37,99,235,0.4)] hover:scale-[1.02] active:scale-95 flex items-center gap-2 group border border-blue-400/20 disabled:opacity-80 disabled:scale-100 min-w-[240px] justify-center"
+              className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-[13px] font-black transition-all shadow-[0_4px_12px_rgba(37,99,235,0.3)] hover:shadow-[0_8px_20px_rgba(37,99,235,0.4)] hover:scale-[1.02] active:scale-95 flex items-center gap-2 group border border-blue-400/20 disabled:opacity-80 disabled:scale-100 w-full sm:w-auto justify-center"
             >
               <RefreshCw className={`w-4 h-4 shrink-0 ${isScanning ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
               <span className="shrink-0">{isScanning ? scanMessages[scanMessageIndex] : 'Comprehensive Scan'}</span>
             </button>
             <button 
               onClick={() => downloadPDF('project-detail-report', `${project?.name || 'Project'}_Full_Report.pdf`)}
-              className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2 cursor-pointer"
+              className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto"
             >
               <Download className="w-4 h-4" />
               EXPORT
