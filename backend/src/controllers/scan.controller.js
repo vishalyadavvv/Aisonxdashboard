@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const axios = require('axios');
 const AIVisibilityReport = require('../models/AIVisibilityReport');
 const User = require('../models/User');
+const { extractIdentity } = require('../utils/urlCleaner');
 
 exports.captureLead = async (req, res) => {
     try {
@@ -243,14 +244,13 @@ exports.startScan = async (req, res) => {
     return res.status(400).json({ error: 'Brand name is required' });
   }
 
-  // Sanitize Brand Name
-  // 1. Remove protocol if present (even if frontend does it, double check)
-  brandName = brandName.replace(/^https?:\/\//i, '').replace(/\/$/, '');
+  // Sanitize and Identify Brand Context
+  const identity = extractIdentity(brandName);
+  const cleanBrandName = identity.brandName;
+  const cleanDomain = identity.domain;
   
-  // 2. Remove special chars but keep spaces, dots, and hyphens (prevent code injection, but allow domains)
-  brandName = brandName.trim().replace(/[^a-zA-Z0-9\s.-]/g, '');
   if (!query) {
-      query = `${brandName} business description, industry sector, and online reputation`;
+      query = identity.brandQuery;
   } else {
       query = query.trim();
   }
@@ -273,13 +273,14 @@ exports.startScan = async (req, res) => {
     sendProgress('Initializing AI Knowledge Engine...', 1);
 
     // 1. SMART INDEPENDENT ANALYSIS
-    sendProgress('Querying AI models for brand knowledge...', 2);
+    const identMsg = cleanDomain ? `Identified brand "${cleanBrandName}" from domain...` : `Analyzing brand profile for "${cleanBrandName}"...`;
+    sendProgress(identMsg, 2);
     
     // 2. MULTI-MODEL ANALYSIS (Each applies unique perspective)
-    sendProgress('Analyzing training data across models...', 4);
+    sendProgress('Querying AI models for brand knowledge...', 4);
     
     // Broadcast - models apply unique analytical frameworks
-    const broadcastPromise = aiOrchestrator.broadcastQuery(brandName, null, (modelId, result) => {
+    const broadcastPromise = aiOrchestrator.broadcastQuery(cleanBrandName, null, (modelId, result) => {
         sendEvent({ type: 'model_result', model: modelId, data: result });
     });
 
@@ -302,11 +303,11 @@ exports.startScan = async (req, res) => {
     });
     
     if (totalModels > 0 && notFoundCount >= Math.ceil(totalModels / 2)) {
-        logger.info(`⚠️ Majority consensus (${notFoundCount}/${totalModels}): Brand "${brandName}" likely not found in training data.`);
+        logger.info(`⚠️ Majority consensus (${notFoundCount}/${totalModels}): Brand "${cleanBrandName}" likely not found in training data.`);
     }
     
     // Always call orchestrator for master profile (now prompt-enforced for honesty)
-    const profileResult = await aiOrchestrator.getStructuredProfile(brandName, null, visibilityResults);
+    const profileResult = await aiOrchestrator.getStructuredProfile(cleanBrandName, null, visibilityResults);
     
     // *** MULTI-MODEL AGGREGATION ***
     // Aggregate insights from ALL models (not just master profile)
@@ -362,7 +363,7 @@ exports.startScan = async (req, res) => {
             
             result.aiVisibilityAssessment.overallLevel = 'Not Found';
             result.aiVisibilityAssessment.visibilityScore = 0;
-            result.aiVisibilityAssessment.interpretation = `Entity "${brandName}" was not identified within the internal training knowledge base of ${modelId}.`;
+            result.aiVisibilityAssessment.interpretation = `Entity "${cleanBrandName}" was not identified within the internal training knowledge base of ${modelId}.`;
             
             if (Array.isArray(result.aiVisibilityAssessment.criteria)) {
                 result.aiVisibilityAssessment.criteria = result.aiVisibilityAssessment.criteria.map(c => ({
@@ -491,7 +492,7 @@ exports.startScan = async (req, res) => {
         
         // Override interpretation to match reality
         aggregatedProfile.aiVisibilityAssessment.interpretation = 
-            `${brandName} has ${levelLabel.toLowerCase()} visibility across AI models. Computed score: ${score}%.`;
+            `${cleanBrandName} has ${levelLabel.toLowerCase()} visibility across AI models. Computed score: ${score}%.`;
     }
 
     // Send final results
@@ -510,7 +511,7 @@ exports.startScan = async (req, res) => {
             const userId = req.user._id || req.user.id;
             await AIVisibilityReport.create({
                 user: userId,
-                brandName,
+                brandName: cleanBrandName,
                 results: {
                     openai: visibilityResults.openai,
                     gemini: visibilityResults.gemini,

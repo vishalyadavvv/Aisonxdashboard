@@ -48,7 +48,7 @@ const fetchWebsiteContent = async (domain) => {
 
     for (const url of urls) {
         try {
-            logger.info(`Attempting to fetch: ${url}`);
+            logger.info(`[SCRAPER] Attempting fetch: ${url}`);
             const response = await axios.get(url, {
                 timeout: 10000,
                 maxRedirects: 5,
@@ -56,10 +56,27 @@ const fetchWebsiteContent = async (domain) => {
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
                     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                     'Accept-Language': 'en-US,en;q=0.9',
-                }
+                },
+                validateStatus: status => status < 600
             });
             
+            if (response.status >= 400) {
+                const statusMsg = response.status === 403 ? 'Forbidden (403)' : 
+                                 response.status === 401 ? 'Unauthorized (401)' : 
+                                 response.status === 503 ? 'Service Unavailable (503)' : 
+                                 `HTTP ${response.status}`;
+                
+                logger.warn(`[SCRAPER] Server returned ${statusMsg} for ${url}`);
+                lastError = { message: statusMsg, status: response.status, isBlocked: true };
+                continue;
+            }
+
             const html = response.data;
+            if (!html || typeof html !== 'string') {
+                logger.warn(`[SCRAPER] Empty or invalid response data from ${url}`);
+                continue;
+            }
+
             const $ = cheerio.load(html);
             
             const title = $('title').text().trim() || $('meta[property="og:title"]').attr('content') || '';
@@ -79,21 +96,31 @@ H2: ${h2s}
 BODY: ${bodyText}
             `.trim();
 
-            logger.info(`Successfully fetched content from: ${url}`);
+            logger.info(`[SCRAPER] Successfully fetched content from: ${url}`);
             return context;
             
         } catch (error) {
             lastError = error;
-            logger.warn(`Failed to fetch ${url}: ${error.message}`);
+            const errorMsg = error.code === 'ENOTFOUND' ? 'DNS Resolve Failed (ENOTFOUND)' : 
+                            error.code === 'ECONNREFUSED' ? 'Connection Refused' :
+                            error.code === 'ETIMEDOUT' ? 'Request Timed Out' :
+                            error.message;
+            
+            logger.warn(`[SCRAPER] Failed to fetch ${url}: ${errorMsg}`);
             if (error.code === 'ENOTFOUND') continue;
         }
     }
     
     if (lastError && lastError.code === 'ENOTFOUND') {
-        return { error: `Domain not found: "${domain}".`, isNotFound: true };
+        logger.error(`[DNS] Domain "${domain}" could not be resolved to any IP address.`);
+        return { error: `Domain not found: "${domain}".`, isNotFound: true, code: 'ENOTFOUND' };
     }
 
-    return { error: 'Website unreachable or blocking requests.', isBlocked: true };
+    if (lastError && lastError.isBlocked) {
+        return { error: `Access restricted (${lastError.message}).`, isBlocked: true, status: lastError.status };
+    }
+
+    return { error: 'Website unreachable or blocking requests.', isBlocked: true, detail: lastError?.message };
 };
 
 /**
@@ -280,9 +307,12 @@ const analyzeDomainMulti = async (domain, content) => {
     logger.info(`Starting Multi-Agent Analysis for ${domain}`);
 
     let context = content;
-    if (content && (content.isBlocked || content.isNotFound)) {
-        logger.warn(`[Profiler] Domain ${domain} is blocked/not found. Switching to Independent Intelligence Analysis (IIA)...`);
-        context = `This domain (${domain}) was unreachable by our live scraper. Perform an internal intelligence lookup using only the brand/domain name to determine its likely architecture, audience, and industry position.`;
+    if (content && typeof content === 'object' && (content.isBlocked || content.isNotFound)) {
+        const reason = content.isNotFound ? `was unreachable (DNS Error)` : `returned a block (${content.status || 'Restriction'})`;
+        logger.warn(`[Profiler] Domain ${domain} ${reason}. Switching to Independent Intelligence Analysis (IIA)...`);
+        context = `This domain (${domain}) was unreachable by our live scraper due to: ${content.error}. 
+        TASK: Perform an exhaustive internal intelligence lookup using only the brand/domain name. 
+        Analyze its market position, likely target audience, architecture, and established industry niche from your training knowledge.`;
     }
 
     const startTime = Date.now();

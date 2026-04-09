@@ -25,8 +25,8 @@ const CONFIG = {
         MAX_SIZE: 100
     },
     VALIDATION: {
-        MIN_SUMMARY_LENGTH: 50,
-        MAX_SUMMARY_LENGTH: 500,
+        MIN_SUMMARY_LENGTH: 100,
+        MAX_SUMMARY_LENGTH: 1500,
         REQUIRED_FIELDS: [
             'interpretation', 'visibilityLevel', 'sentiment', 'checklist', 
             'domainType', 'coreOffering', 'aiVisibilityAssessment'
@@ -271,8 +271,8 @@ OUTPUT FORMAT (Valid JSON - MANDATORY):
     "confidence": "High|Medium|Low|Not Found",
     "trainingDataCoverage": "Describe SPECIFIC facts you know, or state 'No specific information found in training data'"
   },
-  "summary": "MAX 2 sentences: What SPECIFIC facts does YOUR training data contain about ${brandName}? If none, say 'This entity was not found in my training data.'",
-  "interpretation": "MAX 2 sentences based ONLY on verified knowledge. If not found, say '${brandName} does not appear in my training corpus with any specific or verifiable information.'",
+  "summary": "4-5 detailed sentences: What SPECIFIC facts does YOUR training data contain about ${brandName}? Provide a comprehensive description of their products, industry position, and reputation.",
+  "interpretation": "4-5 detailed sentences based ONLY on verified knowledge. Provide a professional assessment of their market impact and significance. If not found, say '${brandName} does not appear in my training corpus with any specific or verifiable information.'",
   "brandStatus": "Present|Not Found|Partially Known",
   "visibilityLevel": "Market Leader|Highly Visible|Moderate Presence|Minimal Visibility|Unknown",
   "sentimentScore": 0-100,
@@ -468,7 +468,7 @@ OUTPUT FORMAT (Valid JSON - MANDATORY):
     "confidence": "High|Medium|Low|Not Found",
     "knowledgeCoverage": "Describe SPECIFIC facts you know, or state 'No specific information found in training data'"
   },
-  "interpretation": "STRICT MAX 2 powerful sentences based on training knowledge. If not found, say '${brand} was not found in my training data.'",
+  "interpretation": "4-5 powerful sentences providing a comprehensive market profile based on training knowledge. Include specific services, industry role, and estimated market presence. If not found, say '${brand} was not found in my training data.'",
   "visibilityLevel": "Market Leader|Top Recommendation|Highly Visible|Moderate Presence|Minimal Visibility|Unknown|Not Found",
   "visibilityScore": 0-100,
   "sentimentScore": 0-100,
@@ -619,7 +619,7 @@ CRITICAL EXTRACTION RULES:
 
 OUTPUT FORMAT (Valid JSON ONLY):
 {
-  "interpretation": "STRICT MAX 2 precise sentences using research terminology. Do NOT exceed 2 sentences.",
+  "interpretation": "6-8 comprehensive and precise sentences using research terminology. Synthesize a deep-dive market overview including competitive positioning, service offerings, and core value propositions found in the research.",
   "visibilityLevel": "Market Leader|Highly Visible|Moderate Presence|Minimal Visibility|Unknown",
   "visibilityScore": 0-100,
   "sentiment": "Positive|Neutral|Negative",

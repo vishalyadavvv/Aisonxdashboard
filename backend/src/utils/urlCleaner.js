@@ -7,7 +7,6 @@ function cleanUrl(url) {
 
   try {
     // 1. ChatGPT/OpenAI Redirects
-    // Example: https://www.bing.com/ck/a?!&&p=...&u=a1aHR0cHM6Ly93d3cubmlrZS5jb20v&ntb=1
     if (url.includes('bing.com/ck/')) {
       const parsedUrl = new URL(url);
       const uParam = parsedUrl.searchParams.get('u');
@@ -45,9 +44,8 @@ function cleanUrl(url) {
     }
 
     // 4. Secondary: Look for domain-like strings even if protocol is missing or malformed
-    // Regex matches common domain formats like example.com or sub.example.co.uk
     const domainMatch = url.match(/([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,10}/);
-    if (domainMatch) {
+    if (domainMatch && !url.includes(' ')) {
         return 'https://' + domainMatch[0];
     }
 
@@ -57,10 +55,10 @@ function cleanUrl(url) {
     // Remove brackets/quotes/markdown artifacts
     cleaned = cleaned.replace(/^[(\["'\[]+|[)\]"'\]/]+$/g, '');
 
-    // 0. FIX REDUNDANT PROTOCOLS (e.g. https://https:// or www.https://)
-    cleaned = cleaned.replace(/^(https?:\/\/)+/, '$1'); // Normalize multiple https:// to one
-    cleaned = cleaned.replace(/^www\.(https?:\/\/)/i, '$1'); // Fix "www.https://"
-    cleaned = cleaned.replace(/^(https?:\/\/)+/g, 'https://'); // Replace any weird repeats
+    // FIX REDUNDANT PROTOCOLS
+    cleaned = cleaned.replace(/^(https?:\/\/)+/, '$1');
+    cleaned = cleaned.replace(/^www\.(https?:\/\/)/i, '$1');
+    cleaned = cleaned.replace(/^(https?:\/\/)+/g, 'https://');
 
     // Remove trailing periods often added by LLMs
     if (cleaned.endsWith('.') && !cleaned.endsWith('..')) {
@@ -84,4 +82,66 @@ function cleanUrl(url) {
   }
 }
 
-module.exports = { cleanUrl };
+/**
+ * Extracts both a clean domain for scraping and a human-friendly brand name for AI lookup.
+ * Goal: "https://www.nike.com/running" -> { domain: "nike.com", brandName: "Nike" }
+ */
+function extractIdentity(input) {
+    if (!input || typeof input !== 'string') return { domain: '', brandName: '', brandQuery: '' };
+    
+    let domain = '';
+    let brandName = '';
+    
+    // 1. Clean the URL first
+    const cleaned = cleanUrl(input);
+    
+    try {
+        if (cleaned.startsWith('http')) {
+            const parsed = new URL(cleaned);
+            domain = parsed.hostname.toLowerCase().replace(/^www\./, '');
+            
+            // Extract brand name from hostname
+            // Logic: Take the segment before the TLD
+            const parts = domain.split('.');
+            if (parts.length >= 2) {
+                // Check for multi-segment TLDs like .co.uk (simplified check for segments of length <= 3)
+                if (parts[parts.length - 2].length <= 3 && parts.length >= 3) {
+                    brandName = parts[parts.length - 3];
+                } else {
+                    brandName = parts[parts.length - 2];
+                }
+            } else {
+                brandName = parts[0];
+            }
+        } else {
+            // It's likely just a brand name (e.g. "Apple")
+            // But check if it's a domain without a protocol (e.g. "nike.com")
+            if (input.includes('.') && !input.includes(' ')) {
+                domain = input.toLowerCase().replace(/^www\./, '');
+                const parts = domain.split('.');
+                brandName = parts[0];
+            } else {
+                brandName = input.trim();
+                domain = ''; // Unknown domain
+            }
+        }
+    } catch (e) {
+        brandName = input.trim();
+    }
+    
+    // Final Polish for Brand Name
+    // 1. Capitalize
+    if (brandName.length > 0) {
+        brandName = brandName.charAt(0).toUpperCase() + brandName.slice(1);
+    }
+    // 2. Remove common file extensions or TLD leftovers if it was a weird string
+    brandName = brandName.replace(/\.(com|net|org|io|ai|co|in|uk|au|us)$/i, '');
+    
+    return {
+        domain: domain,
+        brandName: brandName,
+        brandQuery: `${brandName} business description and AI search footprint`
+    };
+}
+
+module.exports = { cleanUrl, extractIdentity };

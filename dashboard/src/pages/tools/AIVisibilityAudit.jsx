@@ -567,16 +567,21 @@ const AIVisibilityAudit = () => {
           {isAnalyzing && (
             <div className="mt-6">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-blue-400">{progress}</span>
+                <span className="text-xs font-black text-blue-400 uppercase tracking-widest animate-pulse">{progress}</span>
                 <span className="text-[10px] text-gray-500 uppercase font-black">STEP {step}/8</span>
               </div>
               <div className="w-full bg-[#2d3748] h-1.5 rounded-full overflow-hidden">
                 <motion.div 
                   initial={{ width: 0 }}
                   animate={{ width: `${(step / 8) * 100}%` }}
-                  className="h-full bg-blue-500 shadow-[0_0_10px_rgba(37,99,235,0.4)]"
+                  className="h-full bg-gradient-to-r from-blue-600 to-indigo-500 shadow-[0_0_15px_rgba(37,99,235,0.5)]"
                 />
               </div>
+              <p className="text-[9px] text-gray-500 mt-2 font-bold uppercase tracking-tighter">
+                {step <= 2 ? "Analyzing domain infrastructure and brand identity..." : 
+                 step <= 5 ? "Querying internal AI training knowledge..." : 
+                 "Synthesizing visibility nodes and scoring map..."}
+              </p>
             </div>
           )}
         </motion.div>
@@ -712,50 +717,69 @@ const AIVisibilityAudit = () => {
         >
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px] -mr-32 -mt-32" />
           
-          <div className="flex items-start justify-between relative z-10">
-            <div className="flex-1 pr-8">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-400 text-[10px] font-bold uppercase tracking-widest mb-4">
-                <Globe className="w-3 h-3" /> AI Visibility Node Synced
-              </div>
-              <h1 className="text-3xl font-black mb-3 tracking-tight">AI Visibility Summary</h1>
-              <p className="text-gray-400 text-[15px] leading-relaxed mb-8 max-w-2xl font-medium">
-                {results.summary || `This report analyzes how AI systems perceive and retrieve your brand content. Your composite visibility index is based on semantic footprint and technical accessibility.`}
-              </p>
-              
-              <div className="flex items-center gap-3" data-html2canvas-ignore>
-                <button 
-                  onClick={() => downloadPDF('report-content', 'AI_Visibility_Audit.pdf')}
-                  className="flex items-center gap-2 bg-white text-[#1a202c] px-6 py-3 rounded-xl text-sm font-bold hover:bg-gray-100 transition-all active:scale-95 cursor-pointer"
-                >
-                  <FileDown className="w-4 h-4" /> Export PDF Report
-                </button>
-                {!projectId && (
-                  <button 
-                    onClick={() => setResults(null)}
-                    className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-6 py-3 rounded-xl text-sm font-semibold transition-all border border-white/5 active:scale-95"
-                  >
-                    <ArrowLeft className="w-4 h-4" /> New Audit
-                  </button>
+            <div className="flex items-start justify-between relative z-10">
+              <div className="flex-1 pr-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-400 text-[10px] font-bold uppercase tracking-widest">
+                    <Globe className="w-3 h-3" /> AI Visibility Node Synced
+                  </div>
+                  {results.isPredictive && (
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-400 text-[10px] font-bold uppercase tracking-widest">
+                      <Sparkles className="w-3 h-3" /> Predictive Analysis Mode
+                    </div>
+                  )}
+                </div>
+                <h1 className="text-3xl font-black mb-3 tracking-tight">AI Visibility Summary</h1>
+                <p className="text-gray-400 text-[15px] leading-relaxed mb-8 max-w-2xl font-medium">
+                  {results.summary || `This report analyzes how AI systems perceive and retrieve your brand content. Your composite visibility index is based on semantic footprint and technical accessibility.`}
+                </p>
+                
+                {results.isPredictive && (
+                  <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 mb-8 max-w-2xl flex gap-4">
+                     <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                     <div>
+                        <h4 className="text-amber-500 text-xs font-bold uppercase tracking-widest mb-1">Unreachable Domain Fallback</h4>
+                        <p className="text-amber-100/60 text-[12px] leading-relaxed font-medium">
+                          The live website was unreachable (Blocked or DNS failure). We have used **Independent Intelligence Analysis** based on the brand's established identity and industry footprint to generate this report.
+                        </p>
+                     </div>
+                  </div>
                 )}
+                
+                <div className="flex items-center gap-3" data-html2canvas-ignore>
+                  <button 
+                    onClick={() => downloadPDF('report-content', 'AI_Visibility_Audit.pdf')}
+                    className="flex items-center gap-2 bg-white text-[#1a202c] px-6 py-3 rounded-xl text-sm font-bold hover:bg-gray-100 transition-all active:scale-95 cursor-pointer"
+                  >
+                    <FileDown className="w-4 h-4" /> Export PDF Report
+                  </button>
+                  {!projectId && (
+                    <button 
+                      onClick={() => setResults(null)}
+                      className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-6 py-3 rounded-xl text-sm font-semibold transition-all border border-white/5 active:scale-95"
+                    >
+                      <ArrowLeft className="w-4 h-4" /> New Audit
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
 
-            {/* Score Circle */}
-            <div className="text-center shrink-0">
-              <div className="relative w-32 h-32">
-                <svg className="w-32 h-32 -rotate-90" viewBox="0 0 120 120">
-                  <circle cx="60" cy="60" r="50" fill="none" stroke="#2d3748" strokeWidth="8" />
-                  <circle cx="60" cy="60" r="50" fill="none" stroke={scoreColor} strokeWidth="8"
-                    strokeDasharray={circumference} strokeDashoffset={strokeDashoffset}
-                    strokeLinecap="round" className="transition-all duration-1000" />
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-4xl font-black" style={{ color: scoreColor }}>{score}%</span>
-                  <span className="text-[10px] text-gray-400 font-bold uppercase leading-none">Visibility</span>
+              {/* Score Circle */}
+              <div className="text-center shrink-0">
+                <div className="relative w-32 h-32">
+                  <svg className="w-32 h-32 -rotate-90" viewBox="0 0 120 120">
+                    <circle cx="60" cy="60" r="50" fill="none" stroke="#2d3748" strokeWidth="8" />
+                    <circle cx="60" cy="60" r="50" fill="none" stroke={scoreColor} strokeWidth="8"
+                      strokeDasharray={circumference} strokeDashoffset={strokeDashoffset}
+                      strokeLinecap="round" className="transition-all duration-1000" />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-4xl font-black" style={{ color: scoreColor }}>{score}%</span>
+                    <span className="text-[10px] text-gray-400 font-bold uppercase leading-none">Visibility</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
         </motion.div>
 
 

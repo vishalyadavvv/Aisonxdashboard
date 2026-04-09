@@ -3,7 +3,7 @@ const cheerio = require('cheerio');
 const xml2js = require('xml2js');
 const { URL } = require('url');
 
-const { cleanUrl } = require('../utils/urlCleaner');
+const { cleanUrl, extractIdentity } = require('../utils/urlCleaner');
 
 // Common queries database
 const COMMON_QUERIES = {
@@ -1052,10 +1052,15 @@ function getDefaultTechnicalSignals() {
 // Main analysis function
 exports.analyzeWebsite = async (url) => {
     // Normalize and Clean URL
-    url = cleanUrl(url);
+    const identity = extractIdentity(url);
+    url = identity.domain ? `https://${identity.domain}` : cleanerUrl(url);
+    
+    // Fallback if identity extraction couldn't find a domain but we have a URL-like string
+    if (!url.startsWith('http')) url = `https://${url}`;
     
     const parsedUrl = new URL(url);
     const baseUrl = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
+    const brandName = identity.brandName;
     
     let sitemapUrls = [];
     let usedMethod = 'sitemap';
@@ -1086,15 +1091,19 @@ exports.analyzeWebsite = async (url) => {
         
         if (testRes) {
             const isBlocked = (testRes.status === 403 || testRes.status === 503 || testRes.code === 'ECONNRESET' || testRes.code === 'ETIMEDOUT' || (testRes.error && testRes.error.toLowerCase().includes('abort')));
-                        if (isBlocked) {
+            const isNotFound = (testRes.status === 404 || testRes.code === 'ENOTFOUND');
+
+            if (isBlocked || isNotFound) {
                 const statusMsg = testRes.status === 403 ? 'Forbidden (403)' : 
                                  testRes.status === 503 ? 'Service Unavailable (503)' : 
-                                 testRes.code || 'Connection Blocked';
+                                 testRes.status === 404 ? 'Not Found (404)' :
+                                 testRes.code === 'ENOTFOUND' ? 'DNS Resolve Failed' :
+                                 'Connection Blocked';
                 
-                console.log(`[Readiness] Domain ${baseUrl} is blocking scraper (${statusMsg}). Switching to Predictive AI Analysis Fallback...`);
+                console.log(`[Readiness] Domain ${baseUrl} is unreachable (${statusMsg}). Switching to Predictive AI Analysis Fallback...`);
                 
                 // 1. Infer Business Type & Generate Estimated Queries
-                const nicheInf = await fetchOpenAI(`Analyze the domain name "${baseUrl}" and its TLD. Predict its Business Type (SaaS, E-commerce, or General) and its primary industry niche. Return JSON: { "type": "string", "niche": "string" }`, true);
+                const nicheInf = await fetchOpenAI(`Analyze the brand "${brandName}" and its domain "${baseUrl}". Predict its Business Type (SaaS, E-commerce, or General) and its primary industry niche. Return JSON: { "type": "string", "niche": "string" }`, true);
                 let predictedType = 'General';
                 try {
                     const p = JSON.parse(nicheInf.replace(/```json/g, '').replace(/```/g, '').trim());
@@ -1108,7 +1117,7 @@ exports.analyzeWebsite = async (url) => {
                 const adjustedQueries = predictedQueries.map(q => ({
                     ...q,
                     status: 'potential',
-                    action: 'Verify manually (Domain blocked automated check)'
+                    action: 'Verify manually (Domain unreachable for automated check)'
                 }));
 
                 // 4. Synthesize Predictive Report
@@ -1119,16 +1128,17 @@ exports.analyzeWebsite = async (url) => {
 
                 return {
                     businessType: predictedType,
-                    summary: `Direct technical analysis of ${baseUrl} was restricted by the server (${statusMsg}). We have generated this PREDICTIVE readiness model based on your industry niche and domain architecture. High-fidelity scan will require whitelisting our IP.`,
-                    coverageScore: 15, // Low but not 0 (Heuristic for "existing domain but unknown structure")
+                    brandName: brandName, // New field for clearer UI
+                    summary: `Live technical analysis of ${baseUrl} was restricted or unreachable (${statusMsg}). We have generated this PREDICTIVE readiness model based on the brand identity of "${brandName}". High-fidelity scan will require whitelisting our IP.`,
+                    coverageScore: 20, // Slightly higher than 15 to reflect brand identity extraction
                     corePagesFound: 0,
                     totalPages: adjustedQueries.length,
                     totalMissing: adjustedQueries.length,
                     queries: adjustedQueries,
-                    sitemapUrl: 'Restricted (Server Block)',
+                    sitemapUrl: 'Restricted (Inaccessible)',
                     totalSitemapUrls: 0,
                     method: 'predictive', // New method type
-                    isBlocked: false, // Set to false so frontend renders it as a valid (but low-score) report
+                    isBlocked: false, // Set to false so frontend renders it as a valid report
                     isPredictive: true,
                     technicalSignals
                 };
