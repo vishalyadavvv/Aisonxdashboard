@@ -9,9 +9,9 @@ const razorpay = new Razorpay({
 
 // Plan prices in paise (INR × 100)
 const PLAN_PRICES = {
-  'Starter': 1900,       // ₹19
-  'Growth': 4900,        // ₹49
-  'Professional': 9900   // ₹99
+  'Starter': 145000,       // ₹1450
+  'Growth': 450000,        // ₹4500
+  'Professional': 900000   // ₹9000
 };
 
 exports.createOrder = async (req, res) => {

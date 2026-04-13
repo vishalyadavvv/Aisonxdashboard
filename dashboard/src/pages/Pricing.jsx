@@ -11,7 +11,7 @@ const Pricing = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  const PLAN_AMOUNTS = { Starter: 19, Growth: 49, Professional: 99 };
+  const PLAN_AMOUNTS = { Starter: 1450, Growth: 4500, Professional: 9000 }; // Amounts in cents for Razorpay
 
   const handleUpgrade = async (planName) => {
     try {
@@ -92,7 +92,7 @@ const Pricing = () => {
       name: 'Starter',
       icon: Rocket,
       color: 'emerald',
-      price: 19,
+      price: 1450,
       description: 'Individuals & Small Teams',
       trial: '7-Day Free Trial',
       features: {
@@ -115,7 +115,7 @@ const Pricing = () => {
       name: 'Growth',
       icon: Zap,
       color: 'blue',
-      price: 49,
+      price: 4500,
       description: 'Growing Businesses',
       popular: true,
       trial: null,
@@ -139,7 +139,7 @@ const Pricing = () => {
       name: 'Professional',
       icon: Star,
       color: 'purple',
-      price: 99,
+      price: 9000,
       description: 'Agencies & Advanced Teams',
       trial: null,
       features: {
@@ -208,7 +208,7 @@ const Pricing = () => {
 
               <div>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-extrabold text-slate-900">${plan.price}</span>
+                  <span className="text-4xl font-extrabold text-slate-900">₹{plan.price}</span>
                   <span className="text-slate-400 font-bold text-sm">/ month</span>
                 </div>
                 <div className="flex items-center gap-2 mt-2">
@@ -295,7 +295,7 @@ const Pricing = () => {
                   <th key={i} className="py-4 px-4 text-center">
                     <div className="flex flex-col items-center gap-1">
                       <span className="text-sm font-extrabold text-slate-900">{plan.name}</span>
-                      <span className="text-[10px] font-bold text-slate-400">${plan.price}</span>
+                      <span className="text-[10px] font-bold text-slate-400">₹{plan.price}</span>
                     </div>
                   </th>
                 ))}
