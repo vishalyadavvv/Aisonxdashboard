@@ -15,14 +15,17 @@ const sanitizeError = (err) => {
         return { 
             message: truncate(err.message), 
             code: err.code,
-            status: err.status 
+            status: err.status,
+            // Include a snippet of the response data if it's an axios error
+            responseData: err.response?.data ? truncate(JSON.stringify(err.response.data)) : undefined
         };
     }
     // For general objects, stringify and truncate
     try {
         const str = JSON.stringify(err);
-        if (str.includes('<html') || str.length > 500) {
-            return "[SECURE LOG] Object contains HTML or is too large.";
+        if (str.includes('<html') || str.length > 5000) {
+            // Instead of blocking, just truncate and mark as potentially containing HTML
+            return truncate(str) + " [TRUNCATED - Potential HTML or Large Object]";
         }
         return str;
     } catch (e) {

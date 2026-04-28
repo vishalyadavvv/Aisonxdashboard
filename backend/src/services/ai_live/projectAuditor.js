@@ -181,53 +181,60 @@ INSTRUCTIONS:
 }
 🚨 RETURN ONLY JSON.`;
 
-    let text = '';
-    let retries = 3;
+    // MAX 2 retries. On 429 rate limit → HARD STOP immediately (no retry = no spam).
+    const MAX_RETRIES = 2;
     let finalResult = null;
 
-    while (retries > 0) {
-      try {
-        const result = await model.generateContent({
-          contents: [{ role: "user", parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.4 }
-        });
-        text = result.response.text();
-        finalResult = robustParseJSON(text);
-        if (finalResult) {
-            // Extract citations
-            try {
-              let allUrls = [];
-              const candidates = result.response.candidates;
-              if (candidates?.[0]?.groundingMetadata?.groundingChunks) {
-                let groundingUrls = candidates[0].groundingMetadata.groundingChunks.map(c => c.web?.uri).filter(u => u);
-                allUrls.push(...groundingUrls);
-              }
-              const textUrls = text.match(/(https?:\/\/[^\s]+)/g);
-              if (textUrls) allUrls.push(...textUrls);
-              if (allUrls.length > 0) {
-                const cleanedUrls = [...new Set(allUrls.map(cleanUrl).filter(Boolean))];
-                finalResult.authoritySignals.citations = await Promise.all(cleanedUrls.map(resolveVertexRedirect));
-              }
-            } catch (e) {
-              logger.warn("Error extracting Gemini citations:", e.message);
+    const callGemini = async (retriesLeft) => {
+        try {
+            const result = await model.generateContent({
+                contents: [{ role: "user", parts: [{ text: prompt }] }],
+                generationConfig: { temperature: 0.4 }
+            });
+            const text = result.response.text();
+            finalResult = robustParseJSON(text);
+            if (finalResult) {
+                try {
+                    let allUrls = [];
+                    const candidates = result.response.candidates;
+                    if (candidates?.[0]?.groundingMetadata?.groundingChunks) {
+                        const groundingUrls = candidates[0].groundingMetadata.groundingChunks.map(c => c.web?.uri).filter(u => u);
+                        allUrls.push(...groundingUrls);
+                    }
+                    const textUrls = text.match(/(https?:\/\/[^\s]+)/g);
+                    if (textUrls) allUrls.push(...textUrls);
+                    if (allUrls.length > 0) {
+                        const cleanedUrls = [...new Set(allUrls.map(cleanUrl).filter(Boolean))];
+                        finalResult.authoritySignals.citations = await Promise.all(cleanedUrls.map(resolveVertexRedirect));
+                    }
+                } catch (e) {
+                    logger.warn("Error extracting Gemini citations:", e.message);
+                }
+                return finalResult;
             }
-            return finalResult;
+            // No valid JSON parsed — try again if we have retries
+            if (retriesLeft > 0) {
+                await new Promise(r => setTimeout(r, 1500));
+                return callGemini(retriesLeft - 1);
+            }
+            return null;
+        } catch (err) {
+            const isRateLimit = err.message && (err.message.includes('429') || err.message.includes('quota'));
+            if (isRateLimit) {
+                logger.warn(`❌ [GEMINI] Rate limit hit on individual audit — skipping to protect server.`);
+                return null; // HARD STOP — do not retry on 429
+            }
+            if (retriesLeft > 0) {
+                logger.warn(`⚠️ Gemini audit error, retrying (${retriesLeft} left): ${err.message}`);
+                await new Promise(r => setTimeout(r, 2000));
+                return callGemini(retriesLeft - 1);
+            }
+            logger.error(`❌ Gemini Individual Audit Error (max retries reached):`, err.message);
+            return null;
         }
-        retries--;
-      } catch (err) {
-        retries--;
-        const isRateLimit = err.message && (err.message.includes('429') || err.message.includes('quota'));
-        if (retries > 0 && isRateLimit) {
-            logger.warn(`⚠️ Gemini Rate Limit. Retrying in 5s...`);
-            await new Promise(resolve => setTimeout(resolve, 5000));
-        } else if (retries > 0) {
-            await new Promise(resolve => setTimeout(resolve, 1500));
-        } else {
-            logger.error(`❌ Gemini Individual Audit Error:`, err.message);
-        }
-      }
-    }
-    return null;
+    };
+
+    return await callGemini(MAX_RETRIES);
   } catch (err) {
     logger.error("❌ Gemini Audit Fatal Error:", err.message);
     return null;
@@ -361,53 +368,59 @@ INSTRUCTIONS:
 }
 🚨 RETURN ONLY JSON.`;
 
-    let text = '';
-    let retries = 3;
+    // MAX 2 retries. On 429 rate limit → HARD STOP immediately (no retry = no spam).
+    const MAX_RETRIES = 2;
     let finalResult = null;
 
-    while (retries > 0) {
-      try {
-        const result = await model.generateContent({
-          contents: [{ role: "user", parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.4 }
-        });
-        text = result.response.text();
-        finalResult = robustParseJSON(text);
-        if (finalResult) {
-            // Extract citations
-            try {
-              let allUrls = [];
-              const candidates = result.response.candidates;
-              if (candidates?.[0]?.groundingMetadata?.groundingChunks) {
-                let groundingUrls = candidates[0].groundingMetadata.groundingChunks.map(c => c.web?.uri).filter(u => u);
-                allUrls.push(...groundingUrls);
-              }
-              const textUrls = text.match(/(https?:\/\/[^\s]+)/g);
-              if (textUrls) allUrls.push(...textUrls);
-              if (allUrls.length > 0) {
-                const cleanedUrls = [...new Set(allUrls.map(cleanUrl).filter(Boolean))];
-                finalResult.authoritySignals.citations = await Promise.all(cleanedUrls.map(resolveVertexRedirect));
-              }
-            } catch (e) {
-              logger.warn("Error extracting Gemini competitive citations:", e.message);
+    const callGeminiCompetitive = async (retriesLeft) => {
+        try {
+            const result = await model.generateContent({
+                contents: [{ role: "user", parts: [{ text: prompt }] }],
+                generationConfig: { temperature: 0.4 }
+            });
+            const text = result.response.text();
+            finalResult = robustParseJSON(text);
+            if (finalResult) {
+                try {
+                    let allUrls = [];
+                    const candidates = result.response.candidates;
+                    if (candidates?.[0]?.groundingMetadata?.groundingChunks) {
+                        const groundingUrls = candidates[0].groundingMetadata.groundingChunks.map(c => c.web?.uri).filter(u => u);
+                        allUrls.push(...groundingUrls);
+                    }
+                    const textUrls = text.match(/(https?:\/\/[^\s]+)/g);
+                    if (textUrls) allUrls.push(...textUrls);
+                    if (allUrls.length > 0) {
+                        const cleanedUrls = [...new Set(allUrls.map(cleanUrl).filter(Boolean))];
+                        finalResult.authoritySignals.citations = await Promise.all(cleanedUrls.map(resolveVertexRedirect));
+                    }
+                } catch (e) {
+                    logger.warn("Error extracting Gemini competitive citations:", e.message);
+                }
+                return finalResult;
             }
-            return finalResult;
+            if (retriesLeft > 0) {
+                await new Promise(r => setTimeout(r, 1500));
+                return callGeminiCompetitive(retriesLeft - 1);
+            }
+            return null;
+        } catch (err) {
+            const isRateLimit = err.message && (err.message.includes('429') || err.message.includes('quota'));
+            if (isRateLimit) {
+                logger.warn(`❌ [GEMINI] Rate limit hit on competitive audit — skipping to protect server.`);
+                return null; // HARD STOP — do not retry on 429
+            }
+            if (retriesLeft > 0) {
+                logger.warn(`⚠️ Gemini competitive error, retrying (${retriesLeft} left): ${err.message}`);
+                await new Promise(r => setTimeout(r, 2000));
+                return callGeminiCompetitive(retriesLeft - 1);
+            }
+            logger.error(`❌ Gemini Competitive Audit Error (max retries reached):`, err.message);
+            return null;
         }
-        retries--;
-      } catch (err) {
-        retries--;
-        const isRateLimit = err.message && (err.message.includes('429') || err.message.includes('quota'));
-        if (retries > 0 && isRateLimit) {
-            logger.warn(`⚠️ Gemini Competitive Rate Limit. Retrying in 5s...`);
-            await new Promise(resolve => setTimeout(resolve, 5000));
-        } else if (retries > 0) {
-            await new Promise(resolve => setTimeout(resolve, 1500));
-        } else {
-            logger.error(`❌ Gemini Competitive Audit Error:`, err.message);
-        }
-      }
-    }
-    return null;
+    };
+
+    return await callGeminiCompetitive(MAX_RETRIES);
   } catch (err) {
     logger.error("❌ Gemini Competitive Audit Fatal Error:", err.message);
     return null;

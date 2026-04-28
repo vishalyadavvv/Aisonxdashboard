@@ -11,11 +11,9 @@ const { fetchKnowledgeGraphFull } = require('../services/externalEntity.service'
 const logger = require('../utils/logger');
 
 // ─── SCAN CONCURRENCY LIMITER ─────────────────────────────────────────────────
-// Prevents too many simultaneous API calls from crashing OpenAI/Gemini rate limits
-// Max 50 scans can run at the same time across ALL users.
-// ⚠️ WARNING: 50 concurrent scans require a high-tier OpenAI (Tier 5) / Gemini API Key.
-// On Tier 1 (Free/Basic), this will still result in 429 errors from the AI, even if the server is open.
-const MAX_CONCURRENT_SCANS = 50;
+// On a 1GB server, only 2 scans should ever run at the same time.
+// Each scan triggers 5+ heavy AI API calls — more than 2 = OOM crash.
+const MAX_CONCURRENT_SCANS = 2;
 let activeScans = 0;
 
 const acquireScanSlot = () => {
@@ -24,6 +22,20 @@ const acquireScanSlot = () => {
     return true;
 };
 const releaseScanSlot = () => { if (activeScans > 0) activeScans--; };
+
+// ─── GLOBAL GEMINI RATE LIMITER ───────────────────────────────────────────────
+// Ensures no two Gemini calls fire within 2 seconds of each other server-wide.
+let lastGeminiCallTime = 0;
+async function safeGeminiCall(fn) {
+    const now = Date.now();
+    const timeSinceLast = now - lastGeminiCallTime;
+    if (timeSinceLast < 2000) {
+        await new Promise(r => setTimeout(r, 2000 - timeSinceLast));
+    }
+    lastGeminiCallTime = Date.now();
+    return fn();
+}
+exports.safeGeminiCall = safeGeminiCall;
 
 // Helper to get project limit by tier
 const getProjectLimit = (tier) => {
@@ -284,99 +296,53 @@ const internalRunProjectScan = async (project) => {
         // This ensures things like fetchWebsiteContent don't try to fetch https://https://domain.com
         const domain = project.domain.replace(/^(https?:\/\/)+/, '').replace(/^www\.(https?:\/\/)/i, '').replace(/^www\./, '').replace(/\/$/, '').split('/')[0];
         
-        // PHASE 1: Technical & Content Infrastructure (Defensive Parallel)
-        const [techResults, readinessResults, profilerContent, brandAuditResults] = await Promise.all([
-            // Technical check (Robots/Sitemap)
-            (async () => {
-                try {
-                    return await Promise.all([
-                        techAudit.analyzeRobots(domain),
-                        techAudit.analyzeSitemap(domain)
-                    ]);
-                } catch (e) {
-                    logger.warn(`Tech Audit sub-phase failed for ${domain}:`, e.message);
-                    return [{ found: false, error: e.message }, { found: false, error: e.message }];
-                }
-            })(),
-            // AI Readiness Audit
-            (async () => {
-                try {
-                    return await aiReadinessService.analyzeWebsite(domain);
-                } catch (e) {
-                    logger.warn(`AI Readiness sub-phase failed for ${domain}:`, e.message);
-                    return { error: e.message, method: 'failed' };
-                }
-            })(),
-            // Fetch content for Profiler
-            (async () => {
-                try {
-                    return await profilerService.fetchWebsiteContent(domain);
-                } catch (e) {
-                    logger.warn(`Profiler fetch sub-phase failed for ${domain}:`, e.message);
-                    return { error: e.message, isNotFound: true };
-                }
-            })(),
-            // Brand Audit (Knowledge Graph)
-            (async () => {
-                try {
-                    return await fetchKnowledgeGraphFull(project.brandName || project.name);
-                } catch (e) {
-                    logger.warn(`Brand Audit sub-phase failed for ${project.brandName}:`, e.message);
-                    return null;
-                }
-            })()
-        ]);
+        // PHASE 1: Technical Infrastructure (Sequential — low memory, no AI calls)
+        logger.info(`🔄 [PHASE-1] Running technical checks for ${domain}...`);
+        let techResults = [{ found: false }, { found: false }];
+        let readinessResults = { error: 'skipped', method: 'failed' };
+        let profilerContent = { error: 'skipped', isNotFound: true };
+        let brandAuditResults = null;
+
+        try { techResults = await Promise.all([techAudit.analyzeRobots(domain), techAudit.analyzeSitemap(domain)]); }
+        catch (e) { logger.warn(`Tech Audit failed for ${domain}:`, e.message); }
+
+        try { readinessResults = await aiReadinessService.analyzeWebsite(domain); }
+        catch (e) { logger.warn(`AI Readiness failed for ${domain}:`, e.message); }
+
+        try { profilerContent = await profilerService.fetchWebsiteContent(domain); }
+        catch (e) { logger.warn(`Profiler fetch failed for ${domain}:`, e.message); }
+
+        try { brandAuditResults = await fetchKnowledgeGraphFull(project.brandName || project.name); }
+        catch (e) { logger.warn(`Brand Audit failed for ${project.brandName}:`, e.message); }
 
         const [robotsJson, sitemapJson] = techResults;
 
-        // PHASE 2: MULTI-MODEL INTERNAL AUDIT (Defensive Parallel)
-        const [scanResults, synthesisResults, liveAuditResults, auditProfile, auditModelResults] = await Promise.all([
-            // 1. Visibility Audit (Brand + Competitors — typically uses Search)
-            (async () => {
-                try {
-                    return await promptOrchestrator.performProjectScan(project);
-                } catch (e) {
-                    logger.error(`Visibility Audit phase failed for ${project.name}:`, e.message);
-                    return { promptRankings: [], competitorRankings: [], customPromptResults: [], error: e.message };
-                }
-            })(),
-            // 2. Domain Profiler (Synthesis)
-            (async () => {
-                try {
-                    return await profilerService.analyzeDomainMulti(domain, profilerContent);
-                } catch (e) {
-                    logger.error(`Domain Profiler phase failed for ${domain}:`, e.message);
-                    return { brandType: 'Unknown', error: e.message };
-                }
-            })(),
-            // 3. Web search (Live Brand Mentions)
-            (async () => {
-                try {
-                    return await runLiveAudit(project.brandName);
-                } catch (e) {
-                    logger.error(`Live Brand Audit phase failed for ${project.brandName}:`, e.message);
-                    return { citations: [], mentions: [] };
-                }
-            })(),
-            // 4. Independent Audit Profile (for Visibility Audit tool)
-            (async () => {
-                try {
-                    return await aiOrchestrator.getStructuredProfile(project.brandName);
-                } catch (e) {
-                    logger.error(`Structured Profile phase failed for ${project.brandName}:`, e.message);
-                    return { summary: 'Profile generation failed.', error: e.message };
-                }
-            })(),
-            // 5. Independent Model Results (for Visibility Audit tool engine cards)
-            (async () => {
-                try {
-                    return await aiOrchestrator.broadcastQuery(project.brandName);
-                } catch (e) {
-                    logger.error(`Broadcast Query phase failed for ${project.brandName}:`, e.message);
-                    return [];
-                }
-            })()
-        ]);
+        // PHASE 2: AI CALLS — fully sequential to protect the 1GB server
+        // Each await completes before the next starts. No parallel Gemini calls.
+        logger.info(`🔄 [PHASE-2] Running Visibility Audit for ${project.name}...`);
+        let scanResults = { promptRankings: [], competitorRankings: [], customPromptResults: [] };
+        try { scanResults = await promptOrchestrator.performProjectScan(project); }
+        catch (e) { logger.error(`Visibility Audit failed for ${project.name}:`, e.message); }
+
+        logger.info(`🔄 [PHASE-3] Running Domain Profiler for ${domain}...`);
+        let synthesisResults = { brandType: 'Unknown' };
+        try { synthesisResults = await profilerService.analyzeDomainMulti(domain, profilerContent); }
+        catch (e) { logger.error(`Domain Profiler failed for ${domain}:`, e.message); }
+
+        logger.info(`🔄 [PHASE-4] Running Live Brand Audit for ${project.brandName}...`);
+        let liveAuditResults = { citations: [], mentions: [] };
+        try { liveAuditResults = await runLiveAudit(project.brandName); }
+        catch (e) { logger.error(`Live Brand Audit failed for ${project.brandName}:`, e.message); }
+
+        logger.info(`🔄 [PHASE-5] Running Structured Profile for ${project.brandName}...`);
+        let auditProfile = { summary: 'Profile generation failed.' };
+        try { auditProfile = await aiOrchestrator.getStructuredProfile(project.brandName); }
+        catch (e) { logger.error(`Structured Profile failed for ${project.brandName}:`, e.message); }
+
+        logger.info(`🔄 [PHASE-6] Running Broadcast Query for ${project.brandName}...`);
+        let auditModelResults = [];
+        try { auditModelResults = await aiOrchestrator.broadcastQuery(project.brandName); }
+        catch (e) { logger.error(`Broadcast Query failed for ${project.brandName}:`, e.message); }
 
         // ---------------------------------------------------------
         // PHASE 3: Web Mentions Profile (Synthesis)

@@ -15,10 +15,21 @@ exports.initCronJobs = () => {
     });
 
     // 2. Catch-up: Run on server startup for any missed scans today
-    logger.info('🕒 Checking for missed daily scans on startup...');
-    runAllProjectScans().catch(err => {
-        logger.error('❌ Error during catch-up scan on startup:', err.message);
-    });
+    // Delaying startup scan by 10 seconds to let the server fully stabilize and DB connect
+    setTimeout(async () => {
+        try {
+            logger.info('🕒 Cleaning up stuck scans from previous session...');
+            const stuckCount = await Project.updateMany({ isScanning: true }, { isScanning: false });
+            if (stuckCount.modifiedCount > 0) {
+                logger.info(`✅ Reset ${stuckCount.modifiedCount} stuck scan flags.`);
+            }
+
+            logger.info('🕒 Checking for missed daily scans on startup...');
+            await runAllProjectScans();
+        } catch (err) {
+            logger.error('❌ Error during catch-up scan on startup:', err.message);
+        }
+    }, 10000);
 
     logger.info('✅ Cron jobs initialized');
 };
@@ -63,31 +74,28 @@ const runAllProjectScans = async () => {
 
         logger.info(`🔍 Found ${projects.length} eligible subscribing projects needing daily automated scanning`);
 
-        // 3. Calculate Adaptive Delay
-        // Goal: Finish all scans within a 3-hour window (10,800 seconds)
-        // Formula: (Total Window / Total Projects) - Estimated Scan Time (min 10s, max 45s)
-        const TOTAL_WINDOW_MS = 3 * 60 * 60 * 1000; // 3 hours
-        const ESTIMATED_SCAN_TIME_MS = 20000; // 20 seconds
-        let adaptiveDelay = Math.floor((TOTAL_WINDOW_MS / projects.length) - ESTIMATED_SCAN_TIME_MS);
-        adaptiveDelay = Math.max(10000, Math.min(45000, adaptiveDelay)); // Clamp between 10s and 45s
+        // 3. Fixed delay between scans — on a 1GB server, each scan is heavy.
+        // A minimum of 30s ensures the server fully recovers memory before the next scan starts.
+        const INTER_SCAN_DELAY_MS = 30000; // 30 seconds between each project scan
 
-        logger.info(`🕒 Adaptive Delay calculated: ${adaptiveDelay/1000}s between projects`);
+        logger.info(`🕒 Inter-scan delay set to ${INTER_SCAN_DELAY_MS/1000}s (fixed, protects 1GB server)`);
 
-        // 4. Process them sequentially with adaptive delay
+        // 4. Process them sequentially with fixed delay
         for (const project of projects) {
             try {
                 logger.info(`🚀 [AUTO-SCAN] Executing Comprehensive Scan for subscribed project: ${project.name} (${project.domain})`);
                 
-                // Fire the core heavy scanner exactly as if the user manually pushed the sync button
                 await internalRunProjectScan(project);
 
                 logger.info(`✅ [AUTO-SCAN] Successfully completed daily automated scan for ${project.name}`);
 
-                // Pause with adaptive delay
-                await new Promise(resolve => setTimeout(resolve, adaptiveDelay));
+                // Fixed delay before next project — do NOT remove this
+                await new Promise(resolve => setTimeout(resolve, INTER_SCAN_DELAY_MS));
 
             } catch (projectErr) {
                 logger.error(`❌ [AUTO-SCAN] Error scanning subscribed project ${project.name}:`, projectErr.message);
+                // Still wait before trying next project even on error, so we don't spam
+                await new Promise(resolve => setTimeout(resolve, INTER_SCAN_DELAY_MS));
             }
         }
         
