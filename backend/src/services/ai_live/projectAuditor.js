@@ -446,7 +446,7 @@ Context: ${brandName} is a ${market.name !== 'Global' ? market.name + '-based' :
 
 Rules:
 1. CATEGORY FIRST: Identify the brand's actual business category (e.g., EdTech, SaaS, E-commerce).
-2. REAL RIVALS: Search for competitors that offer the SAME service as ${brandName}. Do NOT match by name similarity (e.g., if the brand is 'TreeCampus' for education, do NOT return 'TreePlanting' for environment).
+2. REAL RIVALS: Search for competitors that offer the SAME service as ${brandName}. Do NOT match by name similarity (e.g., if a brand is 'Apple' for technology, do NOT return 'Apple Orchard' for agriculture).
 3. ACTIVE PLAYERS: Only return brands that are currently active in the ${market.name} market.
 4. VARIETY: Include both major global leaders and strong local players in ${market.name}.
 5. Return ONLY a JSON array:
