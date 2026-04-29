@@ -11,7 +11,7 @@ const SYSTEM_PROMPT =
 // FREE MODELS ONLY (priority order) - AVOIDING GEMINI TO PREVENT 403 ERRORS
 const FREE_MODELS = [
   "perplexity/sonar-reasoning",
-  "google/gemini-2.0-flash:free",
+  "google/gemini-2.5-flash:free",
   "deepseek/deepseek-r1:free",
   "meta-llama/llama-3.3-70b-instruct:free"
 ];

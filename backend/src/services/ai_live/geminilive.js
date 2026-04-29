@@ -36,9 +36,9 @@ async function geminiLive(brand) {
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-    // Using gemini-2.0-flash for maximum stability with search tool
+    // Using gemini-2.5-flash for maximum stability with search tool
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash",
+      model: "gemini-2.5-flash",
       tools: [{ googleSearch: {} }]
     });
 
@@ -142,7 +142,7 @@ Maintain exactly one line per point. DO NOT EXCEED 30 WORDS.`;
       logger.warn(`🔄 Gemini Search failed (${err.message}). Retrying WITHOUT search tool...`);
       try {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const modelSafe = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        const modelSafe = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
         const resultSafe = await modelSafe.generateContent(`Analyze "${brand}" based ONLY on known public facts as of your latest knowledge. 
 If this is a specific recent website or small brand you don't know, state: "Minimal digital footprint discovered in current knowledge base."
 Otherwise, provide 4 concise evidence-based findings.`);
@@ -169,7 +169,7 @@ async function geminiPromptAudit(brandName, domain, promptText) {
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash",
+      model: "gemini-2.5-flash",
       tools: [{ googleSearch: {} }]
     });
 
@@ -269,9 +269,9 @@ async function geminiProfile(brand, liveResearchContext) {
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    // Use gemini-2.0-flash with JSON mode enforcement
+    // Use gemini-2.5-flash with JSON mode enforcement
     const model = genAI.getGenerativeModel({ 
-        model: "gemini-2.0-flash",
+        model: "gemini-2.5-flash",
         generationConfig: { responseMimeType: "application/json" }
     });
 

@@ -29,13 +29,38 @@ async function safeGeminiCall(fn) {
 }
 exports.safeGeminiCall = safeGeminiCall;
 
+// Helper to check daily scan usage (Last 24 Hours)
+const checkDailyScanLimit = async (user) => {
+    // 🛡️ WHITELIST: Unlimited scans for testing account
+    if (user.email === 'kumaryadavvishal616@gmail.com') {
+        return { count: 0, limit: 999, isExceeded: false };
+    }
+
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    
+    // Find all project IDs for this user
+    const userProjectIds = await Project.find({ userId: user._id }).distinct('_id');
+    
+    // Count snapshots created for those projects in the last 24h
+    const scanCount = await Snapshot.countDocuments({
+        projectId: { $in: userProjectIds },
+        date: { $gte: twentyFourHoursAgo }
+    });
+    
+    return {
+        count: scanCount,
+        limit: 2,
+        isExceeded: scanCount >= 2
+    };
+};
+
 // Helper to get project limit by tier
 const getProjectLimit = (tier) => {
     switch (tier) {
         case 'professional': return 20;
         case 'growth': return 5;
         case 'starter': return 2;
-        default: return 1; // Free Trial (none)
+        default: return 1; 
     }
 };
 
@@ -45,10 +70,9 @@ const getPromptLimit = (tier) => {
         case 'professional': return 25;
         case 'growth': return 10;
         case 'starter': return 2;
-        default: return 2; // Free Trial (none) gets 2 prompts
+        default: return 2; 
     }
 };
-
 
 // @desc    Create new project
 // @route   POST /api/projects
@@ -91,6 +115,17 @@ exports.createProject = async (req, res) => {
             targetEngines: targetEngines || ['openai', 'gemini'],
             market: market || { name: 'Global', code: 'GLB', type: 'global' }
         });
+
+        // 3. Check Daily Scan Limit before Auto-Scan
+        const scanUsage = await checkDailyScanLimit(req.user);
+        
+        if (scanUsage.isExceeded) {
+            logger.info(`⚠️ [AUTO-SCAN-SKIP] Daily limit reached for user ${req.user.email}. Skipping auto-scan.`);
+            return res.status(201).json({
+                ...project.toObject(),
+                info: "Project created, but auto-scan skipped because your daily limit (2 scans) is reached. Try again tomorrow."
+            });
+        }
 
         // Trigger AI Scan in the background immediately
         logger.info(`🚀 [AUTO-SCAN] Triggering background scan for new project: ${project.name}`);
@@ -239,6 +274,15 @@ exports.runProjectScan = async (req, res) => {
 
         if (!project) {
             return res.status(404).json({ error: 'Project not found' });
+        }
+
+        // 1. Check Daily Scan Limit (2 per day)
+        const scanUsage = await checkDailyScanLimit(req.user);
+        if (scanUsage.isExceeded) {
+            return res.status(403).json({ 
+                error: 'Daily limit reached', 
+                message: `You have already performed ${scanUsage.count} scans in the last 24 hours. Please try again tomorrow.` 
+            });
         }
 
         // Prevent overlapping scans for the SAME project
