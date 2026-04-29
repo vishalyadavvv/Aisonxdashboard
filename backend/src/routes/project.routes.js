@@ -7,7 +7,8 @@ const {
   updateProject,
   deleteProject,
   getProjectHistory,
-  runProjectSync
+  runProjectSync,
+  getScanStatus
 } = require('../controllers/project.controller');
 const { protect } = require('../utils/auth.middleware');
 
@@ -16,6 +17,7 @@ router.use(protect);
 
 router.post('/', createProject);
 router.get('/', getProjects);
+router.get('/:id/scan-status', getScanStatus); // NEW: Real-time queue status
 router.get('/:id', getProject);
 router.put('/:id', updateProject);
 router.delete('/:id', deleteProject);

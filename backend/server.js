@@ -29,6 +29,10 @@ process.on('SIGTERM', () => {
 // Initialize Daily Automated Scans
 cronService.initCronJobs();
 
+// Initialize Production Scan Queue Worker
+require('./src/queues/scanQueue');
+logger.info('✅ Scan queue worker initialized');
+
 const server = app.listen(PORT, () => {
   logger.info(`🚀 Server running on port ${PORT}`);
 });

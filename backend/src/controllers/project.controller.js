@@ -10,30 +10,22 @@ const { runLiveAudit, profileAIInterceptor } = require('../services/ai_live/live
 const { fetchKnowledgeGraphFull } = require('../services/externalEntity.service');
 const logger = require('../utils/logger');
 
-// ─── SCAN CONCURRENCY LIMITER ─────────────────────────────────────────────────
-// On a 1GB server, only 2 scans should ever run at the same time.
-// Each scan triggers 5+ heavy AI API calls — more than 2 = OOM crash.
-const MAX_CONCURRENT_SCANS = 2;
-let activeScans = 0;
+const Bottleneck = require('bottleneck');
+const { queueProjectScan } = require('../queues/scanQueue');
 
-const acquireScanSlot = () => {
-    if (activeScans >= MAX_CONCURRENT_SCANS) return false;
-    activeScans++;
-    return true;
-};
-const releaseScanSlot = () => { if (activeScans > 0) activeScans--; };
+// ─── GEMINI RATE LIMITER (Production Grade) ───────────────────────────────────
+// Allows 3 Gemini calls in parallel with a 1.2s gap between new starts.
+// This is perfectly tuned for Gemini Free/Pay-as-you-go limits (60 RPM).
+const geminiLimiter = new Bottleneck({
+    minTime: 1200, 
+    maxConcurrent: 3,
+    reservoir: 55, // Safety margin
+    reservoirRefreshAmount: 55,
+    reservoirRefreshInterval: 60 * 1000
+});
 
-// ─── GLOBAL GEMINI RATE LIMITER ───────────────────────────────────────────────
-// Ensures no two Gemini calls fire within 2 seconds of each other server-wide.
-let lastGeminiCallTime = 0;
 async function safeGeminiCall(fn) {
-    const now = Date.now();
-    const timeSinceLast = now - lastGeminiCallTime;
-    if (timeSinceLast < 2000) {
-        await new Promise(r => setTimeout(r, 2000 - timeSinceLast));
-    }
-    lastGeminiCallTime = Date.now();
-    return fn();
+    return geminiLimiter.schedule(fn);
 }
 exports.safeGeminiCall = safeGeminiCall;
 
@@ -239,49 +231,45 @@ exports.getProjectHistory = async (req, res) => {
 // @route   POST /api/projects/:id/scan
 // @access  Private
 exports.runProjectScan = async (req, res) => {
-    // Check if scan slots are available
-    if (!acquireScanSlot()) {
-        return res.status(429).json({ 
-            error: 'System Busy',
-            message: 'Our AI systems are currently at capacity. Please wait 30-60 seconds and try again.'
-        });
-    }
-
     try {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-            releaseScanSlot();
             return res.status(400).json({ error: 'Invalid project ID format' });
         }
         const project = await Project.findOne({ _id: req.params.id, userId: req.user._id });
 
         if (!project) {
-            releaseScanSlot();
             return res.status(404).json({ error: 'Project not found' });
         }
 
-        // Prevent overlapping scans if already in progress
+        // Prevent overlapping scans for the SAME project
         if (project.isScanning) {
-            releaseScanSlot();
             return res.status(400).json({ 
                 error: 'Scan in progress', 
-                message: 'A comprehensive scan is already running for this project. Please wait for it to complete.' 
+                message: 'A comprehensive scan is already running for this project. Please wait.' 
             });
         }
 
-        // Set scanning flag IMMEDIATELY and await it before responding to client
-        // This prevents the race condition where the client refreshes before the background task saves the flag
+        // 🚀 PRODUCTION FIX: Add to queue instead of rejecting
+        const queueInfo = await queueProjectScan(project._id);
+
+        if (queueInfo.alreadyQueued) {
+            return res.status(400).json({ error: 'Already Queued', message: 'This project is already waiting in line for a scan.' });
+        }
+
+        // Set scanning flag so UI knows it's pending
         project.isScanning = true;
         await project.save();
 
-        // Start background execution (non-blocking) - flag is already set
-        internalRunProjectScan(project);
-
-        res.json({ message: 'Intelligence assembly initiated. Scan running in background.', isScanning: true });
+        res.json({ 
+            message: 'Scan added to processing queue.', 
+            isScanning: true,
+            jobId: queueInfo.jobId,
+            queuePosition: queueInfo.queuePosition,
+            estimatedWait: queueInfo.estimatedWait
+        });
     } catch (err) {
-        logger.error('Error running project scan:', err.message);
-        res.status(500).json({ error: 'Scan failed', message: 'Something went wrong during the scan. Please try again.' });
-    } finally {
-        releaseScanSlot();
+        logger.error('Error queuing project scan:', err.message);
+        res.status(500).json({ error: 'System error', message: 'Could not initiate scan. Please try again shortly.' });
     }
 };
 
@@ -606,47 +594,61 @@ const internalRunProjectScan = async (project) => {
 // @route   POST /api/projects/:id/sync
 // @access  Private
 exports.runProjectSync = async (req, res) => {
-    // Check if scan slots are available
-    if (!acquireScanSlot()) {
-        return res.status(429).json({ 
-            error: 'System Busy',
-            message: 'Our AI systems are currently at capacity. Please wait 30-60 seconds and try again.'
-        });
-    }
     try {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-            releaseScanSlot();
             return res.status(400).json({ error: 'Invalid project ID format' });
         }
         const project = await Project.findOne({ _id: req.params.id, userId: req.user._id });
 
         if (!project) {
-            releaseScanSlot();
             return res.status(404).json({ error: 'Project not found' });
         }
         
-        // Prevent overlapping scans
         if (project.isScanning) {
-            releaseScanSlot();
             return res.status(400).json({ 
                 error: 'Scan in progress', 
-                message: 'A comprehensive scan is already running for this project. Please wait for it to complete.' 
+                message: 'This project is already being processed.' 
             });
         }
 
-        logger.info(`🔄 [SYNC-TRIGGER] Starting manual background sync for: ${project.name}`);
+        const queueInfo = await queueProjectScan(project._id);
         
-        // Set flag and await it before response
         project.isScanning = true;
         await project.save();
 
-        // Start background execution (non-blocking)
-        internalRunProjectScan(project).finally(() => releaseScanSlot());
-        
-        res.json({ message: 'Intelligence assembly initiated. Scan running in background.', isScanning: true });
+        res.json({ 
+            message: 'Manual sync added to queue.', 
+            isScanning: true,
+            jobId: queueInfo.jobId,
+            queuePosition: queueInfo.queuePosition
+        });
     } catch (err) {
         logger.error('Error in manual background sync trigger:', err.message);
-        res.status(500).json({ error: 'Failed to initiate sync: ' + err.message });
+        res.status(500).json({ error: 'Failed to initiate sync' });
+    }
+};
+
+// @desc    Get real-time scan status from queue
+// @route   GET /api/projects/:id/scan-status
+exports.getScanStatus = async (req, res) => {
+    try {
+        const { scanQueue } = require('../queues/scanQueue');
+        const project = await Project.findOne({ _id: req.params.id, userId: req.user._id });
+        if (!project) return res.status(404).json({ error: 'Not found' });
+
+        const waiting = await scanQueue.getWaiting();
+        const position = waiting.findIndex(j => j.data.projectId === req.params.id);
+        const active = await scanQueue.getActive();
+        const isActive = active.some(j => j.data.projectId === req.params.id);
+
+        res.json({
+            isScanning: project.isScanning || isActive || position >= 0,
+            status: isActive ? 'processing' : (position >= 0 ? 'queued' : 'idle'),
+            queuePosition: position >= 0 ? position + 1 : 0,
+            lastScanAt: project.lastScanAt
+        });
+    } catch (err) {
+        res.status(500).json({ error: 'Status check failed' });
     }
 };
 

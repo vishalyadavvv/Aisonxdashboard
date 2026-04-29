@@ -74,28 +74,21 @@ const runAllProjectScans = async () => {
 
         logger.info(`🔍 Found ${projects.length} eligible subscribing projects needing daily automated scanning`);
 
-        // 3. Fixed delay between scans — on a 1GB server, each scan is heavy.
-        // A minimum of 30s ensures the server fully recovers memory before the next scan starts.
-        const INTER_SCAN_DELAY_MS = 30000; // 30 seconds between each project scan
+        const { queueProjectScan } = require('../queues/scanQueue');
 
-        logger.info(`🕒 Inter-scan delay set to ${INTER_SCAN_DELAY_MS/1000}s (fixed, protects 1GB server)`);
-
-        // 4. Process them sequentially with fixed delay
+        // 4. Process them via queue — concurrency is handled by the worker automatically
         for (const project of projects) {
             try {
-                logger.info(`🚀 [AUTO-SCAN] Executing Comprehensive Scan for subscribed project: ${project.name} (${project.domain})`);
+                logger.info(`🚀 [AUTO-SCAN] Queuing daily scan for: ${project.name} (${project.domain})`);
                 
-                await internalRunProjectScan(project);
-
-                logger.info(`✅ [AUTO-SCAN] Successfully completed daily automated scan for ${project.name}`);
-
-                // Fixed delay before next project — do NOT remove this
-                await new Promise(resolve => setTimeout(resolve, INTER_SCAN_DELAY_MS));
+                // Set flag and add to queue
+                project.isScanning = true;
+                await project.save();
+                
+                await queueProjectScan(project._id);
 
             } catch (projectErr) {
-                logger.error(`❌ [AUTO-SCAN] Error scanning subscribed project ${project.name}:`, projectErr.message);
-                // Still wait before trying next project even on error, so we don't spam
-                await new Promise(resolve => setTimeout(resolve, INTER_SCAN_DELAY_MS));
+                logger.error(`❌ [AUTO-SCAN] Error queuing project ${project.name}:`, projectErr.message);
             }
         }
         
