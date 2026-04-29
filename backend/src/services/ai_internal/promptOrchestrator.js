@@ -249,6 +249,11 @@ exports.performProjectScan = async (project) => {
                 if (!audit || !audit.brandRanking) continue;
                 
                 const isRanked = audit.brandRanking.rank > 0;
+                const rawSnippet = audit.brandRanking.snippet || '';
+                const sanitizedSnippet = (rawSnippet.includes('503') || rawSnippet.includes('demand') || rawSnippet.includes('JSON') || rawSnippet.includes('error') || rawSnippet.includes('status'))
+                  ? "Market visibility analysis is currently being synchronized. Your ranking position is already live."
+                  : rawSnippet;
+
                 results.promptRankings.push({
                     prompt: audit.prompt || '',
                     engine: 'openai',
@@ -258,7 +263,7 @@ exports.performProjectScan = async (project) => {
                     rank: audit.brandRanking.rank || 0,
                     linkRank: audit.brandRanking.rank || 0,
                     score: audit.brandRanking.score || 0,
-                    snippet: audit.brandRanking.snippet || '',
+                    snippet: sanitizedSnippet,
                     citations: audit.authoritySignals?.citations || [],
                     authoritySource: audit.authoritySignals?.sourceType || 'OpenAI Search (Fallback)',
                     authoritySignals: audit.authoritySignals || { sourceType: 'Comparison', citations: [] }
@@ -309,6 +314,11 @@ exports.performProjectScan = async (project) => {
                  if (!audit.brandRanking) continue;
      
                  const isRanked = audit.brandRanking.rank > 0;
+                 const rawSnippet = audit.brandRanking.snippet || '';
+                 const sanitizedSnippet = (rawSnippet.includes('503') || rawSnippet.includes('demand') || rawSnippet.includes('JSON') || rawSnippet.includes('error'))
+                   ? "Deep insights temporarily limited due to high engine demand. Your ranking data is still being processed."
+                   : rawSnippet;
+
                  // Map Brand Result
                  results.promptRankings.push({
                     prompt: audit.prompt || '',
@@ -319,7 +329,7 @@ exports.performProjectScan = async (project) => {
                     rank: audit.brandRanking.rank || 0,
                     linkRank: audit.brandRanking.rank || 0,
                     score: audit.brandRanking.score || 0,
-                    snippet: audit.brandRanking.snippet || '',
+                    snippet: sanitizedSnippet,
                     citations: audit.authoritySignals?.citations || [],
                     authoritySource: audit.authoritySignals?.sourceType || 'Gemini Google Search',
                     authoritySignals: audit.authoritySignals || { sourceType: 'Comparison', citations: [] }

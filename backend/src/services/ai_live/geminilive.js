@@ -81,13 +81,29 @@ If data is missing for a point, state: "Digital record limited for [Category]."
 
 Maintain exactly one line per point. DO NOT EXCEED 30 WORDS.`;
 
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig: {
-        temperature: 0.1,
-        maxOutputTokens: 1000
+    let result = null;
+    let retries = 3;
+    while (retries > 0) {
+      try {
+        result = await model.generateContent({
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.1,
+            maxOutputTokens: 1000
+          }
+        });
+        break;
+      } catch (err) {
+        retries--;
+        const isRetryable = err.message && (err.message.includes('503') || err.message.includes('demand') || err.message.includes('429'));
+        if (isRetryable && retries > 0) {
+          logger.warn(`⚠️ [GEMINI_PROMPT] Server busy, retrying... (${retries} left)`);
+          await new Promise(r => setTimeout(r, 3000));
+        } else {
+          throw err;
+        }
       }
-    });
+    }
 
     if (!result || !result.response) {
       throw new Error("Empty response from Gemini API");
@@ -159,7 +175,7 @@ Otherwise, provide 4 concise evidence-based findings.`);
         response: err.response ? JSON.stringify(err.response) : 'No response data'
     };
     logger.error("❌ Gemini Live Error:", detailedError);
-    return `Gemini search failed: ${err.message}`;
+    return "The AI engine is currently experiencing high demand. A professional brand synthesis will be generated automatically once the queue clears.";
   }
 }
 

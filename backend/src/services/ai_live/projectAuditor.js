@@ -219,13 +219,21 @@ INSTRUCTIONS:
             }
             return null;
         } catch (err) {
-            const isRateLimit = err.message && (err.message.includes('429') || err.message.includes('quota'));
-            if (isRateLimit) {
-                logger.warn(`❌ [GEMINI] Rate limit hit on individual audit — skipping to protect server.`);
-                return null; // HARD STOP — do not retry on 429
+            const isRetryable = err.message && (
+                err.message.includes('429') || 
+                err.message.includes('quota') || 
+                err.message.includes('503') || 
+                err.message.includes('demand')
+            );
+            
+            if (isRetryable && retriesLeft > 0) {
+                logger.warn(`⚠️ [GEMINI] Server busy/Rate limit (503/429), retrying in 3s... (${retriesLeft} left)`);
+                await new Promise(r => setTimeout(r, 3000));
+                return callGemini(retriesLeft - 1);
             }
+
             if (retriesLeft > 0) {
-                logger.warn(`⚠️ Gemini audit error, retrying (${retriesLeft} left): ${err.message}`);
+                logger.warn(`⚠️ Gemini individual audit error, retrying (${retriesLeft} left): ${err.message}`);
                 await new Promise(r => setTimeout(r, 2000));
                 return callGemini(retriesLeft - 1);
             }
@@ -406,10 +414,17 @@ INSTRUCTIONS:
             }
             return null;
         } catch (err) {
-            const isRateLimit = err.message && (err.message.includes('429') || err.message.includes('quota'));
-            if (isRateLimit) {
-                logger.warn(`❌ [GEMINI] Rate limit hit on competitive audit — skipping to protect server.`);
-                return null; // HARD STOP — do not retry on 429
+            const isRetryable = err.message && (
+                err.message.includes('429') || 
+                err.message.includes('quota') || 
+                err.message.includes('503') || 
+                err.message.includes('demand')
+            );
+            
+            if (isRetryable && retriesLeft > 0) {
+                logger.warn(`⚠️ [GEMINI] Server busy/Rate limit (503/429), retrying in 3s... (${retriesLeft} left)`);
+                await new Promise(r => setTimeout(r, 3000));
+                return callGeminiCompetitive(retriesLeft - 1);
             }
             if (retriesLeft > 0) {
                 logger.warn(`⚠️ Gemini competitive error, retrying (${retriesLeft} left): ${err.message}`);
@@ -454,22 +469,38 @@ Rules:
 `;
 
     logger.info(`🔍 [PROJECT_AUDITOR] Searching LIVE for competitors of ${brandName}...`);
-    const res = await client.responses.create({
-      model: "gpt-4o",
-      tools: [{ type: "web_search" }],
-      input: prompt
-    });
+    
+    let retries = 3;
+    while (retries > 0) {
+      try {
+        const res = await client.responses.create({
+          model: "gpt-4o",
+          tools: [{ type: "web_search" }],
+          input: prompt
+        });
 
-    const text = res.output_text || (res.choices && res.choices[0]?.message?.content) || (res.output && res.output.text) || '';
-    const discovered = robustParseJSON(text);
-    if (!discovered) {
-      logger.warn(`⚠️ [PROJECT_AUDITOR] No valid JSON found in competitor search response for ${brandName}: ${text.substring(0, 100)}`);
-      return [];
+        const text = res.output_text || (res.choices && res.choices[0]?.message?.content) || (res.output && res.output.text) || '';
+        const discovered = robustParseJSON(text);
+        if (discovered && Array.isArray(discovered)) {
+          logger.info(`✅ [PROJECT_AUDITOR] Discovered ${discovered.length} rivals for ${brandName} via Live Search`);
+          return discovered;
+        }
+        retries--;
+      } catch (err) {
+        retries--;
+        const isRetryable = err.message && (err.message.includes('429') || err.message.includes('503') || err.message.includes('timeout'));
+        if (isRetryable && retries > 0) {
+          logger.warn(`⚠️ OpenAI Competitor Search Error. Retrying... (${retries} left)`);
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        } else {
+          logger.error(`❌ [PROJECT_AUDITOR] Competitor Search Error:`, err.message);
+          return [];
+        }
+      }
     }
-    logger.info(`✅ [PROJECT_AUDITOR] Discovered ${discovered.length} rivals for ${brandName} via Live Search`);
-    return discovered;
+    return [];
   } catch (err) {
-    logger.error(`❌ [PROJECT_AUDITOR] Competitor Search Error:`, err.message);
+    logger.error(`❌ [PROJECT_AUDITOR] Competitor Search Fatal Error:`, err.message);
     return [];
   }
 };

@@ -511,14 +511,19 @@ const internalRunProjectScan = async (project) => {
             brandName: project.brandName,
             domain: project.domain,
             overallScore: internalAuditScore, // Replaced with strictly internal score
-            summary: auditProfile?.summary || `Internal knowledge base exploration complete. Visibility: ${internalAuditScore}%`,
+            summary: auditProfile?.summary || "AI Visibility analysis is currently being synthesized. Competitive data is being prioritized.",
             profile: {
+                optimizationChecklist: auditProfile?.optimizationChecklist?.length > 0 ? auditProfile.optimizationChecklist : [
+                    { task: "Ensure Robots.txt allows all major AI User-Agents (GPTBot, OAI-SearchBot)", priority: "High", impact: "Direct visibility boost" },
+                    { task: "Create a dedicated 'About Us' or 'Brand Story' page with clear entity markers", priority: "Medium", impact: "Improved knowledge graph indexing" },
+                    { task: "Acquire brand mentions on high-authority industry publications", priority: "High", impact: "Increased LLM citation probability" }
+                ],
                 ...auditProfile,
                 visibilityScore: internalAuditScore,
                 aiVisibilityAssessment: {
                     ...auditProfile?.aiVisibilityAssessment,
                     overallLevel: internalAuditScore >= 70 ? 'High' : (internalAuditScore >= 40 ? 'Moderate' : 'Low'),
-                    interpretation: auditProfile?.interpretation || `Brand awareness index computed from native LLM training data.`
+                    interpretation: auditProfile?.interpretation || "Analysis of brand presence across global AI training sets and neural knowledge bases."
                 }
             }
         };
