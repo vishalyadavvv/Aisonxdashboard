@@ -343,7 +343,7 @@ OUTPUT FORMAT (JSON ONLY):
 
     parsed.generatedAt = new Date().toISOString();
     parsed.dataSource = liveResearchContext ? 'gemini-synthesized-live' : 'gemini-expert-fallback';
-    parsed.engine = 'Gemini-2.0-Flash-Master';
+    parsed.engine = 'Gemini-2.5-Flash-Master';
 
     logger.info(`✅ [MASTER_PROFILE] Gemini Generation complete.`);
     return parsed;
