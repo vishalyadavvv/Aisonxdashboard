@@ -158,7 +158,7 @@ exports.geminiPromptAudit = async function gptPromptAudit(brandName, domain, pro
     if (!process.env.GEMINI_API_KEY) return null;
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
+      model: "gemini-flash-latest",
       tools: [{ googleSearch: {} }]
     });
 
@@ -227,8 +227,9 @@ INSTRUCTIONS:
             );
             
             if (isRetryable && retriesLeft > 0) {
-                logger.warn(`⚠️ [GEMINI] Server busy/Rate limit (503/429), retrying in 3s... (${retriesLeft} left)`);
-                await new Promise(r => setTimeout(r, 3000));
+                const waitTime = err.message.includes('503') ? 10000 : 3000;
+                logger.warn(`⚠️ [GEMINI] Server busy/503, retrying in ${waitTime/1000}s... (${retriesLeft} left)`);
+                await new Promise(r => setTimeout(r, waitTime));
                 return callGemini(retriesLeft - 1);
             }
 
@@ -346,7 +347,7 @@ exports.geminiCompetitiveAudit = async function geminiCompetitiveAudit(brandName
     if (!process.env.GEMINI_API_KEY) return null;
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
+      model: "gemini-flash-latest",
       tools: [{ googleSearch: {} }]
     });
 
@@ -422,8 +423,9 @@ INSTRUCTIONS:
             );
             
             if (isRetryable && retriesLeft > 0) {
-                logger.warn(`⚠️ [GEMINI] Server busy/Rate limit (503/429), retrying in 3s... (${retriesLeft} left)`);
-                await new Promise(r => setTimeout(r, 3000));
+                const waitTime = err.message.includes('503') ? 10000 : 3000;
+                logger.warn(`⚠️ [GEMINI] Server busy (503/429), retrying in ${waitTime/1000}s... (${retriesLeft} left)`);
+                await new Promise(r => setTimeout(r, waitTime));
                 return callGeminiCompetitive(retriesLeft - 1);
             }
             if (retriesLeft > 0) {
@@ -510,7 +512,7 @@ exports.geminiSearchCompetitors = async function geminiSearchCompetitors(brandNa
     if (!process.env.GEMINI_API_KEY) return [];
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
+      model: "gemini-flash-latest",
       tools: [{ googleSearch: {} }]
     });
 

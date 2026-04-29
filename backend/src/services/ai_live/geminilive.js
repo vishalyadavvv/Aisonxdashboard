@@ -38,7 +38,7 @@ async function geminiLive(brand) {
 
     // Using gemini-2.5-flash for maximum stability with search tool
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
+      model: "gemini-flash-latest",
       tools: [{ googleSearch: {} }]
     });
 
@@ -97,8 +97,9 @@ Maintain exactly one line per point. DO NOT EXCEED 30 WORDS.`;
         retries--;
         const isRetryable = err.message && (err.message.includes('503') || err.message.includes('demand') || err.message.includes('429'));
         if (isRetryable && retries > 0) {
-          logger.warn(`⚠️ [GEMINI_PROMPT] Server busy, retrying... (${retries} left)`);
-          await new Promise(r => setTimeout(r, 3000));
+          const waitTime = err.message.includes('503') ? 10000 : 3000;
+          logger.warn(`⚠️ [GEMINI_PROMPT] Server busy (503), retrying in ${waitTime/1000}s... (${retries} left)`);
+          await new Promise(r => setTimeout(r, waitTime));
         } else {
           throw err;
         }
