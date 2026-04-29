@@ -13,7 +13,7 @@ const fetchGemini = async (query, jsonMode = false) => {
     const genAI = new GoogleGenerativeAI(apiKey);
 
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash",
+      model: "gemini-flash-latest",
       systemInstruction: "You are a specific AI model. Follow the user's detailed instructions exactly. Output valid JSON if requested."
     });
 
@@ -58,7 +58,7 @@ const fetchGeminiWithSearch = async (query, jsonMode = false) => {
     const apiKey = process.env.GEMINI_API_KEY;
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash",
+      model: "gemini-flash-latest",
       tools: [{ googleSearch: {} }]
     });
 
