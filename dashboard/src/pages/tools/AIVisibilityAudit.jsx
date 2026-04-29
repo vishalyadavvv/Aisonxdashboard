@@ -321,11 +321,12 @@ const AIVisibilityAudit = () => {
     let text = typeof content === 'string' ? content : (content.summary || content.interpretation || content.content || '');
     
     // If it's a "Not Found" case, ensure we show the honest admission
-    if (!text || text.length < 5) {
+    if (!text || text.length < 5 || text.toLowerCase().includes('was not found in my training data')) {
       if (content.entityRecognition?.found === false || 
           content.brandStatus?.includes('Not Found') ||
-          content.visibilityLevel === 'Unknown') {
-        text = `Entity "${content.brandName || 'this brand'}" was not identified within the native training knowledge base.`;
+          content.visibilityLevel === 'Unknown' ||
+          text.toLowerCase().includes('was not found in my training data')) {
+        text = `${content.brandName || 'This brand'} was not found in my training data.`;
       }
     }
 

@@ -271,8 +271,8 @@ OUTPUT FORMAT (Valid JSON - MANDATORY):
     "confidence": "High|Medium|Low|Not Found",
     "trainingDataCoverage": "Describe SPECIFIC facts you know, or state 'No specific information found in training data'"
   },
-  "summary": "4-5 detailed sentences: What SPECIFIC facts does YOUR training data contain about ${brandName}? Provide a comprehensive description of their products, industry position, and reputation.",
-  "interpretation": "4-5 detailed sentences based ONLY on verified knowledge. Provide a professional assessment of their market impact and significance. If not found, say '${brandName} does not appear in my training corpus with any specific or verifiable information.'",
+  "summary": "4-5 detailed sentences: What SPECIFIC facts does YOUR training data contain about ${brandName}? Provide a comprehensive description of their products, industry position, and reputation. If not found, say '${brandName} was not found in my training data.'",
+  "interpretation": "4-5 detailed sentences based ONLY on verified knowledge. Provide a professional assessment of their market impact and significance. If not found, say '${brandName} was not found in my training data.'",
   "brandStatus": "Present|Not Found|Partially Known",
   "visibilityLevel": "Market Leader|Highly Visible|Moderate Presence|Minimal Visibility|Unknown",
   "sentimentScore": 0-100,

@@ -474,9 +474,38 @@ const internalRunProjectScan = async (project) => {
         );
 
         // ---------------------------------------------------------
-        // PHASE 5: Save Snapshot
+        // PHASE 5: Post-Processing & Hallucination Check
         // ---------------------------------------------------------
-        
+        const detectGenericResponse = (modelResult) => {
+            if (!modelResult || modelResult.error) return true;
+            const status = (modelResult.brandStatus || '').toLowerCase();
+            if (status.includes('not found')) return true;
+            const found = modelResult.entityRecognition?.found;
+            if (found === false) return true;
+            const text = ((modelResult.interpretation || '') + ' ' + (modelResult.summary || '')).toLowerCase();
+            const genericPhrases = ['was not found in my training data', 'not appear in my training corpus', 'no specific or verifiable facts'];
+            return genericPhrases.some(p => text.includes(p));
+        };
+
+        // Standardize Project side "Not Found" responses
+        Object.keys(auditModelResults).forEach(key => {
+            const m = auditModelResults[key];
+            if (detectGenericResponse(m)) {
+                m.aiVisibilityAssessment = m.aiVisibilityAssessment || { criteria: [] };
+                m.aiVisibilityAssessment.overallLevel = 'Not Found';
+                m.aiVisibilityAssessment.visibilityScore = 0;
+                m.summary = `${project.brandName} was not found in my training data.`;
+                m.interpretation = `${project.brandName} was not found in my training data.`;
+            }
+        });
+
+        if (detectGenericResponse(auditProfile)) {
+            auditProfile.summary = `${project.brandName} was not found in my training data.`;
+            auditProfile.interpretation = `${project.brandName} was not found in my training data.`;
+            auditProfile.visibilityScore = 0;
+            auditProfile.visibilityLevel = 'Not Found';
+        }
+
         // *** INTERNAL AUDIT PROFILE RECONCILIATION ***
         // Detect hallucinations in the audit profile
         const isInternalAuditFound = (model) => {

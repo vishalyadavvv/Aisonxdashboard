@@ -363,7 +363,7 @@ exports.startScan = async (req, res) => {
             
             result.aiVisibilityAssessment.overallLevel = 'Not Found';
             result.aiVisibilityAssessment.visibilityScore = 0;
-            result.aiVisibilityAssessment.interpretation = `Entity "${cleanBrandName}" was not identified within the internal training knowledge base of ${modelId}.`;
+            result.aiVisibilityAssessment.interpretation = `${cleanBrandName} was not found in my training data.`;
             
             if (Array.isArray(result.aiVisibilityAssessment.criteria)) {
                 result.aiVisibilityAssessment.criteria = result.aiVisibilityAssessment.criteria.map(c => ({
