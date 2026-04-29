@@ -111,25 +111,24 @@ exports.gptPromptAudit = async function gptPromptAudit(brandName, domain, prompt
     if (!process.env.OPENAI_API_KEY) return null;
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     
-    const prompt = `
-ROLE: You are an Insightful Search Market Analyst.
-TARGET MARKET: "${market.name}" ${market.context ? `(${market.context})` : ''}
-TASK: Evaluate if and how "${brandName}" (${domain}) appears in YOUR real-time results for: "What are the best options for ${promptText}?" in the ${market.name} market.
+    const prompt = `ROLE: Strict Search Market Auditor.
+TARGET BRAND: "${brandName}" (${domain})
+QUERY: "${promptText}" in ${market.name}
+
+TASK: Perform an UNBIASED audit with authority proof.
 
 INSTRUCTIONS:
-1. HYBRID SEARCH: Check general results. If missing, perform a brand-specific search to verify specialized or niche rankings.
-2. 🚨 BRAND RECOGNITION: Prioritize identifying the client. If they appear in top articles, reviews, or industry guides, confirm their ranking.
-3. 🚨 RICH ANALYTICS: Snippets MUST be 2-3 detailed sentences (max 60 words). Explain findings with human-like detail.
-4. RANKING: Assign a realistic rank based on evidence. If found only via targeted search, use Rank 6-10 (Verified Presence).
-4. CITATION FLEXIBILITY: Provide valid citation URLs. ONLY absolute URLs.
+1. HONEST BENCHMARK: Report Rank 1-10 only if the brand is a top leader. Report Rank 0 otherwise.
+2. VERIFIED DISCOVERY: Even if Rank is 0, you MUST find the brand's verified domain and citations to prove it was audited.
+3. SNIPPET: Provide a professional summary of the brand's position and offering.
+4. CITATIONS: Provide 1-3 valid 'https://' links for evidence.
+5. RETURN ONLY RAW JSON.
 
-OUTPUT FORMAT (JSON):
 {
   "prompt": "${promptText}",
-  "brandRanking": { "rank": 0-10, "score": 0-100, "isRecommended": true/false, "linkProvided": true/false, "snippet": "Detailed factual info" },
-  "authoritySignals": { "sourceType": "Native OpenAI Search", "citations": ["URLs"] }
-}
-`;
+  "brandRanking": { "rank": 0-10, "score": 0-100, "isRecommended": true/false, "linkProvided": true/false, "snippet": "Objective standing + Evidence" },
+  "authoritySignals": { "sourceType": "OpenAI Benchmark + Evidence", "citations": [] }
+}`;
 
     const res = await client.responses.create({
       model: "gpt-4o",
@@ -162,24 +161,29 @@ exports.geminiPromptAudit = async function gptPromptAudit(brandName, domain, pro
       tools: [{ googleSearch: {} }]
     });
 
-    const prompt = `ROLE: Professional Search Market Research Auditor.
+    const prompt = `ROLE: Strict Search Market Auditor with Authority Verification.
 TARGET MARKET: "${market.name}" ${market.context ? `(${market.context})` : ''}
 TARGET BRAND (The Client): "${brandName}" (${domain})
 
-TASK: Use Google Search to evaluate the visibility and reputation of "${brandName}" in the ${market.name} market for the query: "${promptText}".
+TASK: Perform a Benchmark Audit for: "${promptText}".
 
-INSTRUCTIONS:
-1. HYBRID SEARCH: First, search for "${promptText} in ${market.name}". If "${brandName}" is not prominent, perform a targeted second search for "${brandName}" to verify its specific authority.
-2. 🚨 DATA INTEGRITY: Be realistic and persistent. Prioritize identifying the client using the provided domain (${domain}). Recognize their status even if they are in niche snippets.
-3. 🚨 RICH SNIPPETS: Snippet MUST be 1-2 factual sentences (max 60 words).
-4. 🚨 PROOF RULES: You MUST return FULL, VALID 'https://' URLs for citations.
-5. OUTPUT FORMAT (JSON ONLY):
+STRICT INSTRUCTIONS:
+1. MARKET BENCHMARK (The Rank): Identify the top 10 industry leaders for this query. 
+   - Report Rank 1-10 only if "${brandName}" is naturally in the top tier.
+   - Report Rank 0 if the brand is not a top-tier recommendation.
+2. AUTHORITY PROOF (The Evidence): Regardless of rank, you MUST perform a targeted search for "${brandName}" (${domain}) to find its citations and authority signals.
+3. OUTPUT DATA:
+   - "rank": The honest benchmark position (1-10 or 0).
+   - "snippet": A 1-2 sentence professional analysis of their standing + specific offering.
+   - "citations": You MUST return valid 'https://' URLs found for this brand.
+4. 🚨 PROOF RULES: Never return empty citations if the brand exists online.
+5. FORMAT: RETURN ONLY RAW JSON.
+
 {
   "prompt": "${promptText}",
-  "brandRanking": { "rank": 1-10 (0 if invisible), "score": 0-100, "isRecommended": true/false, "linkProvided": true/false, "snippet": "Factual analysis summary." },
-  "authoritySignals": { "sourceType": "Google Search", "citations": [] }
-}
-🚨 RETURN ONLY JSON.`;
+  "brandRanking": { "rank": 0-10, "score": 0-100, "isRecommended": true/false, "linkProvided": true/false, "snippet": "Honest benchmark + brand details." },
+  "authoritySignals": { "sourceType": "Benchmark + Verified Discovery", "citations": ["URLs"] }
+}`;
 
     // MAX 2 retries. On 429 rate limit → HARD STOP immediately (no retry = no spam).
     const MAX_RETRIES = 2;

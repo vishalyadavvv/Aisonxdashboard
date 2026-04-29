@@ -159,7 +159,7 @@ Maintain exactly one line per point. DO NOT EXCEED 30 WORDS.`;
       logger.warn(`🔄 Gemini Search failed (${err.message}). Retrying WITHOUT search tool...`);
       try {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const modelSafe = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const modelSafe = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
         const resultSafe = await modelSafe.generateContent(`Analyze "${brand}" based ONLY on known public facts as of your latest knowledge. 
 If this is a specific recent website or small brand you don't know, state: "Minimal digital footprint discovered in current knowledge base."
 Otherwise, provide 4 concise evidence-based findings.`);
@@ -186,7 +186,7 @@ async function geminiPromptAudit(brandName, domain, promptText) {
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
+      model: "gemini-flash-latest",
       tools: [{ googleSearch: {} }]
     });
 
@@ -288,7 +288,7 @@ async function geminiProfile(brand, liveResearchContext) {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     // Use gemini-2.5-flash with JSON mode enforcement
     const model = genAI.getGenerativeModel({ 
-        model: "gemini-2.5-flash",
+        model: "gemini-flash-latest",
         generationConfig: { responseMimeType: "application/json" }
     });
 
@@ -360,7 +360,7 @@ OUTPUT FORMAT (JSON ONLY):
 
     parsed.generatedAt = new Date().toISOString();
     parsed.dataSource = liveResearchContext ? 'gemini-synthesized-live' : 'gemini-expert-fallback';
-    parsed.engine = 'Gemini-2.5-Flash-Master';
+    parsed.engine = 'gemini-flash-latest';
 
     logger.info(`✅ [MASTER_PROFILE] Gemini Generation complete.`);
     return parsed;
