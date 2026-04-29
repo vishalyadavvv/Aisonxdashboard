@@ -7,6 +7,7 @@ import { useProject } from '../../context/ProjectContext';
 import toast from 'react-hot-toast';
 import { Link, useParams } from 'react-router-dom';
 import { downloadPDF } from '../../utils/downloadPDF';
+import AIReadinessReport from '../../components/reports/AIReadinessReport';
 
 const STEPS = [
   { label: 'Domain Synthesis', icon: Globe },
@@ -136,6 +137,7 @@ const AIReadiness = () => {
   const [view, setView] = useState('home'); // 'home' | 'analyzing' | 'report'
   const [syncLoading, setSyncLoading] = useState(!!projectId);
   const [currentStep, setCurrentStep] = useState(0);
+  const [isExporting, setIsExporting] = useState(false);
 
   const project = contextProject;
   const setProject = () => {}; // Placeholder, as project is now from context
@@ -248,6 +250,21 @@ const AIReadiness = () => {
   );
 
   const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+  const handleExportPDF = async (name) => {
+    setIsExporting(true);
+    const toastId = toast.loading('Generating high-quality PDF report...');
+    try {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await downloadPDF('ai-readiness-pdf-template', `AI_Readiness_Report_${name}`);
+      toast.success('Report downloaded successfully!', { id: toastId });
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to generate PDF', { id: toastId });
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const getScoreColor = (score) => {
     if (score >= 80) return '#22c55e';
@@ -441,10 +458,12 @@ const AIReadiness = () => {
               </p>
               <div className="flex items-center gap-3" data-html2canvas-ignore>
                 <button 
-                  onClick={() => downloadPDF('report-content', 'AI_Readiness_Report.pdf')}
-                  className="flex items-center gap-2 bg-white text-[#1a202c] px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-100 transition-colors cursor-pointer"
+                  onClick={() => handleExportPDF(projectId ? (project?.name) : (results.domain || 'Brand'))}
+                  disabled={isExporting}
+                  className="flex items-center gap-2 bg-white text-[#1a202c] px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-50"
                 >
-                  <FileDown className="w-4 h-4" /> Download PDF Report
+                  {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />}
+                  Download PDF Report
                 </button>
               </div>
             </div>
@@ -1264,6 +1283,17 @@ const AIReadiness = () => {
            )}
          </motion.div>
       )}
+      {/* Hidden PDF Template (Rendered off-screen for high-quality capture) */}
+      <div className="absolute -left-[9999px] top-0 pointer-events-none" aria-hidden="true">
+        <div id="ai-readiness-pdf-template">
+          {results && (
+            <AIReadinessReport 
+              brandName={projectId ? (project?.name) : (results.domain || 'Brand')} 
+              data={results} 
+            />
+          )}
+        </div>
+      </div>
     </div>
   );
 };

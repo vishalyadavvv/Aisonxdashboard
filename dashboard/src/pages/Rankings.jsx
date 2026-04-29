@@ -40,6 +40,7 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import { useProject } from '../context/ProjectContext';
 import { fixAIUrl } from '../utils/linkFixer';
+import RankingPerformanceReport from '../components/reports/RankingPerformanceReport';
 
 // Helper: check if a string looks like a valid URL
 const isValidUrl = (str) => {
@@ -57,6 +58,7 @@ const Rankings = () => {
   const [selectedEngine, setSelectedEngine] = useState('all');
   const [activeRange, setActiveRange] = useState('Current');
   const [expandedRow, setExpandedRow] = useState(null);
+  const [isExporting, setIsExporting] = useState(false);
 
   const project = contextProject;
   const history = contextHistory;
@@ -152,6 +154,21 @@ const Rankings = () => {
     });
   }, [history, selectedEngine]);
 
+  const handleExportPDF = async () => {
+    setIsExporting(true);
+    const toastId = toast.loading('Generating ranking performance report...');
+    try {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await downloadPDF('rankings-pdf-template', `${project?.name || 'Project'}_Rankings_Report`);
+      toast.success('Report downloaded successfully!', { id: toastId });
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to generate PDF', { id: toastId });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   if (loading || !project) return (
     <div className="flex flex-col items-center justify-center py-40">
       <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4" />
@@ -212,10 +229,11 @@ const Rankings = () => {
              <div className="h-4 w-px bg-slate-200 mx-2" />
 
              <button 
-               onClick={() => downloadPDF('rankings-content', `${project?.name}_Rankings_Report.pdf`)}
-               className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all active:scale-95 shadow-sm cursor-pointer"
+               onClick={handleExportPDF}
+               disabled={isExporting}
+               className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all active:scale-95 shadow-sm cursor-pointer disabled:opacity-50"
              >
-               <FileDown className="w-3.5 h-3.5" />
+               {isExporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileDown className="w-3.5 h-3.5" />}
                Export PDF
              </button>
           </div>
@@ -610,10 +628,24 @@ const Rankings = () => {
                 })}
               </tbody>
             </table>
-          </div>
+        </div>
+      </div>
+
+      {/* Hidden PDF Template (Rendered off-screen for high-quality capture) */}
+      <div className="absolute -left-[9999px] top-0 pointer-events-none" aria-hidden="true">
+        <div id="rankings-pdf-template">
+          {project && (
+            <RankingPerformanceReport 
+              brandName={project.brandName || project.name} 
+              data={project} 
+              history={history}
+              metrics={metrics}
+            />
+          )}
         </div>
       </div>
     </div>
+  </div>
   );
 };
 

@@ -36,7 +36,7 @@ export const downloadPDF = async (elementId, filename = 'report') => {
     safeZones.sort((a, b) => a.top - b.top);
 
     // 2. High-Fidelity Single Pass Render (Native oklch / Tailwind v4 support)
-    const renderScale = 2;
+    const renderScale = 3;
     const canvas = await html2canvas(element, {
       scale: renderScale,
       useCORS: true,

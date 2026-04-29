@@ -41,6 +41,7 @@ import { useAuth } from '../context/AuthContext';
 import { downloadPDF } from '../utils/downloadPDF';
 import { useProject } from '../context/ProjectContext';
 import { fixAIUrl } from '../utils/linkFixer';
+import ProjectIntelligenceReport from '../components/reports/ProjectIntelligenceReport';
 
 const ProjectDetail = () => {
   const { projectId } = useParams();
@@ -54,6 +55,7 @@ const ProjectDetail = () => {
   const [activeSnapshotIndex, setActiveSnapshotIndex] = useState(0);
   const [selectedEngine, setSelectedEngine] = useState('all');
   const [scanMessageIndex, setScanMessageIndex] = useState(0);
+  const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
     let interval;
@@ -129,6 +131,22 @@ const ProjectDetail = () => {
       } else {
         toast.error(serverMsg || 'Intelligence sync failed. Please try again.', { id: toastId });
       }
+    }
+  };
+
+  const handleExportPDF = async () => {
+    setIsExporting(true);
+    const toastId = toast.loading('Generating comprehensive intelligence report...');
+    try {
+      // Small delay to ensure template is ready
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await downloadPDF('project-detail-pdf-template', `${project?.name || 'Project'}_Full_Report`);
+      toast.success('Report downloaded successfully!', { id: toastId });
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to generate PDF', { id: toastId });
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -322,10 +340,11 @@ const ProjectDetail = () => {
               <span className="shrink-0">{isScanning ? scanMessages[scanMessageIndex] : 'Comprehensive Scan'}</span>
             </button>
             <button 
-              onClick={() => downloadPDF('project-detail-report', `${project?.name || 'Project'}_Full_Report.pdf`)}
-              className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto"
+              onClick={handleExportPDF}
+              disabled={isExporting}
+              className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto disabled:opacity-50"
             >
-              <Download className="w-4 h-4" />
+              {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
               EXPORT
             </button>
           </div>
@@ -1135,9 +1154,22 @@ const ProjectDetail = () => {
             )}
             </>
             );
-            })()}
-          </div>
-        )}
+          })()}
+        </div>
+      )}
+    </div>
+
+      {/* Hidden PDF Template (Rendered off-screen for high-quality capture) */}
+      <div className="absolute -left-[9999px] top-0 pointer-events-none" aria-hidden="true">
+        <div id="project-detail-pdf-template">
+          {project && (
+            <ProjectIntelligenceReport 
+              brandName={project.brandName || project.name} 
+              data={project} 
+              history={history}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

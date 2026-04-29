@@ -7,6 +7,7 @@ import { useProject } from '../../context/ProjectContext';
 import toast from 'react-hot-toast';
 import { Link, useParams } from 'react-router-dom';
 import { downloadPDF } from '../../utils/downloadPDF';
+import DomainProfilerReport from '../../components/reports/DomainProfilerReport';
 
 const DomainProfiler = () => {
   const { projectId } = useParams();
@@ -21,6 +22,7 @@ const DomainProfiler = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [view, setView] = useState('home'); // 'home' | 'report'
   const [syncLoading, setSyncLoading] = useState(!!projectId);
+  const [isExporting, setIsExporting] = useState(false);
 
   const project = contextProject;
   const setProject = () => {};
@@ -123,6 +125,21 @@ const DomainProfiler = () => {
     return new Date(dateStr).toLocaleDateString('en-US', {
       year: 'numeric', month: 'short', day: 'numeric'
     });
+  };
+
+  const handleExportPDF = async (name) => {
+    setIsExporting(true);
+    const toastId = toast.loading('Generating high-quality PDF profile...');
+    try {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await downloadPDF('domain-profiler-pdf-template', `Domain_Profile_${name}`);
+      toast.success('Profile downloaded successfully!', { id: toastId });
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to generate PDF', { id: toastId });
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const formatFullDate = (dateStr) => {
@@ -238,10 +255,12 @@ const DomainProfiler = () => {
               </p>
               <div className="flex items-center gap-3" data-html2canvas-ignore>
                 <button 
-                  onClick={() => downloadPDF('report-content', 'Domain_Profiler_Report.pdf')}
-                  className="flex items-center gap-2 bg-white text-[#1a202c] px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-100 transition-colors cursor-pointer"
+                  onClick={() => handleExportPDF(results.domain || input || 'Domain')}
+                  disabled={isExporting}
+                  className="flex items-center gap-2 bg-white text-[#1a202c] px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-50"
                 >
-                  <FileDown className="w-4 h-4" /> Export PDF Profile
+                  {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />}
+                  Export PDF Profile
                 </button>
                 {!projectId && (
                   <button 
@@ -688,6 +707,17 @@ const DomainProfiler = () => {
           </div>
         )}
       </motion.div>
+      {/* Hidden PDF Template (Rendered off-screen for high-quality capture) */}
+      <div className="absolute -left-[9999px] top-0 pointer-events-none" aria-hidden="true">
+        <div id="domain-profiler-pdf-template">
+          {results && (
+            <DomainProfilerReport 
+              brandName={results.domain || input || 'Domain'} 
+              data={results} 
+            />
+          )}
+        </div>
+      </div>
     </div>
   );
 };

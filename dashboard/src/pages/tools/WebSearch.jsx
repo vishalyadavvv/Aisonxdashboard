@@ -7,6 +7,7 @@ import { Search, Loader2, Globe, Sparkles, AlertCircle, ArrowLeft, Terminal, Fil
 import { motion, AnimatePresence } from 'framer-motion';
 import { useProject } from '../../context/ProjectContext';
 import { downloadPDF } from '../../utils/downloadPDF';
+import WebSearchReport from '../../components/reports/WebSearchReport';
 
 const WebSearch = () => {
   const { projectId } = useParams();
@@ -34,6 +35,7 @@ const WebSearch = () => {
 
   const [progress, setProgress] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   const getScoreColor = (score) => {
     if (score >= 80) return '#22c55e';
@@ -214,6 +216,21 @@ const WebSearch = () => {
   };
 
   const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+  const handleExportPDF = async (name) => {
+    setIsExporting(true);
+    const toastId = toast.loading('Generating high-quality PDF report...');
+    try {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await downloadPDF('web-search-pdf-template', `Web_Visibility_Report_${name}`);
+      toast.success('Report downloaded successfully!', { id: toastId });
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to generate PDF', { id: toastId });
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   // ─── SYNC LOADING VIEW ──────────────────────────────────────
   if (projectId && (syncLoading || projectLoading) && !results) {
@@ -562,10 +579,12 @@ const WebSearch = () => {
               
               <div className="flex items-center gap-3" data-html2canvas-ignore>
                 <button 
-                  onClick={() => downloadPDF('report-content', 'Web_Visibility_Report.pdf')}
-                  className="flex items-center gap-2 bg-white text-[#1a202c] px-6 py-3 rounded-xl text-sm font-bold hover:bg-gray-100 transition-all active:scale-95 cursor-pointer"
+                  onClick={() => handleExportPDF(projectId ? (project?.name) : (input || 'Brand'))}
+                  disabled={isExporting}
+                  className="flex items-center gap-2 bg-white text-[#1a202c] px-6 py-3 rounded-xl text-sm font-bold hover:bg-gray-100 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
                 >
-                  <FileDown className="w-4 h-4" /> Export PDF Audit
+                  {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />}
+                  Export PDF Audit
                 </button>
                 <button 
                   onClick={() => setResults(null)}
@@ -838,6 +857,18 @@ const WebSearch = () => {
             </motion.div>
           </div>
         </div>
+        </div>
+      {/* Hidden PDF Template (Rendered off-screen for high-quality capture) */}
+      <div className="absolute -left-[9999px] top-0 pointer-events-none" aria-hidden="true">
+        <div id="web-search-pdf-template">
+          {results && (
+            <WebSearchReport 
+              brandName={projectId ? (project?.name) : (input || 'Brand')} 
+              data={results} 
+            />
+          )}
+        </div>
+      </div>
       </div>
     );
   }

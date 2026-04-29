@@ -13,6 +13,7 @@ import { useProject } from '../../context/ProjectContext';
 import toast from 'react-hot-toast';
 import { downloadPDF } from '../../utils/downloadPDF';
 import { FileDown, FileText } from 'lucide-react';
+import BrandAuditReport from '../../components/reports/BrandAuditReport';
 
 const CONFIG = {
   GOOGLE_API_KEY: 'AIzaSyCVm4RJrXa0-_yizZL44KrU3T528UgzSv4',
@@ -32,6 +33,7 @@ const BrandAudit = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [syncLoading, setSyncLoading] = useState(!!projectId);
+  const [isExporting, setIsExporting] = useState(false);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -118,6 +120,22 @@ const BrandAudit = () => {
     try { return new URL(url).hostname.replace('www.', ''); } catch { return url; }
   };
 
+  const handleExportPDF = async (name) => {
+    setIsExporting(true);
+    const toastId = toast.loading('Generating high-quality PDF report...');
+    try {
+      // Small delay to ensure the off-screen template is rendered
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await downloadPDF('brand-audit-pdf-template', `Brand_Audit_${name}`);
+      toast.success('Report downloaded successfully!', { id: toastId });
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to generate PDF', { id: toastId });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   // ─── PROJECT MODE: SYNC LOADING ────────────────────────────
   if (projectId && (syncLoading || projectLoading) && !results) {
     return (
@@ -197,10 +215,12 @@ const BrandAudit = () => {
               </p>
             </div>
             <button 
-              onClick={() => downloadPDF('brand-audit-results', `Brand_Audit_${brandName}`)}
-              className="flex items-center gap-2 bg-white text-[#1a202c] px-6 py-3 rounded-xl text-sm font-bold hover:bg-gray-100 transition-all active:scale-95 shrink-0 cursor-pointer"
+              onClick={() => handleExportPDF(brandName)}
+              disabled={isExporting}
+              className="flex items-center gap-2 bg-white text-[#1a202c] px-6 py-3 rounded-xl text-sm font-bold hover:bg-gray-100 transition-all active:scale-95 shrink-0 cursor-pointer disabled:opacity-50"
             >
-              <FileDown className="w-4 h-4" /> Export PDF
+              {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />}
+              Export PDF
             </button>
           </div>
         </motion.div>
@@ -788,6 +808,17 @@ const BrandAudit = () => {
             </p>
           </div>
         </div>
+      {/* Hidden PDF Template (Rendered off-screen for high-quality capture) */}
+      <div className="absolute -left-[9999px] top-0 pointer-events-none" aria-hidden="true">
+        <div id="brand-audit-pdf-template">
+          {results && (
+            <BrandAuditReport 
+              brandName={projectId ? (contextProject?.brandName || contextProject?.name) : pendingQuery} 
+              data={results} 
+            />
+          )}
+        </div>
+      </div>
     </div>
   );
 };

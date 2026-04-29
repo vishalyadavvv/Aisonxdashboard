@@ -26,6 +26,7 @@ import { useAuth } from '../context/AuthContext';
 import { downloadPDF } from '../utils/downloadPDF';
 import { markets } from '../utils/markets';
 import { FileDown } from 'lucide-react';
+import ProjectSummaryReport from '../components/reports/ProjectSummaryReport';
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
@@ -43,6 +44,8 @@ const Projects = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [activeMenu, setActiveMenu] = useState(null);
   const [marketType, setMarketType] = useState('country'); // 'country' or 'region'
+  const [projectToExport, setProjectToExport] = useState(null);
+  const [isExporting, setIsExporting] = useState(false);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
@@ -437,7 +440,7 @@ const Projects = () => {
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                downloadPDF(`project-card-${project._id}`, `${project.name}_Report.pdf`);
+                                handleExportPDF(project);
                               }}
                               className="w-full px-3 py-1.5 text-left text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
                             >
@@ -768,6 +771,17 @@ const Projects = () => {
             </div>
           )}
         </AnimatePresence>
+      </div>
+
+      {/* Hidden PDF Template (Rendered off-screen for high-quality capture) */}
+      <div className="absolute -left-[9999px] top-0 pointer-events-none" aria-hidden="true">
+        <div id="project-summary-pdf-template">
+          {projectToExport && (
+            <ProjectSummaryReport 
+              project={projectToExport} 
+            />
+          )}
+        </div>
       </div>
     </div>
   );
