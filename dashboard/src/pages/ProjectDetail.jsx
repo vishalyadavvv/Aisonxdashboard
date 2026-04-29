@@ -844,7 +844,7 @@ const ProjectDetail = () => {
                                           <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-3">
                                             {isFound || (res?.score > 0 && hasCitations) ? (
                                               <>
-                                                <p className="text-xs text-slate-600 leading-relaxed italic">
+                                                <p className="text-xs text-slate-600 leading-relaxed italic break-all overflow-wrap-anywhere">
                                                   "{res?.snippet || 'No specific insight captured.'}"
                                                 </p>
                                                 
@@ -871,9 +871,9 @@ const ProjectDetail = () => {
                                                             const isOwnDomain = projDomain && domain.includes(projDomain);
                                                             
                                                             return (
-                                                              <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 px-2 py-1 bg-white border border-slate-200 rounded-lg text-blue-600 hover:text-blue-700 transition-colors text-[9px] font-bold shadow-sm max-w-[150px]">
+                                                              <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 px-2 py-1 bg-white border border-slate-200 rounded-lg text-blue-600 hover:text-blue-700 transition-colors text-[9px] font-bold shadow-sm max-w-[150px] overflow-hidden">
                                                                 <LinkIcon className="w-2.5 h-2.5 shrink-0" />
-                                                                <span className="truncate">
+                                                                <span className="truncate block w-full">
                                                                   {isOwnDomain ? projDomain : domain}
                                                                 </span>
                                                               </a>

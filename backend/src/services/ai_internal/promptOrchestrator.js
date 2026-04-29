@@ -288,11 +288,20 @@ exports.performProjectScan = async (project) => {
     // 1.2 Gemini Competitive Audit
     if (engines.includes('gemini')) {
         logger.info(`🔄 [COMPETITIVE] Running Gemini Battle View for ${project.prompts.length} prompts in ${market.name}...`);
-        const tasks = project.prompts.map(promptText => () => 
-            geminiCompetitiveAudit(brandName, domain, project.competitors, promptText, market)
-        );
+        const tasks = project.prompts.map(promptText => async () => {
+            try {
+                return await geminiCompetitiveAudit(brandName, domain, project.competitors, promptText, market);
+            } catch (err) {
+                logger.error(`[ORCHESTRATOR] Gemini call failed: ${err.message}`);
+                return {
+                    prompt: promptText,
+                    brandRanking: { rank: 0, snippet: "Service temporarily unavailable. Please check API configuration.", score: 0 },
+                    authoritySignals: { citations: [] }
+                };
+            }
+        });
         
-        const gCompResultsRaw = await runWithLimit(tasks, 3); // Gemini search is heavy, lower limit
+        const gCompResultsRaw = await runWithLimit(tasks, 3);
         const gCompResults = gCompResultsRaw.filter(Boolean);
         
         if (gCompResults.length > 0) {

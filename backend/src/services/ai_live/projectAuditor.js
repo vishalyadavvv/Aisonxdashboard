@@ -263,14 +263,15 @@ PROMPTS:
 ${promptListStr}
 
 INSTRUCTIONS:
-1. 🚨 NAME-FIRST SEARCH: Search for each competitor BY NAME first, not just by domain. The provided domains may be approximate or outdated. Use the company name to find them.
-2. ⚠️ SEARCH PERSISTENCE: If any Rival or the Client is missing from the top organic list, perform a targeted search: "[Company Name] [prompt topic]" to verify their actual presence.
-3. 🚨 DATA INTEGRITY: Do not report "Not Found" for a rival unless they are truly irrelevant to the topic. Search by NAME thoroughly.
-4. 🚨 RICH ANALYTICS: Snippets MUST be 2-3 detailed sentences (max 60 words).
-5. SCORING: 
-   - Found via any search method: Rank 1-10, Score 60-100.
-   - Not found after thorough name + domain search: Rank 0, Score 0.
-6. 🚨 DOMAIN CORRECTION: If you discover a competitor's actual website differs from the provided domain, return the CORRECT domain in the "domain" field.
+1. NATURAL OBSERVATION: Imagine you are a regular user searching for these prompts.
+2. NO BIAS: Treat "${brandName}" exactly like any other competitor. Do NOT perform special searches for it if it is missing from the main results.
+3. ZERO TOLERANCE: If "${brandName}" does not appear naturally in the top results for a prompt, you MUST return Rank: 0 and Score: 0.
+4. EVIDENCE ONLY: Every rank must be backed by a snippet of text that would actually appear in a response to this prompt.
+5. SCORING:
+   - Ranked #1: Rank 1, Score 95-100.
+   - Ranked Top 3: Rank 2-3, Score 80-90.
+   - Mentioned but unranked: Rank 0, Score 15-40 (Found, but not a top recommendation).
+   - Not found/mentioned: Rank 0, Score 0.
 
 OUTPUT FORMAT (JSON ARRAY):
     [
@@ -350,15 +351,15 @@ COMPETITORS (The Rivals): [${compListStr}]
 TASK: Evaluate "${brandName}" AGAINST the rivals for: "${promptText}" in ${market.name}.
 
 INSTRUCTIONS:
-1. HYBRID BATTLE VIEW: Search for "${promptText}". 
-2. 🚨 NAME-FIRST SEARCH: Search for each competitor BY THEIR NAME (not just domain). The provided domains may be approximate.
-3. ⚠️ PERSISTENT SEARCH: If any competitor or the Client is missing, search: "[Company Name] [prompt topic]" to verify their presence.
-4. 🚨 NATURAL ANALYSIS: If a brand is mentioned in guides, niche articles, or listicles, rank them appropriately (Rank 1-10).
-5. 🚨 RICH ANALYTICS: Snippet MUST be 2-3 factual sentences.
-6. DOMAIN CORRECTION: If you find a competitor's actual website differs from the provided domain, return the CORRECT domain.
-7. SCORING: 
-   - Found via any search method: Rank 1-10, Score 60-100.
-   - Not found at all: Rank 0, Score 0.
+1. NATURAL OBSERVATION: Imagine you are a regular user searching for "${promptText}".
+2. NO BIAS: Treat "${brandName}" exactly like any other competitor. Do NOT perform special searches for it if it is missing from the main results.
+3. ZERO TOLERANCE: If "${brandName}" does not appear naturally in the top results for "${promptText}", you MUST return Rank: 0 and Score: 0.
+4. EVIDENCE ONLY: Every rank must be backed by a snippet of text that would actually appear in a response to this prompt.
+5. SCORING:
+   - Ranked #1: Rank 1, Score 95-100.
+   - Ranked Top 3: Rank 2-3, Score 80-90.
+   - Mentioned but unranked: Rank 0, Score 15-40 (Found, but not a top recommendation).
+   - Not found/mentioned: Rank 0, Score 0.
 8. OUTPUT FORMAT (JSON ONLY):
 {
   "prompt": "${promptText}",
@@ -444,10 +445,10 @@ Who are the top 5 direct competitors of "${brandName}" (${domain}) in the ${mark
 Context: ${brandName} is a ${market.name !== 'Global' ? market.name + '-based' : ''} company. I need to know which companies offer similar products/services and compete for the same customers ${market.name !== 'Global' ? 'in ' + market.name : 'globally'}.
 
 Rules:
-1. Search the web to find REAL, ACTIVE competitors that customers would actually consider as alternatives to ${brandName}.
-2. Focus on competitors that are popular and well-known in ${market.name} specifically.
-3. Include both local ${market.name} competitors AND global competitors that serve ${market.name}.
-4. Do NOT include ${brandName} itself.
+1. CATEGORY FIRST: Identify the brand's actual business category (e.g., EdTech, SaaS, E-commerce).
+2. REAL RIVALS: Search for competitors that offer the SAME service as ${brandName}. Do NOT match by name similarity (e.g., if the brand is 'TreeCampus' for education, do NOT return 'TreePlanting' for environment).
+3. ACTIVE PLAYERS: Only return brands that are currently active in the ${market.name} market.
+4. VARIETY: Include both major global leaders and strong local players in ${market.name}.
 5. Return ONLY a JSON array:
 [{"name": "Company Name", "domain": "company.com"}]
 `;
