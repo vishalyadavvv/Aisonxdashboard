@@ -28,6 +28,7 @@ import {
   Target,
   Clock,
   MoreVertical,
+  Activity
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx } from 'clsx';
@@ -178,6 +179,130 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
 
   const category = getSidebarCategory();
 
+  if (user?.role === 'admin') {
+    return (
+      <>
+        {/* Mobile Overlay */}
+        {isOpen && (
+          <div 
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden"
+            onClick={() => setIsOpen(false)}
+          />
+        )}
+
+        <aside className={cn(
+          "fixed md:sticky top-0 left-0 z-50 h-screen w-[260px] bg-[#0f172a] border-r border-white/5 flex flex-col transition-transform duration-300 ease-in-out shrink-0",
+          isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        )}>
+          {/* Mobile Close Button */}
+          <button 
+            onClick={() => setIsOpen(false)}
+            className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white md:hidden z-50 bg-white/5 rounded-lg border border-white/10"
+          >
+            <X className="w-5 h-5" />
+          </button>
+
+          {/* Logo & Brand Header */}
+          <div className="p-6 border-b border-white/5">
+            <Link to="/dashboard" className="flex items-center gap-3 group">
+              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg shadow-white/5 group-hover:scale-105 transition-all p-1">
+                 <img src="https://res.cloudinary.com/dbbll23jz/image/upload/v1777897134/AISONX_Logo_Final_rzzvfr.png" className="w-full h-full object-contain" alt="Logo" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-sm font-black text-white tracking-widest font-sans">AISONX</span>
+                <span className="text-[9px] font-bold text-blue-500 uppercase tracking-widest -mt-0.5">Admin Console</span>
+              </div>
+            </Link>
+          </div>
+
+          {/* Navigation Links */}
+          <div className="flex-1 px-4 py-6 overflow-y-auto no-scrollbar space-y-6">
+            <SidebarSection title="SYSTEM ANALYTICS">
+              <ContextItem 
+                to="/dashboard/admin/stats" 
+                icon={LineChart} 
+                label="Dashboard" 
+                onClick={() => setIsOpen(false)} 
+              />
+            </SidebarSection>
+
+            <SidebarSection title="PLATFORM MANAGEMENT">
+              <ContextItem 
+                to="/dashboard/admin/users" 
+                icon={Users} 
+                label="User Accounts" 
+                onClick={() => setIsOpen(false)} 
+              />
+              <ContextItem 
+                to="/dashboard/admin/packages" 
+                icon={CreditCard} 
+                label="Subscription Plans" 
+                onClick={() => setIsOpen(false)} 
+              />
+              <ContextItem 
+                to="/dashboard/admin/scans" 
+                icon={Activity} 
+                label="Live Scan Explorer" 
+                onClick={() => setIsOpen(false)} 
+              />
+              <ContextItem 
+                to="/dashboard/admin/manager" 
+                icon={ShieldCheck} 
+                label="System Admins" 
+                onClick={() => setIsOpen(false)} 
+              />
+            </SidebarSection>
+
+            <SidebarSection title="USER SUPPORT">
+              <ContextItem 
+                to="/dashboard/inquiries" 
+                icon={Mail} 
+                label="Inquiries & Tickets" 
+                onClick={() => setIsOpen(false)} 
+              />
+            </SidebarSection>
+
+            <SidebarSection title="ADMIN OPTIONS">
+              <ContextItem 
+                to="/dashboard/settings" 
+                icon={Settings} 
+                label="Console Settings" 
+                onClick={() => setIsOpen(false)} 
+              />
+            </SidebarSection>
+          </div>
+
+          {/* User Profile & Logout Area */}
+          <div className="p-4 border-t border-white/5 bg-[#0b0f19] mt-auto">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 overflow-hidden">
+                <div className="w-9 h-9 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center font-bold text-xs text-blue-400 shrink-0">
+                  {user?.name?.substring(0, 2).toUpperCase()}
+                </div>
+                <div className="flex flex-col overflow-hidden">
+                  <span className="text-xs font-bold text-white truncate">{user?.name}</span>
+                  <span className="text-[9px] font-semibold text-slate-500 truncate">{user?.email}</span>
+                </div>
+              </div>
+              <button 
+                onClick={() => {
+                  if (window.confirm("Are you sure you want to logout?")) {
+                    setIsOpen(false);
+                    logout();
+                  }
+                }}
+                className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all shrink-0"
+                title="Sign Out"
+              >
+                <LogOut className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        </aside>
+      </>
+    );
+  }
+
   return (
     <>
       {/* Mobile Overlay */}
@@ -195,8 +320,8 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
         {/* Primary Rail */}
         <aside className="w-[72px] h-full bg-[#0a0e1a] border-r border-white/5 flex flex-col items-stretch py-8 overflow-y-auto no-scrollbar">
           <Link to="/dashboard" className="mb-10 flex flex-col items-start pl-4 gap-2 group">
-            <div className="w-11 h-11 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-all">
-               <img src="/logo.png" className="w-8 h-8 object-contain" alt="Logo" />
+            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-lg shadow-white/5 group-hover:scale-105 transition-all p-1">
+               <img src="https://res.cloudinary.com/dbbll23jz/image/upload/v1777897134/AISONX_Logo_Final_rzzvfr.png" className="w-full h-full object-contain" alt="Logo" />
             </div>
           </Link>
 

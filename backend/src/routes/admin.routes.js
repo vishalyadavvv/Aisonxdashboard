@@ -28,5 +28,9 @@ router.get('/admins', adminController.getAllAdmins);
 router.post('/create-admin', adminController.createAdmin);
 router.patch('/update-subscription', adminController.updateUserSubscription);
 router.post('/trigger-daily-scan', adminController.triggerDailyScan);
+router.post('/clear-queue', adminController.clearScanQueue);
+router.get('/packages', adminController.getPackages);
+router.patch('/packages/:id', adminController.updatePackage);
+router.get('/scan-logs', adminController.getScanExplorerLogs);
 
 module.exports = router;

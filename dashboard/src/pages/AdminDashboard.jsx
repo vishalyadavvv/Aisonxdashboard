@@ -24,7 +24,13 @@ import {
   ArrowDownRight,
   ArrowUpRight,
   X,
-  ChevronRight
+  ChevronRight,
+  IndianRupee,
+  Cpu,
+  Clock,
+  Trash2,
+  Play,
+  Activity
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api/axios';
@@ -37,10 +43,47 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showUsageModal, setShowUsageModal] = useState(false);
+  const [isTriggeringScan, setIsTriggeringScan] = useState(false);
+  const [isPurgingQueue, setIsPurgingQueue] = useState(false);
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  const formatUptime = (seconds) => {
+    if (seconds < 60) return `${seconds}s`;
+    const mins = Math.floor(seconds / 60);
+    if (mins < 60) return `${mins}m ${seconds % 60}s`;
+    const hours = Math.floor(mins / 60);
+    return `${hours}h ${mins % 60}m`;
+  };
+
+  const handleTriggerDailyScan = async () => {
+    try {
+      setIsTriggeringScan(true);
+      const res = await api.post('/admin/trigger-daily-scan');
+      toast.success(res.data.message || 'Scan triggered successfully');
+      fetchData();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to trigger scan');
+    } finally {
+      setIsTriggeringScan(false);
+    }
+  };
+
+  const handlePurgeQueue = async () => {
+    if (!window.confirm('Are you sure you want to clear the entire pending scan queue waitlist?')) return;
+    try {
+      setIsPurgingQueue(true);
+      const res = await api.post('/admin/clear-queue');
+      toast.success(res.data.message || 'Queue cleared successfully');
+      fetchData();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to clear queue');
+    } finally {
+      setIsPurgingQueue(false);
+    }
+  };
 
   const fetchData = async (isManual = false) => {
     try {
@@ -88,40 +131,146 @@ const AdminDashboard = () => {
       </div>
 
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
         <StatCard 
           title="Total Users" 
           value={stats?.users.total} 
           icon={Users} 
           color="blue"
-          trend="+12%" 
-          trendUp={true}
         />
         <StatCard 
           title="Paid Subscriptions" 
           value={stats?.users.activePaid} 
           icon={UserCheck} 
           color="emerald"
-          trend="+5%" 
-          trendUp={true}
         />
         <StatCard 
           title="Active Trials" 
           value={stats?.users.trialing} 
           icon={Zap} 
           color="amber"
-          trend="+18%" 
-          trendUp={true}
         />
         <StatCard 
           title="Reports Generated" 
           value={stats?.usage.totalReports} 
           icon={FileText} 
           color="purple"
-          trend="+24%" 
-          trendUp={true}
         />
+        <StatCard 
+          title="Total Revenue" 
+          value={`₹${stats?.revenue?.total?.toLocaleString() || '0'}`} 
+          icon={IndianRupee} 
+          color="rose"
+        />
+        <StatCard 
+          title="Monthly Revenue" 
+          value={`₹${stats?.revenue?.mrr?.toLocaleString() || '0'}`} 
+          icon={TrendingUp} 
+          color="indigo"
+        />
+      </div>
+
+      {/* Live Systems & Redis Queue Monitor */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Live Systems Diagnostics */}
+        <div className="lg:col-span-1 bg-white rounded-[32px] p-8 border border-slate-100 shadow-sm space-y-6">
+          <div className="flex items-center gap-3 border-b border-slate-50 pb-4">
+            <div className="p-2.5 bg-blue-50 text-blue-600 rounded-2xl">
+              <Cpu className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Live System Health</h3>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Active resources & latencies</p>
+            </div>
+          </div>
+          
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
+              <div className="flex items-center gap-3">
+                <Cpu className="w-5 h-5 text-slate-400" />
+                <span className="text-xs font-bold text-slate-600">Memory Heap</span>
+              </div>
+              <span className="text-sm font-black text-slate-800">{stats?.diagnostics?.memoryUsage || 0} MB</span>
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
+              <div className="flex items-center gap-3">
+                <Globe className="w-5 h-5 text-slate-400" />
+                <span className="text-xs font-bold text-slate-600">DB Latency</span>
+              </div>
+              <span className={`text-sm font-black ${stats?.diagnostics?.dbLatency < 50 ? 'text-emerald-600' : 'text-amber-600'}`}>
+                {stats?.diagnostics?.dbLatency || 0} ms
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
+              <div className="flex items-center gap-3">
+                <Clock className="w-5 h-5 text-slate-400" />
+                <span className="text-xs font-bold text-slate-600">Server Uptime</span>
+              </div>
+              <span className="text-xs font-black text-slate-800">
+                {stats?.diagnostics?.uptime ? formatUptime(stats.diagnostics.uptime) : '0s'}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Redis Scan Queue Controller */}
+        <div className="lg:col-span-2 bg-white rounded-[32px] p-8 border border-slate-100 shadow-sm space-y-6">
+          <div className="flex items-center justify-between border-b border-slate-50 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-2xl">
+                <Activity className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Redis Background Queue</h3>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Active crawlers status & jobs waitlist</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={handleTriggerDailyScan}
+                disabled={isTriggeringScan}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase tracking-wider rounded-xl transition-all disabled:opacity-50"
+              >
+                {isTriggeringScan ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
+                Trigger Scan
+              </button>
+              <button 
+                onClick={handlePurgeQueue}
+                disabled={isPurgingQueue}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 text-[10px] font-black uppercase tracking-wider rounded-xl transition-all disabled:opacity-50"
+              >
+                {isPurgingQueue ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                Purge Queue
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="p-4 bg-slate-50 rounded-2xl text-center space-y-1">
+              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Active Scans</p>
+              <p className={`text-2xl font-black ${stats?.queue?.active > 0 ? 'text-indigo-600 animate-pulse' : 'text-slate-800'}`}>
+                {stats?.queue?.active || 0}
+              </p>
+            </div>
+            
+            <div className="p-4 bg-slate-50 rounded-2xl text-center space-y-1">
+              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Pending Waitlist</p>
+              <p className="text-2xl font-black text-slate-800">{stats?.queue?.waiting || 0}</p>
+            </div>
+
+            <div className="p-4 bg-slate-50 rounded-2xl text-center space-y-1">
+              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Scans Succeeded</p>
+              <p className="text-2xl font-black text-emerald-600">{stats?.queue?.completed || 0}</p>
+            </div>
+
+            <div className="p-4 bg-slate-50 rounded-2xl text-center space-y-1">
+              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Failed Jobs</p>
+              <p className="text-2xl font-black text-red-500">{stats?.queue?.failed || 0}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -179,6 +328,61 @@ const AdminDashboard = () => {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Recent Platform Signups */}
+      <div className="bg-white rounded-[32px] border border-slate-100 p-8 shadow-sm space-y-6">
+        <div className="flex items-center justify-between border-b border-slate-50 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-blue-50 text-blue-600 rounded-2xl">
+              <Activity className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Recent Platform Signups</h3>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Real-time pulse of registrations & active levels</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                <th className="py-3 px-4">User</th>
+                <th className="py-3 px-4">Email Address</th>
+                <th className="py-3 px-4">Current Package</th>
+                <th className="py-3 px-4">Status</th>
+                <th className="py-3 px-4 text-right">Signed Up</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stats?.recentUsers?.map((userObj) => (
+                <tr key={userObj._id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                  <td className="py-4 px-4 font-bold text-slate-800 text-sm">{userObj.name}</td>
+                  <td className="py-4 px-4 text-slate-500 text-sm">{userObj.email}</td>
+                  <td className="py-4 px-4">
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-700">
+                      {userObj.subscription?.tier || 'Free'}
+                    </span>
+                  </td>
+                  <td className="py-4 px-4">
+                    <StatusBadge status={userObj.subscription?.status || 'inactive'} />
+                  </td>
+                  <td className="py-4 px-4 text-right text-xs font-semibold text-slate-400 font-mono">
+                    {new Date(userObj.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  </td>
+                </tr>
+              ))}
+              {(!stats?.recentUsers || stats.recentUsers.length === 0) && (
+                <tr>
+                  <td colSpan={5} className="py-8 text-center text-sm font-medium text-slate-400">
+                    No recent user activity recorded yet.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -245,8 +449,8 @@ const AdminDashboard = () => {
                       <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Total reports generated to date</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-bold text-emerald-600 flex items-center justify-end gap-1">
-                        <TrendingUp className="w-4 h-4" /> Healthy
+                      <p className={`text-sm font-bold flex items-center justify-end gap-1 ${stats?.usage.systemStatus === 'Healthy' ? 'text-emerald-600' : 'text-amber-600'}`}>
+                        <TrendingUp className="w-4 h-4" /> {stats?.usage.systemStatus || 'Healthy'}
                       </p>
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">System Status</p>
                     </div>
@@ -268,13 +472,17 @@ const AdminDashboard = () => {
   );
 };
 
-const StatCard = ({ title, value, icon: Icon, color, trend, trendUp }) => {
+const StatCard = ({ title, value, icon: Icon, color }) => {
   const colors = {
     blue: 'bg-blue-50 text-blue-600',
     emerald: 'bg-emerald-50 text-emerald-600',
     amber: 'bg-amber-50 text-amber-600',
-    purple: 'bg-purple-50 text-purple-600'
+    purple: 'bg-purple-50 text-purple-600',
+    rose: 'bg-rose-50 text-rose-600',
+    indigo: 'bg-indigo-50 text-indigo-600'
   };
+
+  const displayValue = typeof value === 'number' ? value.toLocaleString() : value;
 
   return (
     <div className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm space-y-4 hover:border-blue-100 transition-all group">
@@ -282,14 +490,10 @@ const StatCard = ({ title, value, icon: Icon, color, trend, trendUp }) => {
         <div className={`p-3 rounded-2xl ${colors[color]} group-hover:scale-110 transition-transform`}>
           <Icon className="w-6 h-6" />
         </div>
-        <div className={`flex items-center gap-1 text-[10px] font-black uppercase px-2 py-1 rounded-full ${trendUp ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
-          {trendUp ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-          {trend}
-        </div>
       </div>
       <div>
         <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{title}</h4>
-        <p className="text-2xl font-black text-slate-900">{value?.toLocaleString() || '0'}</p>
+        <p className="text-2xl font-black text-slate-900">{displayValue || '0'}</p>
       </div>
     </div>
   );

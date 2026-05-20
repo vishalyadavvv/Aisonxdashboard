@@ -302,8 +302,8 @@ const Projects = () => {
             <div className="absolute bottom-0 right-0 w-64 h-64 bg-indigo-50 rounded-full blur-3xl -mr-32 -mt-32 opacity-60" />
             
             <div className="relative z-10 max-w-2xl mx-auto">
-              <div className="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-blue-200 rotate-3 transform transition-transform hover:rotate-0">
-                <Zap className="w-10 h-10 text-white fill-white" />
+              <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-blue-100 rotate-3 transform transition-transform hover:rotate-0 p-3">
+                <img src="https://res.cloudinary.com/dbbll23jz/image/upload/v1777897134/AISONX_Logo_Final_rzzvfr.png" className="w-full h-full object-contain" alt="AISONX Logo" />
               </div>
               
               <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4 tracking-tight leading-tight">

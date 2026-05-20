@@ -12,5 +12,6 @@ router.get('/me', protect, authController.getMe);
 router.patch('/update-me', protect, authController.updateMe);
 router.patch('/update-password', protect, authController.updatePassword);
 router.post('/start-trial', protect, authController.startTrial);
+router.get('/packages', authController.getPublicPackages);
 
 module.exports = router;

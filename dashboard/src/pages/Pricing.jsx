@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Check, X, Shield, Zap, Star, Rocket, ChevronRight, HelpCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
@@ -29,7 +29,7 @@ const Pricing = () => {
         order_id: orderId,
         name: 'AIsonx GEO',
         description: `${planName} Plan — Monthly`,
-        image: '/logo.png',
+        image: 'https://res.cloudinary.com/dbbll23jz/image/upload/v1777897134/AISONX_Logo_Final_rzzvfr.png',
         handler: async function (response) {
           try {
             // Step 3: Verify payment on backend and activate subscription
@@ -87,7 +87,7 @@ const Pricing = () => {
     }
   };
 
-  const plans = [
+  const [plans, setPlans] = useState([
     {
       name: 'Starter',
       icon: Rocket,
@@ -158,7 +158,43 @@ const Pricing = () => {
       },
       bestFor: 'Agencies & Advanced Teams'
     }
-  ];
+  ]);
+
+  useEffect(() => {
+    loadDynamicPlans();
+  }, []);
+
+  const loadDynamicPlans = async () => {
+    try {
+      const res = await api.get('/auth/packages');
+      const dbPackages = res.data.data.packages;
+      
+      setPlans(prevPlans => prevPlans.map(p => {
+        const match = dbPackages.find(db => db.name.toLowerCase() === p.name.toLowerCase());
+        if (match) {
+          // Convert Mongoose features Map to pure JS object
+          const dynamicFeatures = match.features instanceof Map 
+            ? Object.fromEntries(match.features) 
+            : match.features;
+
+          return {
+            ...p,
+            price: match.price,
+            description: match.description,
+            trial: match.trial,
+            bestFor: match.bestFor,
+            features: {
+              ...p.features,
+              ...dynamicFeatures
+            }
+          };
+        }
+        return p;
+      }));
+    } catch (err) {
+      console.warn('Could not load dynamic plans, using hardcoded fallbacks', err);
+    }
+  };
 
   const featureList = [
     'AI Engines Included',

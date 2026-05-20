@@ -857,7 +857,6 @@ const WebSearch = () => {
             </motion.div>
           </div>
         </div>
-        </div>
       {/* Hidden PDF Template (Rendered off-screen for high-quality capture) */}
       <div className="absolute -left-[9999px] top-0 pointer-events-none" aria-hidden="true">
         <div id="web-search-pdf-template">

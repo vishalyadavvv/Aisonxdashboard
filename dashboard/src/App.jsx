@@ -24,6 +24,8 @@ import Team from './pages/Team';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminManager from './pages/AdminManager';
 import AdminUsers from './pages/AdminUsers';
+import AdminPackages from './pages/AdminPackages';
+import AdminScans from './pages/AdminScans';
 import DashboardLayout from './components/DashboardLayout';
 import { Toaster } from 'react-hot-toast';
 import './index.css';
@@ -80,6 +82,8 @@ function App() {
               <Route path="/dashboard/admin/stats" element={<AdminDashboard />} />
               <Route path="/dashboard/admin/manager" element={<AdminManager />} />
               <Route path="/dashboard/admin/users" element={<AdminUsers />} />
+              <Route path="/dashboard/admin/packages" element={<AdminPackages />} />
+              <Route path="/dashboard/admin/scans" element={<AdminScans />} />
               <Route path="/dashboard/settings" element={<Settings />} />
               <Route path="/dashboard/pricing" element={<Pricing />} />
             </Route>

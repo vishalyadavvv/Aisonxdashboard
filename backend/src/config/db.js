@@ -5,6 +5,10 @@ const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/geo_db');
     logger.info('MongoDB Connected');
+    
+    // Seed default pricing plans
+    const seedPlans = require('../utils/planSeeder');
+    await seedPlans();
   } catch (err) {
     logger.error('MongoDB Connection Failed', err);
     process.exit(1);

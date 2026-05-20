@@ -12,7 +12,8 @@ import {
   X,
   CreditCard,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Download
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api/axios';
@@ -32,6 +33,60 @@ const AdminUsers = () => {
     expiresAt: ''
   });
   const [isUpdating, setIsUpdating] = useState(false);
+
+  const exportToCSV = () => {
+    if (users.length === 0) {
+      toast.error('No users to export');
+      return;
+    }
+
+    // CSV Headers
+    const headers = [
+      'User ID',
+      'Name',
+      'Email',
+      'Phone',
+      'Role',
+      'Subscription Tier',
+      'Subscription Status',
+      'Subscription Expiry',
+      'Total Paid (INR)',
+      'Joined Date'
+    ];
+
+    // CSV Rows
+    const rows = users.map(user => [
+      user._id,
+      user.name,
+      user.email,
+      user.phone || 'N/A',
+      user.role || 'user',
+      user.subscription?.tier || 'none',
+      user.subscription?.status || 'inactive',
+      user.subscription?.expiresAt ? new Date(user.subscription.expiresAt).toLocaleDateString() : 'No expiry',
+      (user.subscription?.paymentHistory || []).reduce((sum, p) => sum + (p.amount || 0), 0),
+      new Date(user.createdAt).toLocaleDateString()
+    ]);
+
+    // Combine Headers and Rows with proper escaping
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(val => `"${String(val).replace(/"/g, '""')}"`).join(','))
+    ].join('\n');
+
+    // Create a Blob and Download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `aisonx_users_export_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success('Users exported successfully!');
+  };
 
   useEffect(() => {
     fetchUsers();
@@ -111,12 +166,20 @@ const AdminUsers = () => {
           <h1 className="text-2xl font-bold text-slate-900 font-display">User Manager</h1>
           <p className="text-sm text-slate-500 font-medium mt-1">Search, filter, and manage platform user accounts and subscriptions.</p>
         </div>
-        <button 
-          onClick={fetchUsers}
-          className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all flex items-center gap-2"
-        >
-          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Refresh Users'}
-        </button>
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={exportToCSV}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-md shadow-blue-500/10 hover:shadow-blue-500/20 transition-all flex items-center gap-2"
+          >
+            <Download className="w-4 h-4" /> Export CSV
+          </button>
+          <button 
+            onClick={fetchUsers}
+            className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all flex items-center gap-2"
+          >
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Refresh Users'}
+          </button>
+        </div>
       </div>
 
       {/* Control Bar */}
@@ -161,6 +224,7 @@ const AdminUsers = () => {
                 <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">User Details</th>
                 <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Plan</th>
                 <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Contact</th>
+                <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Paid</th>
                 <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
                 <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Joined Date</th>
                 <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Actions</th>
@@ -196,6 +260,16 @@ const AdminUsers = () => {
                     <div className="flex flex-col">
                       <span className="text-xs font-bold text-slate-600">{u.phone || 'N/A'}</span>
                       <span className="text-[10px] text-slate-400 font-medium">Contact Number</span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold text-slate-700">
+                        ₹{(u.subscription?.paymentHistory || []).reduce((sum, payment) => sum + (payment.amount || 0), 0).toLocaleString()}
+                      </span>
+                      <span className="text-[10px] text-slate-400 font-medium">
+                        {(u.subscription?.paymentHistory || []).length} payments
+                      </span>
                     </div>
                   </td>
                   <td className="px-6 py-4">

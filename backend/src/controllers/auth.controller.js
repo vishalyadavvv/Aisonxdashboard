@@ -393,3 +393,22 @@ exports.resetPassword = async (req, res) => {
     res.status(400).json({ status: 'fail', message: err.message });
   }
 };
+
+const Plan = require('../models/Plan');
+
+exports.getPublicPackages = async (req, res) => {
+  try {
+    const packages = await Plan.find().sort({ price: 1 });
+    res.status(200).json({
+      status: 'success',
+      data: {
+        packages
+      }
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
+      message: err.message
+    });
+  }
+};

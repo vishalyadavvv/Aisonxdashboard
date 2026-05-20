@@ -23,7 +23,9 @@ exports.createOrder = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const amount = PLAN_PRICES[planName];
+    const Plan = require('../models/Plan');
+    const dbPlan = await Plan.findOne({ name: planName });
+    const amount = dbPlan ? dbPlan.price * 100 : PLAN_PRICES[planName];
     if (!amount) {
       return res.status(400).json({ message: 'Invalid plan selected' });
     }

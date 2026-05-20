@@ -146,7 +146,7 @@ const Register = () => {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span className="text-xs font-semibold text-white/90 tracking-wide">GEO ENGINE v3.0 · REGISTRATION</span>
+            <span className="text-xs font-semibold text-white/90 tracking-wide">AISONX v3.0 · REGISTRATION</span>
             <Zap className="w-3 h-3 text-yellow-400" />
           </div>
 
@@ -226,17 +226,9 @@ const Register = () => {
 
             <div className="relative bg-white rounded-2xl shadow-2xl p-5 md:p-6">
               {/* Header */}
-              <div className="text-center mb-4">
-                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl mb-3 transition-all ${
-                  otpSent
-                    ? 'bg-gradient-to-br from-emerald-500 to-teal-500 shadow-lg shadow-emerald-500/25'
-                    : 'bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg shadow-blue-500/25'
-                }`}>
-                  {otpSent ? (
-                    <ShieldCheck className="w-6 h-6 text-white" />
-                  ) : (
-                    <Sparkles className="w-6 h-6 text-white" />
-                  )}
+              <div className="text-center mb-6">
+                <div className="flex justify-center mb-6">
+                  <img src="https://res.cloudinary.com/dbbll23jz/image/upload/v1777897134/AISONX_Logo_Final_rzzvfr.png" className="h-16 w-auto object-contain" alt="AISONX Logo" />
                 </div>
                 <h2 className="text-xl font-bold text-gray-900 mb-1">
                   {otpSent ? 'Verify Your Email' : 'Create Account'}
