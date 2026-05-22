@@ -263,41 +263,55 @@ exports.gptCompetitiveBatchAudit = async function gptCompetitiveBatchAudit(brand
     if (!process.env.OPENAI_API_KEY) return null;
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const promptListStr = prompts.map((k, i) => `${i + 1}. "${k}"`).join('\n');
-    const compListStr = (competitors || []).map(c => `${c.name} (${c.domain})`).join(', ');
+    
+    // Mix the client and rivals into a single neutral list
+    const allDomains = [
+      { name: brandName, domain: domain },
+      ...(competitors || [])
+    ];
+    const domainsListStr = allDomains.map(d => `${d.name} (${d.domain})`).join(', ');
     
     const prompt = `
-ROLE: Professional Search Market Research Auditor.
-TARGET BRAND (The Client): "${brandName}" (${domain})
-COMPETITORS (The Rivals): [${compListStr}]
+ROLE: Professional Neutral Search Market Research Auditor.
+BRANDS TO AUDIT: [${domainsListStr}]
 
-TASK: Analyze visibility for these prompts and map "${brandName}" AGAINST the rivals in the ${market.name} market.
+TASK: Perform a neutral web search audit for the following prompts in the ${market.name} market.
+Identify which of the audited brands naturally appear in the top organic search results for each prompt.
 
 PROMPTS:
 ${promptListStr}
 
 INSTRUCTIONS:
-1. NATURAL OBSERVATION: Imagine you are a regular user searching for these prompts.
-2. NO BIAS: Treat "${brandName}" exactly like any other competitor. Do NOT perform special searches for it if it is missing from the main results.
-3. ZERO TOLERANCE: If "${brandName}" does not appear naturally in the top results for a prompt, you MUST return Rank: 0 and Score: 0.
-4. EVIDENCE ONLY: Every rank must be backed by a snippet of text that would actually appear in a response to this prompt.
+1. STRICTLY NEUTRAL: Treat all audited brands with absolute, 100% equality. Do NOT prioritize or perform special/dedicated searches for any single brand.
+2. EVIDENCE BASED: You must only rank a brand if it naturally appears in the top organic results of a general web search for the prompt.
+3. If a brand is not naturally present in the top organic search results, its rank MUST be 0 and score MUST be 0.
+4. EVIDENCE ONLY: Every rank must be backed by a snippet of text from the search results that proves their presence.
 5. SCORING:
    - Ranked #1: Rank 1, Score 95-100.
    - Ranked Top 3: Rank 2-3, Score 80-90.
-   - Mentioned but unranked: Rank 0, Score 15-40 (Found, but not a top recommendation).
+   - Mentioned but unranked: Rank 0, Score 15-40.
    - Not found/mentioned: Rank 0, Score 0.
 
 OUTPUT FORMAT (JSON ARRAY):
     [
       {
         "prompt": "Exact prompt text",
-        "brandRanking": { "rank": 1-10 (0 if invisible), "score": 0-100, "isRecommended": true/false, "linkProvided": true/false, "snippet": "Deep factual findings." },
-        "competitorRankings": [ { "name": "Competitor", "domain": "correct-domain.com", "rank": 1-10, "score": 1-100, "found": true/false } ],
+        "rankings": [
+          {
+            "name": "Brand Name",
+            "domain": "brand-domain.com",
+            "rank": 1-10 (0 if not found),
+            "score": 0-100 (0 if not found),
+            "found": true/false,
+            "snippet": "Text snippet backing the ranking, or empty if not found."
+          }
+        ],
         "authoritySignals": { "citations": ["URLs"] }
       }
     ]
     `;
 
-    logger.info(`🔄 [COMPETITIVE] GPT Batch Audit for ${brandName} vs rivals...`);
+    logger.info(`🔄 [COMPETITIVE] GPT Batch Audit for ${brandName} vs rivals (Double-Blind)...`);
     let text = '';
     let retries = 3;
     while (retries > 0) {
@@ -334,12 +348,48 @@ OUTPUT FORMAT (JSON ARRAY):
         logger.warn('ROBUST PARSE JSON FAILED TO PARSE:', text ? text.substring(0, 200) + '...' : 'empty string');
         return null;
     }
-    results.forEach(r => {
-      if (r.authoritySignals?.citations) {
-        r.authoritySignals.citations = r.authoritySignals.citations.map(cleanUrl);
-      }
+
+    // Map the double-blind results back to the contract format expected by controllers
+    const mappedResults = results.map(r => {
+      const cleanTargetDomain = domain.toLowerCase().replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '').trim();
+      const targetRankObj = (r.rankings || []).find(brand => {
+        const cleanBrandDomain = (brand.domain || '').toLowerCase().replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '').trim();
+        return cleanBrandDomain === cleanTargetDomain || (brand.name && brand.name.toLowerCase() === brandName.toLowerCase());
+      });
+
+      const brandRanking = {
+        rank: targetRankObj?.rank || 0,
+        score: targetRankObj?.score || 0,
+        isRecommended: !!(targetRankObj?.rank > 0 && targetRankObj?.rank <= 3),
+        linkProvided: !!(targetRankObj?.snippet && targetRankObj.snippet.includes('http')),
+        snippet: targetRankObj?.snippet || ""
+      };
+
+      // Extract competitors
+      const competitorRankings = (r.rankings || [])
+        .filter(brand => {
+          const cleanBrandDomain = (brand.domain || '').toLowerCase().replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '').trim();
+          return cleanBrandDomain !== cleanTargetDomain && !(brand.name && brand.name.toLowerCase() === brandName.toLowerCase());
+        })
+        .map(brand => ({
+          competitorName: brand.name,
+          competitorDomain: brand.domain,
+          rank: brand.rank || 0,
+          score: brand.score || 0,
+          found: brand.found || brand.rank > 0
+        }));
+
+      return {
+        prompt: r.prompt,
+        brandRanking,
+        competitorRankings,
+        authoritySignals: {
+          citations: (r.authoritySignals?.citations || []).map(cleanUrl)
+        }
+      };
     });
-    return results;
+
+    return mappedResults;
   } catch (err) {
     logger.error("❌ GPT Competitive Batch Audit Error:", err.message);
     return null;
@@ -355,29 +405,42 @@ exports.geminiCompetitiveAudit = async function geminiCompetitiveAudit(brandName
       tools: [{ googleSearch: {} }]
     });
 
-    const compListStr = (competitors || []).map(c => `${c.name} (${c.domain})`).join(', ');
+    const allDomains = [
+      { name: brandName, domain: domain },
+      ...(competitors || [])
+    ];
+    const domainsListStr = allDomains.map(d => `${d.name} (${d.domain})`).join(', ');
 
     const prompt = `ROLE: Insightful Search Market Analyst.
-TARGET BRAND (The Client): "${brandName}" (${domain})
-COMPETITORS (The Rivals): [${compListStr}]
+BRANDS TO AUDIT: [${domainsListStr}]
 
-TASK: Evaluate "${brandName}" AGAINST the rivals for: "${promptText}" in ${market.name}.
+TASK: Perform a neutral web search audit for the query: "${promptText}" in the ${market.name} market.
+Identify which of the audited brands naturally appear in the top organic search results for this prompt.
 
 INSTRUCTIONS:
-1. NATURAL OBSERVATION: Imagine you are a regular user searching for "${promptText}".
-2. NO BIAS: Treat "${brandName}" exactly like any other competitor. Do NOT perform special searches for it if it is missing from the main results.
-3. ZERO TOLERANCE: If "${brandName}" does not appear naturally in the top results for "${promptText}", you MUST return Rank: 0 and Score: 0.
-4. EVIDENCE ONLY: Every rank must be backed by a snippet of text that would actually appear in a response to this prompt.
+1. STRICTLY NEUTRAL: Treat all audited brands with absolute, 100% equality. Do NOT perform special/dedicated searches for any single brand.
+2. EVIDENCE BASED: You must only rank a brand if it naturally appears in the top organic results of a general web search for the prompt.
+3. If a brand is not naturally present in the top organic search results, its rank MUST be 0 and score MUST be 0.
+4. EVIDENCE ONLY: Every rank must be backed by a snippet of text from the search results that proves their presence.
 5. SCORING:
    - Ranked #1: Rank 1, Score 95-100.
    - Ranked Top 3: Rank 2-3, Score 80-90.
-   - Mentioned but unranked: Rank 0, Score 15-40 (Found, but not a top recommendation).
+   - Mentioned but unranked: Rank 0, Score 15-40.
    - Not found/mentioned: Rank 0, Score 0.
-8. OUTPUT FORMAT (JSON ONLY):
+
+OUTPUT FORMAT (JSON ONLY):
 {
   "prompt": "${promptText}",
-  "brandRanking": { "rank": 1-10 (0 if invisible), "score": 0-100, "isRecommended": true/false, "linkProvided": true/false, "snippet": "1-sentence info" },
-  "competitorRankings": [ { "name": "X", "domain": "correct-domain.com", "rank": 1-10, "score": 0-100, "found": true/false } ],
+  "rankings": [
+    {
+      "name": "Brand Name",
+      "domain": "brand-domain.com",
+      "rank": 1-10 (0 if not found),
+      "score": 0-100 (0 if not found),
+      "found": true/false,
+      "snippet": "Text snippet backing the ranking, or empty if not found."
+    }
+  ],
   "authoritySignals": { "sourceType": "Google Search Comparison", "citations": [] }
 }
 🚨 RETURN ONLY JSON.`;
@@ -393,8 +456,44 @@ INSTRUCTIONS:
                 generationConfig: { temperature: 0.4 }
             });
             const text = result.response.text();
-            finalResult = robustParseJSON(text);
-            if (finalResult) {
+            const rawResult = robustParseJSON(text);
+            if (rawResult) {
+                // Find our target brand's ranking in the blind search rankings list
+                const cleanTargetDomain = domain.toLowerCase().replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '').trim();
+                const targetRankObj = (rawResult.rankings || []).find(brand => {
+                  const cleanBrandDomain = (brand.domain || '').toLowerCase().replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '').trim();
+                  return cleanBrandDomain === cleanTargetDomain || (brand.name && brand.name.toLowerCase() === brandName.toLowerCase());
+                });
+
+                const brandRanking = {
+                  rank: targetRankObj?.rank || 0,
+                  score: targetRankObj?.score || 0,
+                  isRecommended: !!(targetRankObj?.rank > 0 && targetRankObj?.rank <= 3),
+                  linkProvided: !!(targetRankObj?.snippet && targetRankObj.snippet.includes('http')),
+                  snippet: targetRankObj?.snippet || ""
+                };
+
+                // Extract competitors
+                const competitorRankings = (rawResult.rankings || [])
+                  .filter(brand => {
+                    const cleanBrandDomain = (brand.domain || '').toLowerCase().replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '').trim();
+                    return cleanBrandDomain !== cleanTargetDomain && !(brand.name && brand.name.toLowerCase() === brandName.toLowerCase());
+                  })
+                  .map(brand => ({
+                    competitorName: brand.name,
+                    competitorDomain: brand.domain,
+                    rank: brand.rank || 0,
+                    score: brand.score || 0,
+                    found: brand.found || brand.rank > 0
+                  }));
+
+                finalResult = {
+                  prompt: rawResult.prompt || promptText,
+                  brandRanking,
+                  competitorRankings,
+                  authoritySignals: rawResult.authoritySignals || { sourceType: "Google Search Comparison", citations: [] }
+                };
+
                 try {
                     let allUrls = [];
                     const candidates = result.response.candidates;
