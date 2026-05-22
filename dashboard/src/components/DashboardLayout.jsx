@@ -29,22 +29,32 @@ const DashboardLayout = () => {
         setIsOpen={setIsMobileMenuOpen} 
       />
       <main ref={mainRef} className="flex-1 overflow-y-auto w-full">
-        <header className="h-16 border-b border-gray-200/80 flex items-center justify-between px-4 md:px-5 sticky top-0 bg-white/80 backdrop-blur-xl z-20">
+        <header className="h-16 border-b border-gray-200 bg-white sticky top-0 z-20 flex items-center justify-between px-4 md:px-6">
+          {/* Left: Mobile Hamburger OR Desktop spacing */}
           <div className="flex items-center gap-3">
             <button 
               onClick={() => setIsMobileMenuOpen(true)}
-              className="p-2 -ml-2 rounded-xl text-gray-500 hover:bg-gray-100 md:hidden transition-colors"
+              className="p-2 -ml-1 rounded-xl text-slate-700 hover:bg-slate-50 md:hidden transition-colors border border-slate-200/80 bg-white shadow-sm flex items-center justify-center shrink-0"
+              aria-label="Open Menu"
             >
-              <Menu className="w-5 h-5" />
+              <Menu className="w-5 h-5 text-slate-800" />
             </button>
-            <button 
-              className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 md:hidden transition-colors"
-            >
-              <MoreVertical className="w-4 h-4" />
-            </button>
-            <h2 className="text-sm font-medium text-gray-600 hidden sm:block">Welcome back, <span className="text-[#1E293B] font-semibold">{user?.name}</span></h2>
+            <h2 className="text-sm font-medium text-gray-600 hidden md:block">
+              Welcome back, <span className="text-[#1E293B] font-semibold">{user?.name}</span>
+            </h2>
           </div>
+
+          {/* Center: Mobile Logo & Title */}
+          <div className="flex md:hidden absolute left-1/2 -translate-x-1/2 items-center gap-2">
+            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-md p-1 border border-slate-100 shrink-0">
+              <img src="https://res.cloudinary.com/dbbll23jz/image/upload/v1777897134/AISONX_Logo_Final_rzzvfr.png" className="w-full h-full object-contain" alt="Logo" />
+            </div>
+            <span className="text-xs font-black text-[#1E293B] tracking-wider font-sans">AISONX</span>
+          </div>
+
+          {/* Right: User Avatar / Plan info */}
           <div className="flex items-center gap-4">
+            {/* Desktop Subscription info */}
             <div className="flex flex-col text-right hidden sm:flex">
               {user?.role === 'admin' ? (
                 <span className="text-[11px] font-bold text-blue-600 tracking-wide uppercase flex items-center gap-1 justify-end">
@@ -55,11 +65,11 @@ const DashboardLayout = () => {
               )}
               <span className="text-[10px] text-gray-600">{user?.email}</span>
             </div>
-            <div className="relative group">
-              <div className="w-9 h-9 rounded-lg bg-gray-100 p-0.5 border border-gray-200 group-hover:border-blue-500/30 transition-colors">
-                <div className="w-full h-full bg-white rounded-md flex items-center justify-center font-bold text-[11px] text-gray-600">
-                  {user?.name?.substring(0, 2).toUpperCase()}
-                </div>
+
+            {/* Avatar (Shown on BOTH mobile and desktop) */}
+            <div className="w-9 h-9 rounded-lg bg-gray-100 p-0.5 border border-gray-200 flex items-center justify-center">
+              <div className="w-full h-full bg-white rounded-md flex items-center justify-center font-bold text-[11px] text-gray-600 uppercase">
+                {user?.name?.substring(0, 2).toUpperCase()}
               </div>
             </div>
           </div>
