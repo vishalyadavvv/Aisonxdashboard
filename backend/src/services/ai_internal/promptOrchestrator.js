@@ -127,7 +127,7 @@ OUTPUT FORMAT (JSON ONLY):
     }
 }
 
-async function discoverCompetitors(brandName, domain, market = { name: 'Global' }) {
+async function discoverCompetitors(brandName, domain, market = { name: 'Global' }, prompts = []) {
     try {
         logger.info(`🔍 [DISCOVERY] Researching rivals for ${brandName} in ${market.name} using Multi-Engine Live Search...`);
         
@@ -157,10 +157,30 @@ async function discoverCompetitors(brandName, domain, market = { name: 'Global' 
             }
         });
 
-        const discovered = Array.from(uniqueMap.values()).slice(0, 5);
+        let discovered = Array.from(uniqueMap.values()).slice(0, 5);
+        
+        // 🚀 SMART FALLBACK: If direct competitor lookup is empty, search for industry leaders based on target prompts
+        if (discovered.length === 0 && prompts && prompts.length > 0) {
+            const seedPrompt = prompts[0];
+            logger.info(`⚠️ [DISCOVERY] No direct rivals found for ${brandName}. Trying query-based fallback with seed: "${seedPrompt}"...`);
+            try {
+                const fallbackRivals = await gptSearchCompetitors(seedPrompt, domain, market).catch(() => []);
+                fallbackRivals.forEach(r => {
+                    if (r.domain && r.domain !== domain) {
+                        const cleanD = r.domain.toLowerCase().replace('www.', '').trim();
+                        if (!uniqueMap.has(cleanD)) {
+                            uniqueMap.set(cleanD, r);
+                        }
+                    }
+                });
+                discovered = Array.from(uniqueMap.values()).slice(0, 5);
+            } catch (fallbackErr) {
+                logger.error(`❌ [DISCOVERY-FALLBACK] Failed to discover competitors via seed prompt:`, fallbackErr.message);
+            }
+        }
         
         if (discovered.length > 0) {
-            logger.info(`✅ [DISCOVERY] Found ${discovered.length} unique rivals via search`);
+            logger.info(`✅ [DISCOVERY] Found ${discovered.length} unique rivals via search (including fallbacks)`);
             return discovered;
         } else {
             logger.warn(`⚠️ [DISCOVERY] No rivals found for ${brandName} after fallback attempts`);
@@ -207,7 +227,7 @@ exports.performProjectScan = async (project) => {
     // 0. Auto-Discover Competitors if empty
     if (!project.competitors || project.competitors.length === 0) {
         logger.info(`🔍 Discovery: No competitors set for ${project.name}. Running AI discovery in ${market.name}...`);
-        const discovered = await discoverCompetitors(brandName, domain, market);
+        const discovered = await discoverCompetitors(brandName, domain, market, project.prompts);
         if (discovered && discovered.length > 0) {
             project.competitors = discovered;
             await project.save();

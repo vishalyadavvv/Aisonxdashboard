@@ -905,7 +905,7 @@ const ProjectDetail = () => {
                                               </>
                                             ) : (
                                               <>
-                                                {res?.snippet ? (
+                                                {res?.snippet && res.snippet.toLowerCase() !== 'n/a' ? (
                                                   <>
                                                     <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Market Insight</p>
                                                     <p className="text-xs text-slate-500 leading-relaxed italic">
