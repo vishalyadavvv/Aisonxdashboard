@@ -87,6 +87,9 @@ async function retryWithBackoff(fn, context = 'operation') {
             const result = await fn();
             
             if (result && typeof result === 'string' && result.length > 0) {
+                if (result.trim().toLowerCase().startsWith('error')) {
+                    throw new Error(result);
+                }
                 return result;
             }
             
@@ -426,137 +429,101 @@ OUTPUT FORMAT (Valid JSON - MANDATORY):
 // ============================================================================
 
 exports.getStructuredProfile = async (brand, providedContext = null) => {
-    logger.info(`📊 Generating INDEPENDENT master profile for: ${brand}`);
-    logger.info(`⚠️ Using single model analysis - NO cross-referencing`);
+    logger.info(`📊 Generating SYNTHESIZED master profile for: ${brand}`);
     
-    const independentProfilePrompt = `MASTER BRAND PROFILE ANALYSIS
+    let validInsights = '';
+    
+    if (providedContext && typeof providedContext === 'object') {
+        validInsights = Object.entries(providedContext)
+            .filter(([_, result]) => {
+                if (!result || result.status === 'failed' || result.error) return false;
+                // Only include models that actually found the brand
+                const status = (result.brandStatus || '').toLowerCase();
+                const foundFlag = result.entityRecognition?.found;
+                if (status.includes('not found') || foundFlag === false) return false;
+                return true;
+            })
+            .map(([model, result]) => `[Source: ${model.toUpperCase()}]\nSummary: ${result.summary}\nInterpretation: ${result.interpretation}`)
+            .join('\n\n');
+    }
+
+    if (!validInsights || validInsights.length < 10) {
+        logger.warn(`⚠️ No valid internal insights found for synthesis of ${brand}. Returning Not Found.`);
+        return { 
+            summary: `${brand} was not found in my training data.`,
+            interpretation: `${brand} was not found in my training data.`,
+            visibilityLevel: "Not Found", 
+            visibilityScore: 0,
+            independentAnalysis: false,
+            dataSources: 'internal-training-data-only'
+        };
+    }
+
+    const synthesisPrompt = `MASTER BRAND PROFILE SYNTHESIS
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 BRAND TO ANALYZE: "${brand}"
+RAW AI KNOWLEDGE:
+${validInsights}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-YOUR ROLE: Lead Brand Intelligence Analyst
+YOUR ROLE: Lead Brand Intelligence Synthesizer
 
-DIRECTIVE: STRICT HONESTY - NO GUESSING - INTERNAL TRAINING DATA ONLY
-- Search your training data for REAL, SPECIFIC information about "${brand}"
-- If you DO NOT genuinely recognize this brand with specific facts, you MUST say "Not Found"
-- DO NOT generate generic descriptions based on the brand name alone
-- DO NOT guess what the brand might do based on its name (e.g., "CreatorsXchange" → don't guess "creator collaborations" unless you truly know it)
-- Provide ONLY information you are genuinely confident about from your training data
-- It is better to say "Not Found" than to fabricate plausible-sounding information
-- Data source: YOUR internal training ONLY (no web search)
-
-HALLUCINATION CHECK - Ask yourself:
-1. Can I name a SPECIFIC fact about "${brand}" (founding year, founder, headquarters, specific product)?
-2. Have I seen "${brand}" mentioned in actual articles, research, or documents in my training data?
-3. Am I just guessing based on what the name sounds like?
-→ If your answers are No, No, Yes — then mark as "Not Found" with entityVerification.found = false
+DIRECTIVE: 
+- You have been provided with raw internal knowledge retrieved from various AI models about "${brand}".
+- Your task is to combine and synthesize this knowledge into a single, highly professional brand profile.
+- Use ONLY the facts provided in the RAW AI KNOWLEDGE above. Do not hallucinate or guess.
+- If the data is limited, provide a concise summary based only on what is available.
 
 ANALYSIS OBJECTIVES:
-1. Entity Recognition: Is "${brand}" present in your training data with SPECIFIC facts?
-2. Market Intelligence: What CONCRETE information do you have (not guesses)?
-3. Brand Strength: How prominent is this brand in your knowledge base?
-4. Competitive Context: What industry patterns and competitors do you recognize?
+1. Market Intelligence: Synthesize the concrete information provided.
+2. Brand Strength: Evaluate the overall prominence based on the provided insights.
+3. Competitive Context: Extract any industry patterns and competitors mentioned.
 
 OUTPUT FORMAT (Valid JSON - MANDATORY):
 {
   "modelUsed": "Model name",
-  "dataSource": "internal-training-knowledge-only",
+  "dataSource": "cross-synthesized-internal-knowledge",
   "analysisTimestamp": "${new Date().toISOString()}",
-  "entityVerification": {
-    "found": true/false,
-    "confidence": "High|Medium|Low|Not Found",
-    "knowledgeCoverage": "Describe SPECIFIC facts you know, or state 'No specific information found in training data'"
-  },
-  "interpretation": "4-5 powerful sentences providing a comprehensive market profile based on training knowledge. Include specific services, industry role, and estimated market presence. If not found, say '${brand} was not found in my training data.'",
-  "visibilityLevel": "Market Leader|Top Recommendation|Highly Visible|Moderate Presence|Minimal Visibility|Unknown|Not Found",
+  "interpretation": "4-5 powerful sentences providing a comprehensive market profile based ON THE PROVIDED RAW KNOWLEDGE. Include specific services, industry role, and estimated market presence.",
+  "visibilityLevel": "Market Leader|Top Recommendation|Highly Visible|Moderate Presence|Minimal Visibility|Unknown",
   "visibilityScore": 0-100,
   "sentimentScore": 0-100,
-  "prompts": ["specific prompts from your training knowledge"],
-  "domainType": "Specific industry from your training or Unknown",
-  "brandType": "Specific category from your training or Unknown",
-  "coreOffering": "Detailed description from your training or Unknown",
+  "domainType": "Specific industry from data or Unknown",
+  "brandType": "Specific category from data or Unknown",
+  "coreOffering": "Detailed description from data or Unknown",
   "sentiment": "Positive|Neutral|Negative|Unknown",
   "checklist": ["Brand-focused recommendation 1", "Brand-focused recommendation 2", "Brand-focused recommendation 3", "Brand-focused recommendation 4", "Brand-focused recommendation 5"],
-  "citations": [
-    {
-      "source": "My training data",
-      "authority": "Internal Knowledge",
-      "context": "Specific facts from training, or 'No verifiable citations available'",
-      "confidence": "High|Medium|Low"
-    }
-  ],
-  "criticalMissing": "Specific gaps in your knowledge (if any)",
-  "confidence": "High|Medium|Low",
-  "dataQuality": "Assessment of your training data completeness for this brand",
-  "knowledgeLimitations": "Honest statement about data gaps",
-  "recommendations": {
-    "immediate": ["Immediate action from your analysis"],
-    "shortTerm": ["Short-term strategy"],
-    "longTerm": ["Long-term optimization"]
-  },
-  "competitiveAnalysis": {
-    "position": "Leader|Challenger|Follower|Unknown",
-    "competitors": ["Known competitors from your training or empty array"],
-    "differentiators": ["Known strengths from your training or empty array"],
-    "dataCompleteness": "Assessment of your competitive knowledge"
-  },
   "aiVisibilityAssessment": {
-    "overallLevel": "Very Low AI visibility (0-15) OR Low AI visibility (16-45) OR Moderate AI visibility (46-69) OR High AI visibility (70-100) OR Unknown",
-    "interpretation": "How prominent is ${brand} in your training data? Be honest.",
-    "dataCompleteness": "Complete|Partial|Minimal|None",
-    "criteria": [
-      {
-        "name": "Distinct entity recognition in your training",
-        "assessment": "None OR Very Low OR Weak OR Moderate OR Strong",
-        "evidence": "Can you clearly identify this brand as a unique entity with specific facts?"
-      },
-      {
-        "name": "Semantic footprint in your data",
-        "assessment": "None OR Very Low OR Low OR High",
-        "evidence": "How often does this brand appear with specific context in your training?"
-      },
-      {
-        "name": "Stable associations in your knowledge",
-        "assessment": "None OR Very Low OR Low OR High",
-        "evidence": "What consistent, verifiable patterns appear in your training?"
-      },
-      {
-        "name": "Organic recall likelihood",
-        "assessment": "Unlikely OR Possible OR Likely",
-        "evidence": "Can you recall specific facts without guessing from the name?"
-      }
-    ]
+    "overallLevel": "High|Moderate|Low|Very Low",
+    "interpretation": "Summary of AI knowledge presence"
   }
 }
 
 🚨 CRITICAL RULES:
 - Output ONLY valid JSON (no markdown, no code blocks)
-- Be HONEST: say "Not Found" if you don't genuinely know the brand
-- DO NOT fabricate information based on what the brand name sounds like
-- Data source: Internal training ONLY (no web search)`;
+- Use ONLY the provided RAW AI KNOWLEDGE.`;
 
-    // Try models in priority order (but use only ONE)
+    // Try models in priority order for synthesis
     const models = [
-        { name: 'Google Gemini', fn: () => gemini.fetchGemini(independentProfilePrompt, true, false) },
-        { name: 'OpenAI GPT-4o', fn: () => openai.fetchOpenAI(independentProfilePrompt, true, false) },
-        // { name: 'Groq LLaMA', fn: () => groq.fetchGroq(independentProfilePrompt, true, false) }
+        { name: 'OpenAI GPT-4o', fn: () => openai.fetchOpenAI(synthesisPrompt, true, false) },
+        { name: 'Google Gemini', fn: () => gemini.fetchGemini(synthesisPrompt, true, false) }
     ];
 
     for (const model of models) {
         try {
-            logger.info(`🤖 [${model.name}] Generating independent master profile...`);
-            const response = await retryWithBackoff(() => model.fn(), `${model.name} independent profile`);
+            logger.info(`🤖 [${model.name}] Generating synthesized master profile...`);
+            const response = await retryWithBackoff(() => model.fn(), `${model.name} synthesized profile`);
             const parsed = cleanAndParseJSON(response, 'profile');
             
-            // Add independence metadata
+            // Add synthesis metadata
             parsed.generatedBy = model.name;
-            parsed.independentAnalysis = true;
-            parsed.dataSources = 'internal-training-data-only';
-            parsed.crossReferencing = 'disabled';
+            parsed.independentAnalysis = false;
+            parsed.dataSources = 'cross-synthesized-internal-knowledge';
+            parsed.crossReferencing = 'enabled';
             parsed.generatedAt = new Date().toISOString();
             
-            logger.info(`✅ [${model.name}] Independent master profile complete`);
+            logger.info(`✅ [${model.name}] Synthesized master profile complete`);
             return parsed;
         } catch (error) {
             logger.error(`❌ [${model.name}] Failed:`, error.message);
@@ -564,13 +531,13 @@ OUTPUT FORMAT (Valid JSON - MANDATORY):
         }
     }
 
-    logger.error(`❌ All models failed to generate independent master profile`);
+    logger.error(`❌ All models failed to generate synthesized master profile`);
     return { 
         error: "All models failed", 
         visibilityLevel: "Unknown", 
         visibilityScore: 0,
-        independentAnalysis: true,
-        dataSources: 'internal-training-data-only'
+        independentAnalysis: false,
+        dataSources: 'cross-synthesized-internal-knowledge'
     };
 };
 

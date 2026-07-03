@@ -1,5 +1,7 @@
 const { Redis } = require('ioredis');
 
+console.log('[DEBUG] UPSTASH_REDIS_URL at load time:', process.env.UPSTASH_REDIS_URL);
+
 // Upstash Redis — serverless, zero RAM on your EC2 instance
 // Set UPSTASH_REDIS_URL in your .env (from console.upstash.com)
 const isTls = process.env.UPSTASH_REDIS_URL && process.env.UPSTASH_REDIS_URL.startsWith('rediss://');

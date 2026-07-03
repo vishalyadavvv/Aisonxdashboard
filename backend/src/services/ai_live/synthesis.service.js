@@ -58,7 +58,7 @@ OUTPUT FORMAT (JSON ONLY):
 
     try {
         const response = await client.chat.completions.create({
-            model: "gpt-4o-mini",
+            model: "gpt-4o",
             messages: [
                 { role: "system", content: "You are a professional brand analyst. Output ONLY valid JSON." },
                 { role: "user", content: synthesisPrompt }

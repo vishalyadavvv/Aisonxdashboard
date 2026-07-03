@@ -372,7 +372,7 @@ const Projects = () => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
-                className="bg-white border border-gray-200 rounded-lg hover:border-gray-300 hover:shadow-sm transition-all cursor-pointer"
+                className="bg-white border border-gray-200/80 rounded-xl hover:border-blue-300 hover:shadow-md transition-all cursor-pointer"
                 onClick={() => navigate(`/dashboard/projects/${project._id}`)}
                 id={`project-card-${project._id}`}
               >
@@ -384,7 +384,7 @@ const Projects = () => {
                         <Globe className="w-5 h-5 text-slate-600" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <h3 className="font-semibold text-slate-900 text-base group-hover:text-blue-600 transition-colors truncate">{project.name}</h3>
+                        <h3 className="font-bold text-slate-900 text-base group-hover:text-blue-600 transition-colors truncate" title={project.name}>{project.name}</h3>
                         <div className="flex items-center gap-2 mt-0.5">
                           <div className="flex items-center gap-1 min-w-0">
                             <Building2 className="w-3 h-3 text-slate-400 shrink-0" />
@@ -474,7 +474,7 @@ const Projects = () => {
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2 text-xs text-slate-600 font-medium">
                       <Globe className="w-3 h-3 text-slate-400" />
-                      <span className="truncate max-w-[120px]">{project.domain}</span>
+                      <span className="truncate max-w-[200px]">{project.domain}</span>
                     </div>
                     <div className="flex items-center gap-2 px-2 py-1 bg-slate-50 rounded-lg border border-slate-100">
                       <div className="flex items-center gap-1.5" title="OpenAI Favorability">
@@ -500,7 +500,7 @@ const Projects = () => {
                             key={idx}
                             className="px-2 py-0.5 bg-slate-50 border border-slate-100 text-slate-600 text-[10px] font-semibold rounded"
                           >
-                            {promptText.length > 12 ? promptText.substring(0, 12) + '...' : promptText}
+                            {promptText.length > 20 ? promptText.substring(0, 20) + '...' : promptText}
                           </span>
                         ))}
                         {project.prompts.length > 2 && (
@@ -531,26 +531,26 @@ const Projects = () => {
         )}
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-10 mb-6">
           {stats.map((stat, i) => (
             <motion.div 
               key={i}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className="bg-white border border-gray-200/60 p-6 rounded-2xl shadow-sm relative overflow-hidden group hover:border-blue-500/20 transition-all"
+              className="bg-white border border-gray-200/60 p-4 rounded-xl shadow-sm relative overflow-hidden group hover:border-blue-500/20 transition-all"
             >
-              <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50/50 rounded-full blur-[40px] -mr-12 -mt-12 group-hover:bg-blue-100/50 transition-all" />
-              <p className="text-[10px] text-[#1E293B] uppercase tracking-widest font-bold mb-3">{stat.label}</p>
+              <div className="absolute top-0 right-0 w-16 h-16 bg-blue-50/50 rounded-full blur-[30px] -mr-8 -mt-8 group-hover:bg-blue-100/50 transition-all" />
+              <p className="text-[9px] text-[#1E293B] uppercase tracking-widest font-bold mb-2">{stat.label}</p>
               <div className="flex flex-col gap-3">
                 <div className="flex items-baseline gap-2">
-                  <h3 className={`${stat.isTierCard ? 'text-2xl capitalize' : 'text-4xl'} font-bold tracking-tight ${stat.highlight ? 'text-blue-600' : 'text-[#1E293B]'}`}>
+                  <h3 className={`${stat.isTierCard ? 'text-xl capitalize' : 'text-2xl'} font-bold tracking-tight ${stat.highlight ? 'text-blue-600' : 'text-[#1E293B]'}`}>
                     {stat.value}
                   </h3>
                   {stat.total && <span className="text-gray-400 font-semibold text-sm">/ {stat.total}</span>}
                 </div>
                 {stat.details && (
-                  <div className="flex gap-4 mt-2 border-t border-gray-100 pt-3">
+                  <div className="flex gap-3 mt-2 border-t border-gray-100 pt-2">
                     {stat.details.map((d, idx) => (
                       <div key={idx} className="flex flex-col">
                         <span className="text-[9px] text-gray-400 uppercase font-semibold">{d.label}</span>
@@ -580,7 +580,7 @@ const Projects = () => {
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
-                className="bg-white w-full max-w-md rounded-2xl shadow-2xl relative flex flex-col max-h-[90vh]"
+                className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl relative flex flex-col max-h-[90vh]"
               >
                 <div className="p-6 border-b border-gray-100">
                   <div className="flex items-center justify-between">
@@ -598,7 +598,7 @@ const Projects = () => {
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-6 pt-2 custom-scrollbar">
-                  <form onSubmit={handleCreateProject} className="space-y-6">
+                  <form onSubmit={handleCreateProject} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
                         Project Name
@@ -641,7 +641,7 @@ const Projects = () => {
                       />
                     </div>
 
-                    <div className="space-y-4 pt-2 border-t border-gray-50 mt-2">
+                    <div className="space-y-4 pt-2 border-t border-gray-50 mt-2 md:col-span-2">
                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
                         Market Selection Strategy
                       </label>
@@ -701,7 +701,7 @@ const Projects = () => {
                       </div>
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-2 md:col-span-2">
                       <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center justify-between">
                         <span>Audit Prompts</span>
                         <span className="text-blue-600">
@@ -727,7 +727,7 @@ const Projects = () => {
                       <p className="text-[10px] text-slate-400 font-medium mt-1.5">Separate multiple prompts with commas</p>
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-2 md:col-span-2">
                       <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center justify-between">
                         <span>Competitors (Optional)</span>
                         <span className="text-xs normal-case font-medium text-slate-500">Leave blank for AI discovery</span>
@@ -742,7 +742,7 @@ const Projects = () => {
                       <p className="text-[10px] text-slate-400 font-medium mt-1.5">Domains separated by commas</p>
                     </div>
 
-                    <div className="flex gap-3 pt-6">
+                    <div className="flex gap-3 pt-6 md:col-span-2">
                       <button
                         type="button"
                         onClick={() => setIsModalOpen(false)}

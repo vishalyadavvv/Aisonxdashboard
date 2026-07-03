@@ -157,7 +157,7 @@ exports.geminiPromptAudit = async function gptPromptAudit(brandName, domain, pro
     if (!process.env.GEMINI_API_KEY) return null;
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({
-      model: "gemini-flash-latest",
+      model: "gemini-1.5-pro-latest",
       tools: [{ googleSearch: {} }]
     });
 
@@ -401,7 +401,7 @@ exports.geminiCompetitiveAudit = async function geminiCompetitiveAudit(brandName
     if (!process.env.GEMINI_API_KEY) return null;
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({
-      model: "gemini-flash-latest",
+      model: "gemini-1.5-pro-latest",
       tools: [{ googleSearch: {} }]
     });
 
@@ -615,7 +615,7 @@ exports.geminiSearchCompetitors = async function geminiSearchCompetitors(brandNa
     if (!process.env.GEMINI_API_KEY) return [];
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({
-      model: "gemini-flash-latest",
+      model: "gemini-1.5-pro-latest",
       tools: [{ googleSearch: {} }]
     });
 

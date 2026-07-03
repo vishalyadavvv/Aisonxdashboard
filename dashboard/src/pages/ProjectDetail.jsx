@@ -469,7 +469,7 @@ const ProjectDetail = () => {
                     </div>
                   </div>
                   <div className="w-full h-24 bg-slate-50/80 border border-slate-100 rounded-xl p-3 flex flex-col items-center justify-center text-center">
-                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-tight">True Search<br/>Visibility</span>
+                    <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest leading-tight">True Search<br/>Visibility</span>
                     <span className="text-2xl font-black text-blue-600 leading-none mt-2">{stats.rawVisibility}%</span>
                   </div>
                 </div>
@@ -784,7 +784,7 @@ const ProjectDetail = () => {
                                       )}
                                       
                                       <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover/tip:opacity-100 transition-opacity pointer-events-none z-50">
-                                        <div className="bg-slate-700 text-white text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded shadow-xl whitespace-nowrap">
+                                        <div className="bg-gray-700 text-white text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded shadow-xl whitespace-nowrap">
                                           Not Found
                                         </div>
                                         <div className="w-2 h-2 bg-slate-700 rotate-45 mx-auto -mt-1" />
@@ -829,7 +829,7 @@ const ProjectDetail = () => {
                                         <MessageSquare className="w-4 h-4 text-blue-600" />
                                         <h4 className="text-sm font-bold text-slate-900">Per-Engine Insights</h4>
                                       </div>
-                                      <div className="text-[10px] font-black text-blue-600 bg-blue-50 px-3 py-1 rounded-full uppercase tracking-widest">
+                                      <div className="text-[10px] font-semibold text-blue-600  px-3 py-1 rounded-full uppercase tracking-widest">
                                         Viewing Scan: {new Date(tableHistory[activeSnapshotIndex].date).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
                                       </div>
                                     </div>
@@ -913,7 +913,7 @@ const ProjectDetail = () => {
                                                     </p>
                                                   </>
                                                 ) : (
-                                                  <p className="text-xs text-slate-400 leading-relaxed text-center py-2">
+                                                  <p className="text-xs text-gray-500 leading-relaxed text-center py-2">
                                                     Your brand was not found for this prompt.
                                                   </p>
                                                 )}
@@ -1047,7 +1047,7 @@ const ProjectDetail = () => {
                 <div className="p-8 border-b border-slate-100 flex items-center justify-between">
                   <div>
                     <h3 className="text-xl font-bold text-slate-900">Head-to-Head Comparison</h3>
-                    <p className="text-sm text-slate-500 mt-1">Direct visibility comparison for your target prompts</p>
+                    <p className="text-sm text-gray-600 mt-1">Direct visibility comparison for your target prompts</p>
                   </div>
                 </div>
 

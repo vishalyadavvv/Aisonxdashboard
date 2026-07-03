@@ -366,15 +366,15 @@ const internalRunProjectScan = async (project) => {
         try { liveAuditResults = await runLiveAudit(project.brandName); }
         catch (e) { logger.error(`Live Brand Audit failed for ${project.brandName}:`, e.message); }
 
-        logger.info(`🔄 [PHASE-5] Running Structured Profile for ${project.brandName}...`);
-        let auditProfile = { summary: 'Profile generation failed.' };
-        try { auditProfile = await aiOrchestrator.getStructuredProfile(project.brandName); }
-        catch (e) { logger.error(`Structured Profile failed for ${project.brandName}:`, e.message); }
-
-        logger.info(`🔄 [PHASE-6] Running Broadcast Query for ${project.brandName}...`);
+        logger.info(`🔄 [PHASE-5] Running Broadcast Query for ${project.brandName}...`);
         let auditModelResults = [];
         try { auditModelResults = await aiOrchestrator.broadcastQuery(project.brandName); }
         catch (e) { logger.error(`Broadcast Query failed for ${project.brandName}:`, e.message); }
+
+        logger.info(`🔄 [PHASE-6] Running Structured Profile for ${project.brandName}...`);
+        let auditProfile = { summary: 'Profile generation failed.' };
+        try { auditProfile = await aiOrchestrator.getStructuredProfile(project.brandName, auditModelResults); }
+        catch (e) { logger.error(`Structured Profile failed for ${project.brandName}:`, e.message); }
 
         // ---------------------------------------------------------
         // PHASE 3: Web Mentions Profile (Synthesis)

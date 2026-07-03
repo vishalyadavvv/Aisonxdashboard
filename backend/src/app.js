@@ -18,6 +18,9 @@ const logger = require('./utils/logger');
 
 const app = express();
 
+// Security Middleware
+app.use(helmet());
+
 const allowedOrigins = [
   'https://app.aisonx.com',
   'http://localhost:5173'

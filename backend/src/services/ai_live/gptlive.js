@@ -25,7 +25,7 @@ Instructions:
     try {
       logger.info(`🔍 ChatGPT Live: Executing DEEP SEARCH for "${brand}"...`);
       const res = await client.responses.create({
-        model: "gpt-4o-mini",
+        model: "gpt-4o",
         tools: [{ type: "web_search" }],
         input: prompt + "\nOptimization: Max 2 searches. Do not read full pages if snippets suffice."
       });
@@ -46,7 +46,7 @@ Instructions:
     // We strictly tell it NOT to guess if it doesn't have live search access here
     logger.info("🔍 ChatGPT Live: Using direct analysis fallback (Warning: No search tool)...");
     const fallbackRes = await client.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       messages: [
         {
           role: "system",
@@ -111,7 +111,7 @@ Schema: {interpretation:string, visibilityLevel:string, visibilityScore:number, 
     logger.info(`🧠 ChatGPT Profile: Synthesizing profile for "${brand}" using live context (${liveResearchContext?.length || 0} chars)...`);
 
     const response = await client.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       messages: [
         { role: "system", content: "You are a factual brand analyst. Output ONLY JSON. prioritize live search evidence provided in the prompt." },
         { role: "user", content: synthesisPrompt }
@@ -184,7 +184,7 @@ OUTPUT FORMAT (JSON ONLY):
 `;
 
     const res = await client.responses.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       tools: [{ type: "web_search" }],
       input: prompt
     });
@@ -255,7 +255,7 @@ OUTPUT FORMAT (JSON ARRAY — one object per prompt):
     logger.info(`🔄 [GPT_BATCH] Auditing ${prompts.length} prompts in ONE call...`);
 
     const res = await client.responses.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       tools: [{ type: "web_search" }],
       input: prompt
     });

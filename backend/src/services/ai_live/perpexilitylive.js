@@ -73,7 +73,7 @@ RULES:
 - Ensure ONLY valid JSON is returned.`;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       messages: [
         { role: "system", content: "You are a factual brand analyst. Output ONLY JSON." },
         { role: "user", content: synthesisPrompt }
