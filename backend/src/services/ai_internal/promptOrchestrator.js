@@ -238,11 +238,13 @@ exports.performProjectScan = async (project) => {
     // 1. Competitive Audits — OpenAI & Gemini (The "Battle View")
     // These calls evaluate the brand and rivals in the same search context.
     
+    let compResults = null; // Lifted to outer scope for Cross-Engine Fallback
+
     // 1.1 OpenAI Competitive Audit (with Smart Fallback)
     if (engines.includes('openai')) {
         logger.info(`🔄 [COMPETITIVE] Running OpenAI Battle View for ${project.prompts.length} prompts in ${market.name}...`);
         
-        let compResults = await gptCompetitiveBatchAudit(brandName, domain, project.competitors, project.prompts, market);
+        compResults = await gptCompetitiveBatchAudit(brandName, domain, project.competitors, project.prompts, market);
         
         // --- FALLBACK: If OpenAI is exhausted, use Gemini to simulate the OpenAI perspective ---
         if (!compResults || compResults.length === 0) {
@@ -293,8 +295,8 @@ exports.performProjectScan = async (project) => {
                 if (audit.competitorRankings) {
                     for (const cr of audit.competitorRankings) {
                         results.competitorRankings.push({
-                            competitorName: cr.name,
-                            competitorDomain: cr.domain,
+                            competitorName: cr.competitorName,
+                            competitorDomain: cr.competitorDomain,
                             prompt: audit.prompt,
                             engine: 'openai',
                             visibility: cr.rank > 0 ? (cr.rank <= 3 ? 'High' : 'Moderate') : 'None',
@@ -315,9 +317,30 @@ exports.performProjectScan = async (project) => {
         logger.info(`🔄 [COMPETITIVE] Running Gemini Battle View for ${project.prompts.length} prompts in ${market.name}...`);
         const tasks = project.prompts.map(promptText => async () => {
             try {
-                return await geminiCompetitiveAudit(brandName, domain, project.competitors, promptText, market);
+                const res = await geminiCompetitiveAudit(brandName, domain, project.competitors, promptText, market);
+                if (!res || (res.brandRanking && res.brandRanking.snippet && res.brandRanking.snippet.includes('temporarily unavailable'))) {
+                    throw new Error("Invalid or empty Gemini response");
+                }
+                return res;
             } catch (err) {
                 logger.error(`[ORCHESTRATOR] Gemini call failed: ${err.message}`);
+                
+                // --- FALLBACK: If Gemini fails, use OpenAI to simulate the Gemini perspective ---
+                if (compResults && compResults.length > 0) {
+                    const fallbackRes = compResults.find(r => r.prompt === promptText);
+                    if (fallbackRes) {
+                        logger.warn(`⚠️ [COMPETITIVE] Initiating OpenAI-Surrogate for Gemini slot on prompt: ${promptText}`);
+                        return {
+                            ...fallbackRes,
+                            authoritySignals: { 
+                                ...fallbackRes.authoritySignals, 
+                                sourceType: 'OpenAI (Gemini Surrogate)',
+                                isSurrogate: true 
+                            }
+                        };
+                    }
+                }
+                
                 return {
                     prompt: promptText,
                     brandRanking: { rank: 0, snippet: "Service temporarily unavailable. Please check API configuration.", score: 0 },
@@ -327,7 +350,22 @@ exports.performProjectScan = async (project) => {
         });
         
         const gCompResultsRaw = await runWithLimit(tasks, 3);
-        const gCompResults = gCompResultsRaw.filter(Boolean);
+        
+        // Final sanity check: if the entire batch failed and we couldn't fallback per-prompt, do a batch fallback
+        let gCompResults = gCompResultsRaw.filter(Boolean);
+        const isCompletelyFailed = gCompResults.every(r => !r.brandRanking || r.brandRanking.rank === 0 && r.brandRanking.snippet.includes('unavailable'));
+        
+        if (isCompletelyFailed && compResults && compResults.length > 0) {
+            logger.warn(`⚠️ [COMPETITIVE] Gemini totally failed. Using full OpenAI compResults as Surrogate.`);
+            gCompResults = compResults.map(r => ({
+                ...r,
+                authoritySignals: { 
+                    ...r.authoritySignals, 
+                    sourceType: 'OpenAI (Gemini Surrogate)',
+                    isSurrogate: true 
+                }
+            }));
+        }
         
         if (gCompResults.length > 0) {
             for (const audit of gCompResults) {
@@ -359,8 +397,8 @@ exports.performProjectScan = async (project) => {
                 if (audit.competitorRankings) {
                     for (const cr of audit.competitorRankings) {
                         results.competitorRankings.push({
-                            competitorName: cr.name,
-                            competitorDomain: cr.domain,
+                            competitorName: cr.competitorName,
+                            competitorDomain: cr.competitorDomain,
                             prompt: audit.prompt,
                             engine: 'gemini',
                             visibility: cr.rank > 0 ? (cr.rank <= 3 ? 'High' : 'Moderate') : 'None',
