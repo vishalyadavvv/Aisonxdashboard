@@ -68,9 +68,35 @@ const Rankings = () => {
     // Context handles the data fetching
   }, [projectId]);
 
-  // Latest snapshot data
+  // Calculate filtered history based on activeRange
+  const filteredHistory = useMemo(() => {
+    if (!history || history.length === 0) return [];
+    if (activeRange === 'Current') return history; // Current shows all history in the chart, but compares with immediate prev
+
+    const now = new Date();
+    const cutoff = new Date();
+    
+    switch (activeRange) {
+      case '7D': cutoff.setDate(now.getDate() - 7); break;
+      case '1M': cutoff.setMonth(now.getMonth() - 1); break;
+      case '3M': cutoff.setMonth(now.getMonth() - 3); break;
+      case '1Y': cutoff.setFullYear(now.getFullYear() - 1); break;
+      default: return history;
+    }
+    
+    return history.filter(h => new Date(h.date) >= cutoff);
+  }, [history, activeRange]);
+
+  // Latest snapshot is always the absolute latest (index 0)
   const lastSnapshot = useMemo(() => history[0] || null, [history]);
-  const prevSnapshot = useMemo(() => history[1] || null, [history]);
+  
+  // Previous snapshot for deltas
+  // If 'Current', compare to the immediate previous (index 1).
+  // Otherwise, compare to the oldest snapshot within the selected time range.
+  const prevSnapshot = useMemo(() => {
+    if (activeRange === 'Current') return history[1] || null;
+    return filteredHistory.length > 1 ? filteredHistory[filteredHistory.length - 1] : (history[1] || null);
+  }, [history, filteredHistory, activeRange]);
 
   // Comprehensive Metrics
   const metrics = useMemo(() => {
@@ -134,9 +160,10 @@ const Rankings = () => {
     { name: 'Unranked', value: metrics.unranked, color: '#94A3B8' },
   ];
 
-  // Historical Average Position
+  // Historical Average Position (Chart uses filtered timeframe)
   const trendData = useMemo(() => {
-    return [...history].reverse().map(h => {
+    const dataToChart = activeRange === 'Current' ? history : filteredHistory;
+    return [...dataToChart].reverse().map(h => {
       const rankings = h.promptRankings || [];
       const filtered = selectedEngine === 'all' ? rankings : rankings.filter(r => r.engine === selectedEngine);
       const rankedCount = filtered.filter(r => r.found && r.rank > 0).length;
@@ -637,7 +664,7 @@ const Rankings = () => {
             <RankingPerformanceReport 
               brandName={project.brandName || project.name} 
               data={project} 
-              history={history}
+              history={[lastSnapshot, prevSnapshot].filter(Boolean)}
               metrics={metrics}
             />
           )}
