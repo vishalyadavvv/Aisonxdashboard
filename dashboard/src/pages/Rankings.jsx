@@ -469,7 +469,7 @@ const Rankings = () => {
                             <div className="min-w-0">
                               <p className="text-sm font-bold text-gray-800 leading-tight truncate max-w-[400px]" title={prompt}>{prompt}</p>
                               <p className="text-[9px] font-black text-gray-600 uppercase tracking-tighter mt-1">
-                                {selectedEngine === 'all' ? `${allEngResults.filter(r => r.found).length} / 3 Engines` : res?.engine}
+                                {selectedEngine === 'all' ? `${allEngResults.filter(r => r.found).length} / 2 ENGINES` : res?.engine}
                               </p>
                             </div>
                           </div>
