@@ -885,14 +885,14 @@ const ProjectDetail = () => {
                                                           .slice(0, 4)
                                                           .map((item, i) => {
                                                             const url = item.fixedUrl;
-                                                            const domain = url.replace(/^https?:\/\/(www\.)?/, '').split('/')[0];
-                                                            const isOwnDomain = projDomain && domain.includes(projDomain);
+                                                            const cleanUrl = url.replace(/^https?:\/\/(www\.)?/, '');
+                                                            const isOwnDomain = projDomain && cleanUrl.startsWith(projDomain);
                                                             
                                                             return (
-                                                              <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 px-2 py-1 bg-white border border-slate-200 rounded-lg text-blue-600 hover:text-blue-700 transition-colors text-[9px] font-bold shadow-sm max-w-[150px] overflow-hidden">
+                                                              <a key={i} href={url} target="_blank" rel="noopener noreferrer" title={url} className="flex items-center gap-1 px-2 py-1 bg-white border border-slate-200 rounded-lg text-blue-600 hover:text-blue-700 transition-colors text-[9px] font-bold shadow-sm max-w-[200px] overflow-hidden">
                                                                 <LinkIcon className="w-2.5 h-2.5 shrink-0" />
                                                                 <span className="truncate block w-full">
-                                                                  {isOwnDomain ? projDomain : domain}
+                                                                  {cleanUrl}
                                                                 </span>
                                                               </a>
                                                             );

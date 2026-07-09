@@ -122,9 +122,12 @@ const RankingPerformanceReport = ({ brandName, data, history = [], metrics, date
               const prevRes = prevSnapshot?.promptRankings?.find(pr => pr.prompt === r.prompt && pr.engine === r.engine);
               const delta = (r.found && prevRes?.found) ? prevRes.rank - r.rank : 0;
               const isTop = r.found && r.rank > 0 && r.rank <= 3;
+              const hasCitations = r.citations && r.citations.length > 0;
+              const showDetails = r.found || (r.score > 0 && hasCitations) || r.snippet;
 
               return (
-                <tr key={i}>
+                <React.Fragment key={i}>
+                  <tr>
                   <td>
                     <div style={{ fontWeight: '600', color: '#1F2937', fontSize: '13px' }}>{r.prompt}</div>
                     <div style={{ fontSize: '10px', color: '#444444', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: '2px' }}>{r.engine}</div>
@@ -153,7 +156,35 @@ const RankingPerformanceReport = ({ brandName, data, history = [], metrics, date
                       {r.found ? `${Math.max(30, 100 - r.rank * 5)}%` : '0%'}
                     </span>
                   </td>
-                </tr>
+                  </tr>
+                  {showDetails && (
+                    <tr>
+                      <td colSpan="5" style={{ padding: '12px 16px', background: '#FAFBFC', borderBottom: '1px solid #E2E8F0' }}>
+                        <div style={{ paddingLeft: '8px', borderLeft: '3px solid #059669' }}>
+                          <p style={{ fontSize: '11px', color: '#374151', fontStyle: 'italic', margin: '0 0 8px 0', lineHeight: '1.5' }}>
+                            "{r.snippet || 'No specific insight captured.'}"
+                          </p>
+                          {hasCitations && (
+                            <div>
+                              <div style={{ fontSize: '9px', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '4px' }}>Verified Sources</div>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                {r.citations.slice(0, 3).map((cit, idx) => {
+                                  let displayUrl = cit;
+                                  try { displayUrl = new URL(cit).href.replace(/^https?:\/\/(www\.)?/, ''); } catch(e) {}
+                                  return (
+                                    <span key={idx} style={{ fontSize: '9px', padding: '3px 8px', background: '#ECFDF5', color: '#047857', borderRadius: '4px', border: '1px solid #A7F3D0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '240px' }}>
+                                      {displayUrl}
+                                    </span>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
               );
             })}
           </tbody>
