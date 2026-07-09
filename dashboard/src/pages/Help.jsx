@@ -53,9 +53,9 @@ const Help = () => {
           <HelpCircle className="w-4 h-4" />
           Support Center
         </div>
-        <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">How can we help you?</h1>
+        <h1 className="text-4xl font-extrabold text-gray-800 tracking-tight">How can we help you?</h1>
         <div className="relative max-w-xl mx-auto">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-600" />
           <input 
             type="text" 
             placeholder="Search for articles, guides, or questions..." 
@@ -77,20 +77,20 @@ const Help = () => {
             <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mx-auto group-hover:bg-blue-600 group-hover:text-white transition-colors">
               <cat.icon className="w-6 h-6" />
             </div>
-            <h3 className="text-xs font-bold text-slate-900">{cat.name}</h3>
-            <p className="text-[10px] font-medium text-slate-400">{cat.count} articles</p>
+            <h3 className="text-xs font-bold text-gray-800">{cat.name}</h3>
+            <p className="text-[10px] font-medium text-gray-600">{cat.count} articles</p>
           </motion.button>
         ))}
       </div>
 
       {/* FAQs */}
       <div className="space-y-6">
-        <h2 className="text-xl font-bold text-slate-900 border-l-4 border-blue-600 pl-4">Frequently Asked Questions</h2>
+        <h2 className="text-xl font-bold text-gray-800 border-l-4 border-blue-600 pl-4">Frequently Asked Questions</h2>
         <div className="space-y-3">
           {loading ? (
             <div className="text-center py-12">
               <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4" />
-              <p className="text-sm text-slate-500 font-medium">Loading answers...</p>
+              <p className="text-sm text-gray-700 font-medium">Loading answers...</p>
             </div>
           ) : (
             filteredFaqs.map((faq, i) => (
@@ -99,8 +99,8 @@ const Help = () => {
                   onClick={() => setActiveFaq(activeFaq === i ? null : i)}
                   className="w-full px-6 py-5 flex items-center justify-between text-left group"
                 >
-                  <span className="text-sm font-bold text-slate-800 group-hover:text-blue-600 transition-colors">{faq.question}</span>
-                  <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform duration-300 ${activeFaq === i ? 'rotate-180' : ''}`} />
+                  <span className="text-sm font-bold text-gray-800 group-hover:text-blue-600 transition-colors">{faq.question}</span>
+                  <ChevronDown className={`w-5 h-5 text-gray-600 transition-transform duration-300 ${activeFaq === i ? 'rotate-180' : ''}`} />
                 </button>
                 <AnimatePresence>
                   {activeFaq === i && (
@@ -110,7 +110,7 @@ const Help = () => {
                       exit={{ height: 0, opacity: 0 }}
                       className="overflow-hidden"
                     >
-                      <div className="px-6 pb-6 text-sm text-slate-600 font-medium leading-relaxed border-t border-slate-50 pt-4">
+                      <div className="px-6 pb-6 text-sm text-gray-700 font-medium leading-relaxed border-t border-slate-50 pt-4">
                         {faq.answer}
                       </div>
                     </motion.div>
@@ -129,7 +129,7 @@ const Help = () => {
         
         <div className="space-y-2 relative z-10">
           <h2 className="text-2xl font-bold text-white">Still have questions?</h2>
-          <p className="text-slate-400 text-sm max-w-md mx-auto">Can't find the answer you're looking for? Please chat with our friendly team.</p>
+          <p className="text-gray-600 text-sm max-w-md mx-auto">Can't find the answer you're looking for? Please chat with our friendly team.</p>
         </div>
         
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 relative z-10">

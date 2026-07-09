@@ -130,7 +130,7 @@ const Login = () => {
                 <div className="w-3 h-3 rounded-full bg-yellow-500" />
                 <div className="w-3 h-3 rounded-full bg-green-500" />
                 <div className="flex-1 ml-3">
-                  <div className="bg-white/5 rounded-lg px-3 py-1.5 text-xs text-gray-400 font-mono">
+                  <div className="bg-white/5 rounded-lg px-3 py-1.5 text-xs text-gray-600 font-mono">
                     dashboard.geoengine.ai/analytics
                   </div>
                 </div>
@@ -139,17 +139,17 @@ const Login = () => {
               {/* Dashboard Metrics */}
               <div className="grid grid-cols-3 gap-3 mt-4">
                 <div className="bg-white/5 rounded-xl p-3 text-center">
-                  <div className="text-xs text-gray-400 mb-1">GEO Score</div>
+                  <div className="text-xs text-gray-600 mb-1">GEO Score</div>
                   <div className="text-2xl font-bold text-white">94.2</div>
                   <div className="text-xs text-green-400">↑ +12.4%</div>
                 </div>
                 <div className="bg-white/5 rounded-xl p-3 text-center">
-                  <div className="text-xs text-gray-400 mb-1">Visibility</div>
+                  <div className="text-xs text-gray-600 mb-1">Visibility</div>
                   <div className="text-2xl font-bold text-white">28.6K</div>
                   <div className="text-xs text-green-400">↑ +8.2%</div>
                 </div>
                 <div className="bg-white/5 rounded-xl p-3 text-center">
-                  <div className="text-xs text-gray-400 mb-1">LLM Reach</div>
+                  <div className="text-xs text-gray-600 mb-1">LLM Reach</div>
                   <div className="text-2xl font-bold text-white">12.4K</div>
                   <div className="text-xs text-green-400">↑ +23%</div>
                 </div>
@@ -157,7 +157,7 @@ const Login = () => {
               
               {/* Progress Bar */}
               <div className="mt-4 space-y-2">
-                <div className="flex justify-between text-xs text-gray-400">
+                <div className="flex justify-between text-xs text-gray-600">
                   <span>AI Authority Score</span>
                   <span>87%</span>
                 </div>
@@ -167,7 +167,7 @@ const Login = () => {
               </div>
 
               {/* Activity Indicator */}
-              <div className="mt-4 flex items-center justify-between text-xs text-gray-500">
+              <div className="mt-4 flex items-center justify-between text-xs text-gray-700">
                 <div className="flex items-center gap-1">
                   <Activity className="w-3 h-3 text-green-400" />
                   <span>Real-time updates</span>
@@ -197,8 +197,8 @@ const Login = () => {
         <div className="flex justify-center mb-6">
           <img src="https://res.cloudinary.com/dbbll23jz/image/upload/v1777897134/AISONX_Logo_Final_rzzvfr.png" className="h-20 w-auto object-contain" alt="AISONX Logo" />
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back</h2>
-        <p className="text-gray-500 text-sm">Login to access your AISONX dashboard</p>
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">Welcome Back</h2>
+        <p className="text-gray-700 text-sm">Login to access your AISONX dashboard</p>
       </div>
 
       {/* Error Message */}
@@ -216,15 +216,15 @@ const Login = () => {
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Email Field */}
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1">
+          <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider ml-1">
             Email Address
           </label>
           <div className="relative">
-            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 w-5 h-5" />
             <input
               type="email"
               required
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 pl-12 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 transition-all"
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 pl-12 pr-4 text-gray-800 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 transition-all"
               placeholder="name@company.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -234,15 +234,15 @@ const Login = () => {
 
         {/* Password Field */}
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1">
+          <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider ml-1">
             Password
           </label>
           <div className="relative">
-            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 w-5 h-5" />
             <input
               type={showPassword ? "text" : "password"}
               required
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 pl-12 pr-12 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 transition-all"
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 pl-12 pr-12 text-gray-800 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 transition-all"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -250,7 +250,7 @@ const Login = () => {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-600 transition-colors"
             >
               {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
@@ -284,7 +284,7 @@ const Login = () => {
 
       {/* Sign Up Link */}
       <div className="mt-8 pt-6 border-t border-gray-100 text-center">
-        <p className="text-gray-500 text-sm">
+        <p className="text-gray-700 text-sm">
           Don't have an account?{' '}
           <Link to="/register" className="text-blue-500 font-semibold hover:text-blue-600 transition-colors">
             Create an account
@@ -293,7 +293,7 @@ const Login = () => {
       </div>
 
       {/* Trust Badges */}
-      <div className="mt-6 flex justify-center items-center gap-4 text-xs text-gray-400">
+      <div className="mt-6 flex justify-center items-center gap-4 text-xs text-gray-600">
         <div className="flex items-center gap-1">
           <Shield className="w-3 h-3" />
           <span>Enterprise Grade</span>

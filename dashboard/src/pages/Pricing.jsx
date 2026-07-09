@@ -215,8 +215,8 @@ const Pricing = () => {
     <div className="max-w-7xl mx-auto space-y-12 py-4 px-4">
       {/* Header */}
       <div className="text-center space-y-4">
-        <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">Simple, Transparent Pricing</h1>
-        <p className="text-lg text-slate-500 max-w-2xl mx-auto">Choose the plan that fits your business needs. Scale your AI visibility with precision.</p>
+        <h1 className="text-4xl font-extrabold text-gray-800 tracking-tight">Simple, Transparent Pricing</h1>
+        <p className="text-lg text-gray-700 max-w-2xl mx-auto">Choose the plan that fits your business needs. Scale your AI visibility with precision.</p>
       </div>
 
       {/* Pricing Cards */}
@@ -239,16 +239,16 @@ const Pricing = () => {
                 <div className={`p-3 rounded-2xl bg-${plan.color}-50 text-${plan.color}-600`}>
                   <plan.icon className="w-6 h-6" />
                 </div>
-                <span className={`text-xs font-bold uppercase tracking-widest text-slate-400`}>{plan.name}</span>
+                <span className={`text-xs font-bold uppercase tracking-widest text-gray-600`}>{plan.name}</span>
               </div>
 
               <div>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-extrabold text-slate-900">₹{plan.price}</span>
-                  <span className="text-slate-400 font-bold text-sm">/ month</span>
+                  <span className="text-4xl font-extrabold text-gray-800">₹{plan.price}</span>
+                  <span className="text-gray-600 font-bold text-sm">/ month</span>
                 </div>
                 <div className="flex items-center gap-2 mt-2">
-                  <p className="text-xs text-slate-500 font-medium">{plan.description}</p>
+                  <p className="text-xs text-gray-700 font-medium">{plan.description}</p>
                   {plan.trial && (
                     <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
                       {plan.trial}
@@ -267,8 +267,8 @@ const Pricing = () => {
                         <Check className={`w-4 h-4 text-${plan.color}-600`} />
                       )}
                     </div>
-                    <span className="text-xs font-medium text-slate-600 leading-tight">
-                      <span className="block font-bold text-slate-400 text-[10px] uppercase tracking-wider">{feature}</span>
+                    <span className="text-xs font-medium text-gray-700 leading-tight">
+                      <span className="block font-bold text-gray-600 text-[10px] uppercase tracking-wider">{feature}</span>
                       {typeof plan.features[feature] === 'boolean' ? (plan.features[feature] ? 'Included' : 'Not Included') : plan.features[feature]}
                     </span>
                   </div>
@@ -304,7 +304,7 @@ const Pricing = () => {
               )}
             </button>
             {user?.subscription?.trialUsed && user?.subscription?.tier === 'none' && (
-              <p className="text-[10px] text-center mt-2 text-slate-400 font-medium italic">
+              <p className="text-[10px] text-center mt-2 text-gray-600 font-medium italic">
                 Free trial already used for this account
               </p>
             )}
@@ -315,7 +315,7 @@ const Pricing = () => {
       {/* Comparison Table */}
       <div className="mt-20 space-y-8 bg-white border border-slate-100 rounded-3xl p-8 shadow-sm">
         <div className="flex items-center justify-between border-b border-slate-50 pb-6">
-          <h2 className="text-xl font-bold text-slate-900">Feature Comparison</h2>
+          <h2 className="text-xl font-bold text-gray-800">Feature Comparison</h2>
           <div className="flex items-center gap-2 text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg">
             <HelpCircle className="w-4 h-4" />
             Learn more about each feature
@@ -326,12 +326,12 @@ const Pricing = () => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-slate-50">
-                <th className="py-4 px-4 text-xs font-bold uppercase tracking-widest text-slate-400">Features</th>
+                <th className="py-4 px-4 text-xs font-bold uppercase tracking-widest text-gray-600">Features</th>
                 {plans.map((plan, i) => (
                   <th key={i} className="py-4 px-4 text-center">
                     <div className="flex flex-col items-center gap-1">
-                      <span className="text-sm font-extrabold text-slate-900">{plan.name}</span>
-                      <span className="text-[10px] font-bold text-slate-400">₹{plan.price}</span>
+                      <span className="text-sm font-extrabold text-gray-800">{plan.name}</span>
+                      <span className="text-[10px] font-bold text-gray-600">₹{plan.price}</span>
                     </div>
                   </th>
                 ))}
@@ -353,7 +353,7 @@ const Pricing = () => {
                             <span className="text-slate-300">—</span>
                           )
                         ) : (
-                          <span className="text-xs font-extrabold text-slate-900">{plan.features[feature]}</span>
+                          <span className="text-xs font-extrabold text-gray-800">{plan.features[feature]}</span>
                         )}
                       </div>
                     </td>
@@ -364,7 +364,7 @@ const Pricing = () => {
                 <td className="py-4 px-4 text-xs font-bold text-slate-700">Best For</td>
                 {plans.map((plan, i) => (
                   <td key={i} className="py-4 px-4 text-center">
-                    <span className="text-[10px] font-bold text-slate-500">{plan.bestFor}</span>
+                    <span className="text-[10px] font-bold text-gray-700">{plan.bestFor}</span>
                   </td>
                 ))}
               </tr>
@@ -376,10 +376,10 @@ const Pricing = () => {
       {/* FAQ / Support footer */}
       <div className="bg-slate-900 rounded-3xl p-10 text-center space-y-6 relative overflow-hidden">
         <h2 className="text-2xl font-bold text-white relative z-10">Need a custom plan?</h2>
-        <p className="text-slate-400 text-sm max-w-lg mx-auto relative z-10">We offer custom enterprise solutions with dedicated account management and advanced API access.</p>
+        <p className="text-gray-600 text-sm max-w-lg mx-auto relative z-10">We offer custom enterprise solutions with dedicated account management and advanced API access.</p>
         <button 
           onClick={() => window.location.href = 'mailto:contact@dgtlmart.com'}
-          className="relative z-10 px-8 py-3 bg-white text-slate-900 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all"
+          className="relative z-10 px-8 py-3 bg-white text-gray-800 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all"
         >
           Contact Sales
         </button>

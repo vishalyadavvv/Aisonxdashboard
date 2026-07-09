@@ -33,7 +33,7 @@ const VisibilityAssessmentTable = ({ data }) => {
     if (a.includes('moderate') || a.includes('possible')) return 'bg-blue-50 text-blue-600 border-blue-100';
     if (a.includes('low')) return 'bg-amber-50 text-amber-600 border-amber-100';
     if (a.includes('weak') || a.includes('unlikely') || a.includes('minimal')) return 'bg-red-50 text-red-600 border-red-100';
-    if (a.includes('none') || a.includes('not found')) return 'bg-gray-100 text-gray-500 border-gray-200';
+    if (a.includes('none') || a.includes('not found')) return 'bg-gray-100 text-gray-700 border-gray-200';
     return 'bg-red-50 text-red-600 border-red-100';
   };
 
@@ -53,7 +53,7 @@ const VisibilityAssessmentTable = ({ data }) => {
   return (
     <div className="mt-8 space-y-6">
       <div className="flex flex-col gap-1.5 border-l-4 border-current pl-4" style={{ color: color.replace('text-', '') }}>
-        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Overall AI visibility level</span>
+        <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Overall AI visibility level</span>
         <span className={`text-lg font-black ${color}`}>{label}</span>
       </div>
 
@@ -61,8 +61,8 @@ const VisibilityAssessmentTable = ({ data }) => {
         <table className="w-full text-xs">
           <thead>
             <tr className="bg-gray-50/50 border-b border-gray-100">
-              <th className="py-3.5 px-5 text-left font-black text-gray-400 uppercase tracking-widest">Criterion</th>
-              <th className="py-3.5 px-5 text-right font-black text-gray-400 uppercase tracking-widest">Assessment</th>
+              <th className="py-3.5 px-5 text-left font-black text-gray-600 uppercase tracking-widest">Criterion</th>
+              <th className="py-3.5 px-5 text-right font-black text-gray-600 uppercase tracking-widest">Assessment</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
@@ -83,7 +83,7 @@ const VisibilityAssessmentTable = ({ data }) => {
       {va.interpretation && (
         <div className="space-y-2">
           <span className="text-[10px] font-black text-[#1E293B] uppercase tracking-widest block">Interpretation</span>
-          <p className="text-[13px] text-gray-500 leading-relaxed border-t border-gray-50 pt-3">
+          <p className="text-[13px] text-gray-700 leading-relaxed border-t border-gray-50 pt-3">
             {va.interpretation}
           </p>
         </div>
@@ -156,8 +156,8 @@ const AIVisibilityAudit = () => {
       if (allowUnknown) {
         return (
           <div className="flex items-center justify-between mt-3 mb-3">
-            <span className="text-xs font-medium text-gray-400">{label}</span>
-            <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-md bg-gray-800/50 text-gray-500 border border-gray-700/50">Unknown</span>
+            <span className="text-xs font-medium text-gray-600">{label}</span>
+            <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-md bg-gray-800/50 text-gray-700 border border-gray-700/50">Unknown</span>
           </div>
         );
       }
@@ -371,8 +371,8 @@ const AIVisibilityAudit = () => {
           <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
           <div className="absolute inset-0 bg-blue-500/20 rounded-3xl animate-ping opacity-20" />
         </div>
-        <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter mb-2 text-center">Synchronizing Intelligence</h2>
-        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] text-center">Syncing live nodes for your project...</p>
+        <h2 className="text-xl font-black text-gray-800 uppercase tracking-tighter mb-2 text-center">Synchronizing Intelligence</h2>
+        <p className="text-gray-600 font-bold uppercase tracking-widest text-[10px] text-center">Syncing live nodes for your project...</p>
       </div>
     );
   }
@@ -411,14 +411,14 @@ const AIVisibilityAudit = () => {
           )}
         </AnimatePresence>
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-gray-400 mb-6 pt-6">
+        <div className="flex items-center gap-2 text-sm text-gray-600 mb-6 pt-6">
           <Link to="/dashboard" className="hover:text-gray-600 transition-colors border-b border-transparent hover:border-gray-200">Dashboard</Link>
           <span className="opacity-40">/</span>
-          <span className="text-gray-400 font-medium">AI Module</span>
+          <span className="text-gray-600 font-medium">AI Module</span>
           <span className="opacity-40">/</span>
           <span className="text-gray-600 font-bold bg-gray-100 px-2 py-0.5 rounded-md">AI Visibility Audit</span>
           <span className="opacity-40">/</span>
-          <span className="text-gray-400">{project?.name}</span>
+          <span className="text-gray-600">{project?.name}</span>
         </div>
 
         <AnimatePresence>
@@ -463,7 +463,7 @@ const AIVisibilityAudit = () => {
           <div className="flex items-start justify-between mb-4">
             <div>
               <h1 className="text-2xl font-bold mb-1">{projectId ? `Project Scan: ${project?.name}` : 'AI Visibility Audit'}</h1>
-              <p className="text-gray-400 text-sm">{projectId ? `Automated visibility analysis for ${project?.brandName}` : 'Conduct a deep-scan across major LLMs to understand how your brand is perceived and cited.'}</p>
+              <p className="text-gray-300 text-sm">{projectId ? `Automated visibility analysis for ${project?.brandName}` : 'Conduct a deep-scan across major LLMs to understand how your brand is perceived and cited.'}</p>
             </div>
             
             {!projectId && (
@@ -487,7 +487,7 @@ const AIVisibilityAudit = () => {
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
                     <span className="text-2xl font-black text-blue-400 leading-none">{promptsUsed}</span>
-                    <span className="text-[9px] text-gray-500 font-bold uppercase tracking-tighter mt-1">of {totalPrompts}</span>
+                    <span className="text-[9px] text-gray-700 font-bold uppercase tracking-tighter mt-1">of {totalPrompts}</span>
                   </div>
                 </div>
                 <span className="inline-block mt-3 text-[10px] font-black uppercase tracking-widest bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full border border-blue-500/20">
@@ -500,7 +500,7 @@ const AIVisibilityAudit = () => {
           {!projectId ? (
             <form onSubmit={handleAnalyze} className="relative group max-w-4xl">
               <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-gray-500 group-hover:text-blue-400 transition-colors" />
+                <Search className="h-5 w-5 text-gray-700 group-hover:text-blue-400 transition-colors" />
               </div>
               <input
                 type="text"
@@ -513,7 +513,7 @@ const AIVisibilityAudit = () => {
                 <button
                   type="submit"
                   disabled={isAnalyzing || !input || isLimitReached}
-                  className={`inline-flex items-center px-8 py-3.5 border border-transparent text-sm font-black rounded-xl text-slate-900 bg-white hover:bg-gray-100 focus:outline-none transition-all shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed`}
+                  className={`inline-flex items-center px-8 py-3.5 border border-transparent text-sm font-black rounded-xl text-gray-800 bg-white hover:bg-gray-100 focus:outline-none transition-all shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   {isAnalyzing ? (
                     <>
@@ -536,14 +536,14 @@ const AIVisibilityAudit = () => {
                   {syncLoading ? (
                     <RefreshCw className="w-5 h-5 text-blue-400 animate-spin" />
                   ) : (
-                    <AlertCircle className="w-5 h-5 text-slate-400" />
+                    <AlertCircle className="w-5 h-5 text-gray-600" />
                   )}
                 </div>
                 <div>
-                  <h4 className={`text-sm font-black uppercase tracking-widest ${syncLoading ? 'text-blue-100' : 'text-slate-400'}`}>
+                  <h4 className={`text-sm font-black uppercase tracking-widest ${syncLoading ? 'text-blue-100' : 'text-gray-600'}`}>
                     {syncLoading ? 'Synchronizing Intelligence' : 'No Data Available'}
                   </h4>
-                  <p className={`text-xs font-medium tracking-tight ${syncLoading ? 'text-blue-300' : 'text-slate-500'}`}>
+                  <p className={`text-xs font-medium tracking-tight ${syncLoading ? 'text-blue-300' : 'text-gray-700'}`}>
                     {syncLoading 
                       ? `Syncing live nodes for ${project?.brandName || 'project'}...`
                       : `No AI visibility audit data has been found for ${project?.brandName} yet. Trigger a scan from your project dashboard.`}
@@ -556,10 +556,10 @@ const AIVisibilityAudit = () => {
                 </div>
               ) : (
                 <div className="flex flex-col items-end gap-1">
-                  <span className="px-4 py-1.5 bg-slate-900/10 text-slate-500 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-200">
+                  <span className="px-4 py-1.5 bg-slate-900/10 text-gray-700 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-200">
                     Awaiting Project Sync
                   </span>
-                  <p className="text-[9px] text-slate-400 font-bold">Trigger scan from dashboard</p>
+                  <p className="text-[9px] text-gray-600 font-bold">Trigger scan from dashboard</p>
                 </div>
               )}
              </div>
@@ -569,7 +569,7 @@ const AIVisibilityAudit = () => {
             <div className="mt-6">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-black text-blue-400 uppercase tracking-widest animate-pulse">{progress}</span>
-                <span className="text-[10px] text-gray-500 uppercase font-black">STEP {step}/8</span>
+                <span className="text-[10px] text-gray-700 uppercase font-black">STEP {step}/8</span>
               </div>
               <div className="w-full bg-[#2d3748] h-1.5 rounded-full overflow-hidden">
                 <motion.div 
@@ -578,7 +578,7 @@ const AIVisibilityAudit = () => {
                   className="h-full bg-gradient-to-r from-blue-600 to-indigo-500 shadow-[0_0_15px_rgba(37,99,235,0.5)]"
                 />
               </div>
-              <p className="text-[9px] text-gray-500 mt-2 font-bold uppercase tracking-tighter">
+              <p className="text-[9px] text-gray-700 mt-2 font-bold uppercase tracking-tighter">
                 {step <= 2 ? "Analyzing domain infrastructure and brand identity..." : 
                  step <= 5 ? "Querying internal AI training knowledge..." : 
                  "Synthesizing visibility nodes and scoring map..."}
@@ -592,10 +592,10 @@ const AIVisibilityAudit = () => {
           className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm"
         >
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-xl font-black text-slate-900 tracking-tight">Recent Audits</h2>
+              <h2 className="text-xl font-black text-gray-800 tracking-tight">Recent Audits</h2>
               {reports.length > 0 && (
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
                   <input
                     type="text"
                     value={searchQuery}
@@ -610,17 +610,17 @@ const AIVisibilityAudit = () => {
             {reports.length === 0 ? (
               <div className="py-12 text-center">
                 <ShieldCheck className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-                <p className="text-gray-400 text-sm font-medium">No previous audits found. Start your first analysis above.</p>
+                <p className="text-gray-600 text-sm font-medium">No previous audits found. Start your first analysis above.</p>
               </div>
             ) : (
               <div className="overflow-x-auto text-left">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-100">
-                      <th className="py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Entity</th>
-                      <th className="py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Type</th>
-                      <th className="py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Date</th>
-                      <th className="py-3 px-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Action</th>
+                      <th className="py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Entity</th>
+                      <th className="py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Type</th>
+                      <th className="py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Date</th>
+                      <th className="py-3 px-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -637,7 +637,7 @@ const AIVisibilityAudit = () => {
                             {r.results?.score || r.coverageScore || 0}% AUDITED
                           </span>
                         </td>
-                        <td className="py-4 px-4 text-sm text-gray-400">{new Date(r.createdAt).toLocaleDateString()}</td>
+                        <td className="py-4 px-4 text-sm text-gray-600">{new Date(r.createdAt).toLocaleDateString()}</td>
                         <td className="py-4 px-4 text-right">
                           <button onClick={() => viewReport(r)} className="text-blue-600 hover:text-blue-800 font-bold text-xs uppercase tracking-widest">View Results</button>
                         </td>
@@ -663,15 +663,15 @@ const AIVisibilityAudit = () => {
     return (
       <div className="max-w-6xl mx-auto" id="report-content">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-gray-400 mb-6 pt-6" data-html2canvas-ignore>
+        <div className="flex items-center gap-2 text-sm text-gray-600 mb-6 pt-6" data-html2canvas-ignore>
           <Link to="/dashboard" className="hover:text-gray-600 transition-colors border-b border-transparent hover:border-gray-200">Dashboard</Link>
           <span className="opacity-40">/</span>
-          <span className="text-gray-400 font-medium">AI Module</span>
+          <span className="text-gray-600 font-medium">AI Module</span>
           <span className="opacity-40">/</span>
           {!projectId ? (
-            <button onClick={() => setResults(null)} className="text-gray-400 hover:text-gray-600 transition-colors font-medium border-b border-transparent hover:border-gray-200">AI Visibility Audit</button>
+            <button onClick={() => setResults(null)} className="text-gray-600 hover:text-gray-600 transition-colors font-medium border-b border-transparent hover:border-gray-200">AI Visibility Audit</button>
           ) : (
-            <span className="text-gray-400 font-medium">AI Visibility Audit</span>
+            <span className="text-gray-600 font-medium">AI Visibility Audit</span>
           )}
           <span className="opacity-40">/</span>
           <span className="text-gray-600 font-bold bg-gray-100 px-2 py-0.5 rounded-md">Report</span>
@@ -731,7 +731,7 @@ const AIVisibilityAudit = () => {
                   )}
                 </div>
                 <h1 className="text-3xl font-black mb-3 tracking-tight">AI Visibility Summary</h1>
-                <p className="text-gray-400 text-[15px] leading-relaxed mb-8 max-w-2xl font-medium">
+                <p className="text-gray-300 text-[15px] leading-relaxed mb-8 max-w-2xl font-medium">
                   {results.summary || `This report analyzes how AI systems perceive and retrieve your brand content. Your composite visibility index is based on semantic footprint and technical accessibility.`}
                 </p>
                 
@@ -776,7 +776,7 @@ const AIVisibilityAudit = () => {
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
                     <span className="text-4xl font-black" style={{ color: scoreColor }}>{score}%</span>
-                    <span className="text-[10px] text-gray-400 font-bold uppercase leading-none">Visibility</span>
+                    <span className="text-[10px] text-gray-600 font-bold uppercase leading-none">Visibility</span>
                   </div>
                 </div>
               </div>
@@ -793,7 +793,7 @@ const AIVisibilityAudit = () => {
           className="flex items-center gap-3 mb-6 px-1"
         >
           <AlertTriangle className="w-5 h-5 text-yellow-500" />
-          <p className="text-sm text-gray-500 font-medium">
+          <p className="text-sm text-gray-700 font-medium">
             "{results.profile?.interpretation || (score >= 80 ? 'Strong AI visibility. Keep optimizing to maintain coverage.' : 'Significant improvements needed to boost AI visibility.')}"
           </p>
         </motion.div>
@@ -805,7 +805,7 @@ const AIVisibilityAudit = () => {
             {/* AI Engine Snapshots */}
             <div className="space-y-4">
               <div className="flex items-center justify-between px-2">
-                <h4 className="text-[11px] font-black text-gray-400 h-4 flex items-center gap-2 uppercase tracking-widest">
+                <h4 className="text-[11px] font-black text-gray-600 h-4 flex items-center gap-2 uppercase tracking-widest">
                   <Terminal className="w-3.5 h-3.5 text-blue-600" /> AI Engine Analysis
                 </h4>
                 <div className="flex items-center gap-1.5 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">
@@ -845,11 +845,11 @@ const AIVisibilityAudit = () => {
                 className="bg-white border border-gray-200/60 rounded-2xl shadow-sm overflow-hidden"
               >
                 <div className="p-6 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
-                  <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                  <h4 className="text-[11px] font-black text-gray-600 uppercase tracking-widest flex items-center gap-2">
                     <Target className="w-4 h-4 text-purple-600" /> AI Visibility Assessment
                   </h4>
                   <div className="flex flex-col items-end gap-1">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Overall Level</span>
+                    <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Overall Level</span>
                     <span className={`px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-widest border 
                       ${(results.profile.aiVisibilityAssessment.overallLevel || '').toLowerCase().includes('high') ? 'bg-green-50 text-green-700 border-green-100' : 
                         (results.profile.aiVisibilityAssessment.overallLevel || '').toLowerCase().includes('moderate') ? 'bg-blue-50 text-blue-700 border-blue-100' : 
@@ -876,7 +876,7 @@ const AIVisibilityAudit = () => {
                   <Sparkles className="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
-                  <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">AI Interpretation</h4>
+                  <h4 className="text-[11px] font-black text-gray-600 uppercase tracking-widest mb-1">AI Interpretation</h4>
                   <div>
                     {renderFormattedContent(results.profile?.interpretation || "Deep scanning live web results for brand authority...")}
                   </div>
@@ -890,7 +890,7 @@ const AIVisibilityAudit = () => {
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
               className="bg-white border border-gray-200/60 rounded-2xl p-8"
             >
-              <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+              <h4 className="text-[11px] font-black text-gray-600 uppercase tracking-widest mb-6 flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-green-600" /> Optimization Checklist
               </h4>
               <div className="space-y-3">
@@ -903,7 +903,7 @@ const AIVisibilityAudit = () => {
                   </div>
                 ))}
                 {!results.profile?.checklist?.length && (
-                   <p className="text-xs text-gray-400">No optimization tasks identified for this profile yet.</p>
+                   <p className="text-xs text-gray-600">No optimization tasks identified for this profile yet.</p>
                 )}
               </div>
             </motion.div>

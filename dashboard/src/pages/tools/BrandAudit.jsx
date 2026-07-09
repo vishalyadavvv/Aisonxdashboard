@@ -124,8 +124,6 @@ const BrandAudit = () => {
     setIsExporting(true);
     const toastId = toast.loading('Generating high-quality PDF report...');
     try {
-      // Small delay to ensure the off-screen template is rendered
-      await new Promise(resolve => setTimeout(resolve, 500));
       await downloadPDF('brand-audit-pdf-template', `Brand_Audit_${name}`);
       toast.success('Report downloaded successfully!', { id: toastId });
     } catch (err) {
@@ -144,8 +142,8 @@ const BrandAudit = () => {
           <RefreshCw className="w-8 h-8 text-indigo-600 animate-spin" />
           <div className="absolute inset-0 bg-indigo-500/20 rounded-3xl animate-ping opacity-20" />
         </div>
-        <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter mb-2 text-center">Synchronizing Intelligence</h2>
-        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] text-center">Loading brand audit data...</p>
+        <h2 className="text-xl font-black text-gray-800 uppercase tracking-tighter mb-2 text-center">Synchronizing Intelligence</h2>
+        <p className="text-gray-600 font-bold uppercase tracking-widest text-[10px] text-center">Loading brand audit data...</p>
       </div>
     );
   }
@@ -158,10 +156,10 @@ const BrandAudit = () => {
     return (
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8" id="brand-audit-results">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-gray-400 mb-6 pt-6">
+        <div className="flex items-center gap-2 text-sm text-gray-600 mb-6 pt-6">
           <Link to="/dashboard" className="hover:text-gray-600 transition-colors">Dashboard</Link>
           <span>›</span>
-          <span className="text-gray-400">AI Module</span>
+          <span className="text-gray-600">AI Module</span>
           <span>›</span>
           <span className="text-gray-600 font-medium">Brand Audit</span>
         </div>
@@ -210,7 +208,7 @@ const BrandAudit = () => {
                 <Fingerprint className="w-3 h-3" /> Knowledge Graph Synced
               </div>
               <h1 className="text-3xl font-black mb-2 tracking-tight">Brand Audit Report</h1>
-              <p className="text-slate-400 text-sm font-medium">
+              <p className="text-gray-300 text-sm font-medium">
                 Google Knowledge Graph analysis for <span className="text-white font-bold">{brandName}</span> · {entities.length} {entities.length === 1 ? 'entity' : 'entities'} found
               </p>
             </div>
@@ -222,6 +220,17 @@ const BrandAudit = () => {
               {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />}
               Export PDF
             </button>
+            {/* Hidden PDF Template */}
+            <div className="absolute -left-[9999px] top-0 pointer-events-none" aria-hidden="true">
+              <div id="brand-audit-pdf-template">
+                {results && (
+                  <BrandAuditReport 
+                    brandName={brandName} 
+                    data={results} 
+                  />
+                )}
+              </div>
+            </div>
           </div>
         </motion.div>
 
@@ -262,8 +271,8 @@ const BrandAudit = () => {
                       ))}
                     </div>
 
-                    <h2 className="text-3xl font-black text-slate-900 mb-2 tracking-tight group-hover:text-indigo-600 transition-colors">{entity.name}</h2>
-                    <p className="text-gray-400 font-bold text-sm mb-6 italic">{entity.description || 'Google Knowledge Graph Entry'}</p>
+                    <h2 className="text-3xl font-black text-gray-800 mb-2 tracking-tight group-hover:text-indigo-600 transition-colors">{entity.name}</h2>
+                    <p className="text-gray-600 font-bold text-sm mb-6 italic">{entity.description || 'Google Knowledge Graph Entry'}</p>
                     
                     <div className="flex flex-wrap justify-center md:justify-start gap-4">
                       <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 text-emerald-600 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-sm">
@@ -272,7 +281,7 @@ const BrandAudit = () => {
                       </div>
                       
                       {entity.kgId && (
-                        <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-50 border border-slate-100 text-slate-500 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-sm">
+                        <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-50 border border-slate-100 text-gray-700 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-sm">
                           <Fingerprint className="w-4 h-4" /> ID: <span className="text-slate-700 ml-1 truncate max-w-[80px]">{entity.kgId}</span>
                         </div>
                       )}
@@ -282,10 +291,10 @@ const BrandAudit = () => {
 
                 {entity.detailedDescription && (
                   <div className="bg-slate-50/50 backdrop-blur-sm border border-slate-100 rounded-3xl p-8 mb-8 relative z-10 hover:bg-white/80 transition-colors duration-300">
-                    <div className="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">
+                    <div className="inline-flex items-center gap-2 text-[10px] font-black text-gray-600 uppercase tracking-widest mb-4">
                       <Brain className="w-3.5 h-3.5" /> Entity Synthesis
                     </div>
-                    <p className="text-[14px] text-slate-600 leading-relaxed font-bold">
+                    <p className="text-[14px] text-gray-700 leading-relaxed font-bold">
                       {truncate(entity.detailedDescription, 500)}
                     </p>
                     {entity.descriptionUrl && (
@@ -313,8 +322,8 @@ const BrandAudit = () => {
                         <Fingerprint className="w-6 h-6" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Knowledge Node</p>
-                        <p className="text-xs font-black text-slate-900 truncate">Google ID: {entity.kgId}</p>
+                        <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-1">Knowledge Node</p>
+                        <p className="text-xs font-black text-gray-800 truncate">Google ID: {entity.kgId}</p>
                       </div>
                       <ExternalLink className="w-4 h-4 text-slate-300 group-hover/link:text-indigo-600 group-hover/link:translate-x-0.5 transition-all" />
                     </a>
@@ -331,8 +340,8 @@ const BrandAudit = () => {
                         <Globe className="w-6 h-6" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Official Domain</p>
-                        <p className="text-xs font-black text-slate-900 truncate">{getDomain(entity.url)}</p>
+                        <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-1">Official Domain</p>
+                        <p className="text-xs font-black text-gray-800 truncate">{getDomain(entity.url)}</p>
                       </div>
                       <ExternalLink className="w-4 h-4 text-slate-300 group-hover/link:text-emerald-600 group-hover/link:translate-x-0.5 transition-all" />
                     </a>
@@ -349,8 +358,8 @@ const BrandAudit = () => {
                         <Info className="w-6 h-6" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Primary Source</p>
-                        <p className="text-xs font-black text-slate-900 truncate">{getDomain(entity.descriptionUrl)}</p>
+                        <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-1">Primary Source</p>
+                        <p className="text-xs font-black text-gray-800 truncate">{getDomain(entity.descriptionUrl)}</p>
                       </div>
                       <ExternalLink className="w-4 h-4 text-slate-300 group-hover/link:text-blue-600 group-hover/link:translate-x-0.5 transition-all" />
                     </a>
@@ -364,8 +373,8 @@ const BrandAudit = () => {
             <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <Fingerprint className="w-8 h-8 text-slate-300" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900 mb-2">No Knowledge Graph Data</h3>
-            <p className="text-sm text-slate-500 font-medium max-w-md mx-auto">
+            <h3 className="text-lg font-bold text-gray-800 mb-2">No Knowledge Graph Data</h3>
+            <p className="text-sm text-gray-700 font-medium max-w-md mx-auto">
               No entities were found for <span className="font-bold text-slate-700">{brandName}</span> in the Google Knowledge Graph. Run a <span className="font-bold">Comprehensive Scan</span> from the project dashboard to generate this data.
             </p>
           </div>
@@ -376,7 +385,7 @@ const BrandAudit = () => {
           <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/5 rounded-full blur-[60px] -mr-24 -mt-24" />
           
           <div className="text-center mb-8 relative z-10">
-            <h3 className="text-lg font-black text-slate-800 flex items-center justify-center gap-2 tracking-tight">
+            <h3 className="text-lg font-black text-gray-800 flex items-center justify-center gap-2 tracking-tight">
               <span className="text-xl">💡</span> What you'll discover about your digital presence
             </h3>
           </div>
@@ -392,14 +401,14 @@ const BrandAudit = () => {
                 <div className={`w-12 h-12 mx-auto mb-4 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 ${item.color}`}>
                   <item.icon className="w-6 h-6" />
                 </div>
-                <h4 className="font-black text-slate-900 mb-1 uppercase tracking-tighter text-[11px]">{item.label}</h4>
-                <p className="text-[10px] font-bold text-slate-400 leading-tight max-w-[120px] mx-auto">{item.desc}</p>
+                <h4 className="font-black text-gray-800 mb-1 uppercase tracking-tighter text-[11px]">{item.label}</h4>
+                <p className="text-[10px] font-bold text-gray-600 leading-tight max-w-[120px] mx-auto">{item.desc}</p>
               </div>
             ))}
           </div>
 
           <div className="mt-8 pt-6 border-t border-slate-50 text-center relative z-10">
-            <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
+            <p className="text-[9px] font-black text-gray-600 uppercase tracking-[0.2em]">
               This tool analyzes your digital footprint using authentic Google data
             </p>
           </div>
@@ -412,10 +421,10 @@ const BrandAudit = () => {
   if (projectId && !results && !syncLoading) {
     return (
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-2 text-sm text-gray-400 mb-6 pt-6">
+        <div className="flex items-center gap-2 text-sm text-gray-600 mb-6 pt-6">
           <Link to="/dashboard" className="hover:text-gray-600 transition-colors">Dashboard</Link>
           <span>›</span>
-          <span className="text-gray-400">AI Module</span>
+          <span className="text-gray-600">AI Module</span>
           <span>›</span>
           <span className="text-gray-600 font-medium">Brand Audit</span>
         </div>
@@ -427,17 +436,17 @@ const BrandAudit = () => {
         >
           <div className="relative z-10">
             <h1 className="text-3xl font-black mb-2 tracking-tight">Brand Audit</h1>
-            <p className="text-slate-400 text-sm font-medium">
+            <p className="text-gray-600 text-sm font-medium">
               Google Knowledge Graph analysis for <span className="text-white font-bold">{contextProject?.brandName || contextProject?.name || 'your brand'}</span>
             </p>
           </div>
           <div className="mt-6 bg-slate-700/50 border border-slate-600 rounded-2xl p-6 flex items-center gap-4">
             <div className="w-10 h-10 bg-slate-600 rounded-xl flex items-center justify-center shrink-0">
-              <Fingerprint className="w-5 h-5 text-slate-400" />
+              <Fingerprint className="w-5 h-5 text-gray-600" />
             </div>
             <div>
               <h4 className="text-sm font-bold text-slate-300">No Data Available</h4>
-              <p className="text-xs text-slate-500 font-medium">
+              <p className="text-xs text-gray-700 font-medium">
                 Run a <span className="text-indigo-400 font-bold">Comprehensive Scan</span> from the Project Overview to generate Brand Audit data.
               </p>
             </div>
@@ -452,14 +461,14 @@ const BrandAudit = () => {
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-gray-400 mb-6 pt-6">
+        <div className="flex items-center gap-2 text-sm text-gray-600 mb-6 pt-6">
           <Link to="/dashboard" className="hover:text-gray-600 transition-colors">Dashboard</Link>
           <span>›</span>
-          <span className="text-gray-400">AI Module</span>
+          <span className="text-gray-600">AI Module</span>
           <span>›</span>
           <button 
             onClick={() => setResults(null)} 
-            className={`transition-colors font-medium ${results ? 'text-gray-400 hover:text-gray-600' : 'text-gray-600 cursor-default'}`}
+            className={`transition-colors font-medium ${results ? 'text-gray-600 hover:text-gray-600' : 'text-gray-600 cursor-default'}`}
           >
             Brand Audit
           </button>
@@ -482,12 +491,12 @@ const BrandAudit = () => {
           
           <div className="relative z-10 mb-8">
             <h1 className="text-3xl font-black mb-2 tracking-tight">Brand Audit Explorer</h1>
-            <p className="text-slate-400 text-sm font-medium">Check your Google visibility and digital brand authority across the Knowledge Graph.</p>
+            <p className="text-gray-600 text-sm font-medium">Check your Google visibility and digital brand authority across the Knowledge Graph.</p>
           </div>
 
           <form onSubmit={handleSearchSubmit} className="relative group max-w-4xl z-10">
             <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-slate-500 group-hover:text-indigo-400 transition-colors" />
+              <Search className="h-5 w-5 text-gray-700 group-hover:text-indigo-400 transition-colors" />
             </div>
             <input
               id="audit-query"
@@ -501,7 +510,7 @@ const BrandAudit = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="inline-flex items-center px-8 py-3.5 bg-white text-slate-900 hover:bg-slate-100 font-black rounded-xl text-sm transition-all shadow-lg active:scale-95 disabled:opacity-50"
+                className="inline-flex items-center px-8 py-3.5 bg-white text-gray-800 hover:bg-slate-100 font-black rounded-xl text-sm transition-all shadow-lg active:scale-95 disabled:opacity-50"
               >
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : (
                   <>
@@ -522,7 +531,7 @@ const BrandAudit = () => {
                   setPendingQuery(example);
                   performSearch(example);
                 }}
-                className="px-4 py-2 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white rounded-lg text-xs font-bold transition-all border border-white/5"
+                className="px-4 py-2 bg-white/5 hover:bg-white/10 text-gray-600 hover:text-white rounded-lg text-xs font-bold transition-all border border-white/5"
               >
                 {example}
               </button>
@@ -550,8 +559,8 @@ const BrandAudit = () => {
               <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
               <div className="absolute inset-0 bg-indigo-500/20 rounded-3xl animate-ping opacity-20" />
             </div>
-            <h3 className="text-xl font-black text-slate-900 uppercase tracking-tighter mb-2">Analyzing Intelligence</h3>
-            <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Checking Knowledge Graph & Digital Authority...</p>
+            <h3 className="text-xl font-black text-gray-800 uppercase tracking-tighter mb-2">Analyzing Intelligence</h3>
+            <p className="text-gray-600 font-bold uppercase tracking-widest text-[10px]">Checking Knowledge Graph & Digital Authority...</p>
           </div>
         )}
 
@@ -565,10 +574,10 @@ const BrandAudit = () => {
                     <Brain className="w-6 h-6 text-indigo-600" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-black text-slate-900 tracking-tight">
+                    <h2 className="text-xl font-black text-gray-800 tracking-tight">
                       Found {results.itemListElement?.length || 0} result{results.itemListElement?.length !== 1 ? 's' : ''}
                     </h2>
-                    <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">For query: {pendingQuery}</p>
+                    <p className="text-xs text-gray-600 font-bold uppercase tracking-widest">For query: {pendingQuery}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -607,8 +616,8 @@ const BrandAudit = () => {
                         <div className="inline-block px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-widest rounded-lg mb-3">
                           {types[0]}
                         </div>
-                        <h2 className="text-3xl font-black text-slate-900 mb-1 tracking-tight">{entity.name}</h2>
-                        <p className="text-gray-400 font-bold text-sm mb-5 italic">{entity.description || 'Google Knowledge Graph Entry'}</p>
+                        <h2 className="text-3xl font-black text-gray-800 mb-1 tracking-tight">{entity.name}</h2>
+                        <p className="text-gray-600 font-bold text-sm mb-5 italic">{entity.description || 'Google Knowledge Graph Entry'}</p>
                         
                         <div className="flex flex-wrap justify-center md:justify-start gap-4 mb-3">
                           <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 border border-emerald-100 text-emerald-600 rounded-xl text-xs font-black uppercase tracking-tighter">
@@ -630,7 +639,7 @@ const BrandAudit = () => {
 
                     {entity.detailedDescription?.articleBody && (
                       <div className="bg-gray-50 border border-gray-100 rounded-2xl p-6 mb-8 relative z-10">
-                        <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-3">Entity Synthesis</div>
+                        <div className="text-[9px] font-black text-gray-600 uppercase tracking-widest mb-3">Entity Synthesis</div>
                         <p className="text-[13px] text-gray-600 leading-relaxed font-medium">
                           {truncate(entity.detailedDescription.articleBody, 400)}
                         </p>
@@ -654,7 +663,7 @@ const BrandAudit = () => {
                             <Globe className="w-5 h-5" />
                           </div>
                           <div className="min-w-0">
-                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Search Result</p>
+                            <p className="text-[9px] font-black text-gray-600 uppercase tracking-widest">Search Result</p>
                             <p className="text-xs font-bold text-gray-700 truncate">Google Search Node</p>
                           </div>
                           <ExternalLink className="w-4 h-4 ml-auto text-gray-300 group-hover/link:text-indigo-600 transition-colors" />
@@ -671,7 +680,7 @@ const BrandAudit = () => {
                             <Globe className="w-5 h-5" />
                           </div>
                           <div className="min-w-0">
-                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Official Site</p>
+                            <p className="text-[9px] font-black text-gray-600 uppercase tracking-widest">Official Site</p>
                             <p className="text-xs font-bold text-gray-700 truncate">{getDomain(entity.url)}</p>
                           </div>
                           <ExternalLink className="w-4 h-4 ml-auto text-gray-300 group-hover/link:text-indigo-600 transition-colors" />
@@ -689,12 +698,12 @@ const BrandAudit = () => {
                <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
                  <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
                    <div>
-                     <h2 className="text-xl font-black text-slate-900 tracking-tight">Recent Audits</h2>
-                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">History of your analytical queries</p>
+                     <h2 className="text-xl font-black text-gray-800 tracking-tight">Recent Audits</h2>
+                     <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest">History of your analytical queries</p>
                    </div>
                    {reports.length > 0 && (
                      <div className="relative w-full md:w-64">
-                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
                        <input
                          type="text"
                          value={searchQuery}
@@ -709,17 +718,17 @@ const BrandAudit = () => {
                  {reports.length === 0 ? (
                    <div className="py-12 text-center bg-slate-50 border border-dashed border-slate-200 rounded-2xl">
                      <Globe className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-                     <p className="text-sm text-slate-400 font-medium uppercase tracking-widest leading-none">No previous audits found</p>
+                     <p className="text-sm text-gray-600 font-medium uppercase tracking-widest leading-none">No previous audits found</p>
                    </div>
                  ) : (
                    <div className="overflow-x-auto">
                      <table className="w-full text-left">
                        <thead>
                          <tr className="border-b border-gray-100">
-                           <th className="py-4 px-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Entity</th>
-                           <th className="py-4 px-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Confidence</th>
-                           <th className="py-4 px-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Date</th>
-                           <th className="py-4 px-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Action</th>
+                           <th className="py-4 px-4 text-[10px] font-black text-gray-600 uppercase tracking-widest">Entity</th>
+                           <th className="py-4 px-4 text-[10px] font-black text-gray-600 uppercase tracking-widest">Confidence</th>
+                           <th className="py-4 px-4 text-[10px] font-black text-gray-600 uppercase tracking-widest text-center">Date</th>
+                           <th className="py-4 px-4 text-[10px] font-black text-gray-600 uppercase tracking-widest text-right">Action</th>
                          </tr>
                        </thead>
                        <tbody>
@@ -734,8 +743,8 @@ const BrandAudit = () => {
                                    <FileText className="w-4 h-4" />
                                  </div>
                                  <div>
-                                   <p className="text-sm font-bold text-slate-900 leading-none mb-1">{report.query}</p>
-                                   <p className="text-[10px] text-gray-400 font-medium truncate max-w-[150px]">{report.topEntity}</p>
+                                   <p className="text-sm font-bold text-gray-800 leading-none mb-1">{report.query}</p>
+                                   <p className="text-[10px] text-gray-600 font-medium truncate max-w-[150px]">{report.topEntity}</p>
                                  </div>
                                </div>
                              </td>
@@ -744,7 +753,7 @@ const BrandAudit = () => {
                                  {report.topScore}% RELIABILITY
                                </span>
                              </td>
-                             <td className="py-4 px-4 text-[10px] font-black text-gray-400 uppercase text-center">
+                             <td className="py-4 px-4 text-[10px] font-black text-gray-600 uppercase text-center">
                                {new Date(report.timestamp).toLocaleDateString()}
                              </td>
                              <td className="py-4 px-4 text-right">
@@ -780,7 +789,7 @@ const BrandAudit = () => {
           <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/5 rounded-full blur-[60px] -mr-24 -mt-24" />
           
           <div className="text-center mb-8 relative z-10">
-            <h3 className="text-lg font-black text-slate-800 flex items-center justify-center gap-2 tracking-tight">
+            <h3 className="text-lg font-black text-gray-800 flex items-center justify-center gap-2 tracking-tight">
               <span className="text-xl">💡</span> What you'll discover about your digital presence
             </h3>
           </div>
@@ -796,30 +805,19 @@ const BrandAudit = () => {
                 <div className={`w-12 h-12 mx-auto mb-4 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 ${item.color}`}>
                   <item.icon className="w-6 h-6" />
                 </div>
-                <h4 className="font-black text-slate-900 mb-1 uppercase tracking-tighter text-[11px]">{item.label}</h4>
-                <p className="text-[10px] font-bold text-slate-400 leading-tight max-w-[120px] mx-auto">{item.desc}</p>
+                <h4 className="font-black text-gray-800 mb-1 uppercase tracking-tighter text-[11px]">{item.label}</h4>
+                <p className="text-[10px] font-bold text-gray-600 leading-tight max-w-[120px] mx-auto">{item.desc}</p>
               </div>
             ))}
           </div>
 
           <div className="mt-8 pt-6 border-t border-slate-50 text-center relative z-10">
-            <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
+            <p className="text-[9px] font-black text-gray-600 uppercase tracking-[0.2em]">
               This tool analyzes your digital footprint using authentic Google data
             </p>
           </div>
         </div>
-      {/* Hidden PDF Template (Rendered off-screen for high-quality capture) */}
-      <div className="absolute -left-[9999px] top-0 pointer-events-none" aria-hidden="true">
-        <div id="brand-audit-pdf-template">
-          {results && (
-            <BrandAuditReport 
-              brandName={projectId ? (contextProject?.brandName || contextProject?.name) : pendingQuery} 
-              data={results} 
-            />
-          )}
-        </div>
       </div>
-    </div>
   );
 };
 

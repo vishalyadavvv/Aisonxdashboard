@@ -131,7 +131,6 @@ const DomainProfiler = () => {
     setIsExporting(true);
     const toastId = toast.loading('Generating high-quality PDF profile...');
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
       await downloadPDF('domain-profiler-pdf-template', `Domain_Profile_${name}`);
       toast.success('Profile downloaded successfully!', { id: toastId });
     } catch (err) {
@@ -187,15 +186,15 @@ const DomainProfiler = () => {
           )}
         </AnimatePresence>
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-gray-400 mb-6 pt-6" data-html2canvas-ignore>
+        <div className="flex items-center gap-2 text-sm text-gray-600 mb-6 pt-6" data-html2canvas-ignore>
           <Link to="/dashboard" className="hover:text-gray-600 transition-colors border-b border-transparent hover:border-gray-200">Dashboard</Link>
           <span className="opacity-40">/</span>
-          <span className="text-gray-400 font-medium">AI Module</span>
+          <span className="text-gray-600 font-medium">AI Module</span>
           <span className="opacity-40">/</span>
           {!projectId ? (
-            <button onClick={goBack} className="text-gray-400 hover:text-gray-600 transition-colors font-medium border-b border-transparent hover:border-gray-200">Domain Profiler</button>
+            <button onClick={goBack} className="text-gray-600 hover:text-gray-600 transition-colors font-medium border-b border-transparent hover:border-gray-200">Domain Profiler</button>
           ) : (
-            <span className="text-gray-400 font-medium">Domain Profiler</span>
+            <span className="text-gray-600 font-medium">Domain Profiler</span>
           )}
           <span className="opacity-40">/</span>
           <span className="text-gray-600 font-bold bg-gray-100 px-2 py-0.5 rounded-md">Report</span>
@@ -248,7 +247,7 @@ const DomainProfiler = () => {
                   </span>
                 )}
               </h1>
-              <p className="text-gray-400 text-sm leading-relaxed mb-6">
+              <p className="text-gray-300 text-sm leading-relaxed mb-6">
                 Institutional-grade analysis for <strong>{results.domain || input}</strong>. 
                 {projectId && " This data is synchronized with your latest project-wide comprehensive scan."} 
                 Dissects brand architecture, audience alignment, and AI perceptual mapping.
@@ -278,7 +277,7 @@ const DomainProfiler = () => {
                <div className="w-28 h-28 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-white/10 flex flex-col items-center justify-center">
                   <Layout className="w-8 h-8 text-blue-400 mb-2" />
                   <span className="text-[10px] font-black uppercase tracking-tighter text-blue-300">Profile Verified</span>
-                  <span className="text-[9px] text-gray-400">{results.createdAt ? formatDate(results.createdAt) : 'LIVE'}</span>
+                  <span className="text-[9px] text-gray-600">{results.createdAt ? formatDate(results.createdAt) : 'LIVE'}</span>
                </div>
             </div>
           </div>
@@ -339,7 +338,7 @@ const DomainProfiler = () => {
                        </div>
                        <div>
                           <h3 className="text-lg font-bold text-[#1E293B]">AI Domain Synthesis</h3>
-                          <p className="text-xs text-gray-400">Automated perception of market positioning</p>
+                          <p className="text-xs text-gray-600">Automated perception of market positioning</p>
                        </div>
                     </div>
                     <div className="bg-gray-50 border border-gray-100 p-6 rounded-2xl">
@@ -356,7 +355,7 @@ const DomainProfiler = () => {
                        </div>
                        <div>
                           <h3 className="text-lg font-bold text-[#1E293B]">Brand Sentiment</h3>
-                          <p className="text-xs text-gray-400">Public and algorithmic brand perception</p>
+                          <p className="text-xs text-gray-600">Public and algorithmic brand perception</p>
                        </div>
                     </div>
                     <p className="text-sm text-gray-600 leading-relaxed p-2">
@@ -377,7 +376,7 @@ const DomainProfiler = () => {
                  </div>
                  <div>
                     <h3 className="text-lg font-bold text-[#1E293B]">Primary Value Hypothesis</h3>
-                    <p className="text-xs text-gray-400">Core market differentiator identified by AI engines</p>
+                    <p className="text-xs text-gray-600">Core market differentiator identified by AI engines</p>
                  </div>
               </div>
               <div className="p-2 border-l-4 border-purple-500 ml-2">
@@ -392,7 +391,7 @@ const DomainProfiler = () => {
               <div className="lg:col-span-2 space-y-6">
                  {/* Topic Footprint */}
                  <div className="bg-white border border-gray-200/60 p-8 rounded-2xl shadow-sm">
-                    <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                    <h4 className="text-[11px] font-black text-gray-600 uppercase tracking-widest mb-6 flex items-center gap-2">
                        <Tag className="w-4 h-4 text-blue-500" /> Topic Footprint
                     </h4>
                     <div className="flex flex-wrap gap-2">
@@ -406,7 +405,7 @@ const DomainProfiler = () => {
 
                  {/* Presence Tags */}
                  <div className="bg-white border border-gray-200/60 p-8 rounded-2xl shadow-sm">
-                    <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                    <h4 className="text-[11px] font-black text-gray-600 uppercase tracking-widest mb-6 flex items-center gap-2">
                        <Layout className="w-4 h-4 text-green-500" /> Brand presence Tags
                     </h4>
                     <div className="flex flex-wrap gap-2">
@@ -415,14 +414,14 @@ const DomainProfiler = () => {
                              {tag}
                           </span>
                        )) : (
-                          <p className="text-xs text-gray-400 italic">No presence tags identified for this profile.</p>
+                          <p className="text-xs text-gray-600 italic">No presence tags identified for this profile.</p>
                        )}
                     </div>
                  </div>
 
                  {/* Prompt Cloud */}
                  <div className="bg-white border border-gray-200/60 p-8 rounded-2xl shadow-sm">
-                    <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                    <h4 className="text-[11px] font-black text-gray-600 uppercase tracking-widest mb-6 flex items-center gap-2">
                        <Globe className="w-4 h-4 text-purple-500" /> Machine-Perceived Prompts
                     </h4>
                     <div className="flex flex-wrap gap-2">
@@ -439,7 +438,7 @@ const DomainProfiler = () => {
               <div className="space-y-8">
                  {/* Competitive Snapshot */}
                  <div className="bg-white border border-gray-200/60 p-6 rounded-2xl shadow-sm">
-                    <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-6 block px-1">Competitive Landscape</h4>
+                    <h4 className="text-[11px] font-black text-gray-600 uppercase tracking-widest mb-6 block px-1">Competitive Landscape</h4>
                     <div className="space-y-4">
                        {results.competitors?.map((comp, i) => (
                           <div key={i} className="flex gap-4 group bg-gray-50 p-4 rounded-xl border border-gray-100 hover:bg-white transition-all">
@@ -455,7 +454,7 @@ const DomainProfiler = () => {
                  {/* Strategic Next Step */}
                  <div className="bg-[#1a202c] p-8 rounded-2xl shadow-xl border border-white/5 relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-[40px] -mr-16 -mt-16 group-hover:bg-blue-500/20 transition-all" />
-                    <h4 className="text-[11px] font-black mb-6 text-gray-400 uppercase tracking-widest flex items-center gap-2 relative z-10">
+                    <h4 className="text-[11px] font-black mb-6 text-gray-600 uppercase tracking-widest flex items-center gap-2 relative z-10">
                        <Terminal className="w-3.5 h-3.5 text-blue-400" /> Intelligence Suggestion
                     </h4>
                     <div className="relative z-10">
@@ -470,7 +469,18 @@ const DomainProfiler = () => {
               </div>
            </div>
         </div>
+      {/* Hidden PDF Template (Rendered off-screen for high-quality capture) */}
+      <div className="absolute -left-[9999px] top-0 pointer-events-none" aria-hidden="true">
+        <div id="domain-profiler-pdf-template">
+          {results && (
+            <DomainProfilerReport 
+              brandName={results.domain || input || 'Domain'} 
+              data={results} 
+            />
+          )}
+        </div>
       </div>
+    </div>
     );
   }
 
@@ -483,8 +493,8 @@ const DomainProfiler = () => {
           <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
           <div className="absolute inset-0 bg-blue-500/20 rounded-3xl animate-ping opacity-20" />
         </div>
-        <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter mb-2 text-center">Synchronizing Intelligence</h2>
-        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] text-center">Syncing live nodes for your project...</p>
+        <h2 className="text-xl font-black text-gray-800 uppercase tracking-tighter mb-2 text-center">Synchronizing Intelligence</h2>
+        <p className="text-gray-600 font-bold uppercase tracking-widest text-[10px] text-center">Syncing live nodes for your project...</p>
       </div>
     );
   }
@@ -493,10 +503,10 @@ const DomainProfiler = () => {
   return (
     <div className="max-w-6xl mx-auto">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-gray-400 mb-6 pt-6">
+      <div className="flex items-center gap-2 text-sm text-gray-600 mb-6 pt-6">
         <Link to="/dashboard" className="hover:text-gray-600 transition-colors border-b border-transparent hover:border-gray-200">Dashboard</Link>
         <span className="opacity-40">/</span>
-        <span className="text-gray-400 font-medium">AI Module</span>
+        <span className="text-gray-600 font-medium">AI Module</span>
         <span className="opacity-40">/</span>
         <span className="text-gray-600 font-bold bg-gray-100 px-2 py-0.5 rounded-md">Domain Profiler</span>
       </div>
@@ -517,7 +527,7 @@ const DomainProfiler = () => {
               <h1 className="text-2xl font-black mb-2 tracking-tight leading-none">
                 {projectId ? `Project Focus: ${project?.name}` : 'Domain Profiler'}
               </h1>
-              <p className="text-gray-400 text-sm font-medium leading-relaxed max-w-2xl">
+              <p className="text-gray-300 text-sm font-medium leading-relaxed max-w-2xl">
                 {projectId ? `Deep-scanning architectural fingerprint for ${project?.domain}.` : 'Analyze any domain\'s architectural fingerprint, audience alignment, and AI perceptual mapping in seconds.'}
               </p>
             </div>
@@ -535,7 +545,7 @@ const DomainProfiler = () => {
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
                     <span className="text-3xl font-black text-blue-400 leading-none">{scansUsed}</span>
-                    <span className="text-[10px] text-gray-500 font-bold uppercase mt-1">OF {totalScans}</span>
+                    <span className="text-[10px] text-gray-700 font-bold uppercase mt-1">OF {totalScans}</span>
                   </div>
                 </div>
               </div>
@@ -545,7 +555,7 @@ const DomainProfiler = () => {
           {!projectId ? (
             <form onSubmit={handleAnalyze} className="mt-5 relative group max-w-4xl">
               <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-gray-400 group-hover:text-blue-400 transition-colors" />
+                <Search className="h-5 w-5 text-gray-600 group-hover:text-blue-400 transition-colors" />
               </div>
               <input
                 type="text"
@@ -558,7 +568,7 @@ const DomainProfiler = () => {
                 <button
                   type="submit"
                   disabled={isAnalyzing || !input || isLimitReached}
-                  className="inline-flex items-center px-8 py-3.5 border border-transparent text-sm font-black rounded-xl text-slate-900 bg-white hover:bg-gray-100 focus:outline-none transition-all shadow-lg active:scale-95 disabled:opacity-50"
+                  className="inline-flex items-center px-8 py-3.5 border border-transparent text-sm font-black rounded-xl text-gray-800 bg-white hover:bg-gray-100 focus:outline-none transition-all shadow-lg active:scale-95 disabled:opacity-50"
                 >
                   {isAnalyzing ? 'Profiling...' : 'Generate Profile'}
                 </button>
@@ -612,7 +622,7 @@ const DomainProfiler = () => {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
             <div className="md:col-span-2 lg:col-span-3 mb-2">
-              <h2 className="text-xl font-black text-slate-900 tracking-tight">Recent Profiles</h2>
+              <h2 className="text-xl font-black text-gray-800 tracking-tight">Recent Profiles</h2>
             </div>
             
             {reports.slice(0, 6).map((report, idx) => (
@@ -622,13 +632,13 @@ const DomainProfiler = () => {
                 className="bg-white border border-slate-200 p-6 rounded-2xl hover:border-blue-500 hover:shadow-xl transition-all cursor-pointer group"
               >
                 <div className="flex items-center justify-between mb-4">
-                  <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                  <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-gray-600 group-hover:bg-blue-600 group-hover:text-white transition-all">
                     <FileText className="w-5 h-5" />
                   </div>
                   <ExternalLink className="w-4 h-4 text-slate-300 opacity-0 group-hover:opacity-100 transition-all" />
                 </div>
-                <h3 className="font-bold text-slate-900 mb-1 truncate">{report.domain}</h3>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">
+                <h3 className="font-bold text-gray-800 mb-1 truncate">{report.domain}</h3>
+                <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest leading-none">
                   {report.domainType} • {new Date(report.createdAt).toLocaleDateString()}
                 </p>
               </div>
@@ -637,7 +647,7 @@ const DomainProfiler = () => {
             {reports.length === 0 && (
               <div className="md:col-span-2 lg:col-span-3 py-12 text-center bg-slate-50 border border-dashed border-slate-200 rounded-2xl">
                 <Globe className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-                <p className="text-sm text-slate-400 font-medium uppercase tracking-widest">No previous profiles found</p>
+                <p className="text-sm text-gray-600 font-medium uppercase tracking-widest">No previous profiles found</p>
               </div>
             )}
           </motion.div>
@@ -656,7 +666,7 @@ const DomainProfiler = () => {
           </h3>
           {reports.length > 0 && (
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
               <input
                 type="text"
                 value={searchQuery}
@@ -675,11 +685,11 @@ const DomainProfiler = () => {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-100">
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Domain</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Domain Type</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Brand Type</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Date</th>
-                  <th className="text-right py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Action</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Domain</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Domain Type</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Brand Type</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Date</th>
+                  <th className="text-right py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -690,11 +700,11 @@ const DomainProfiler = () => {
                     </td>
                     <td className="py-4 px-4 text-sm text-gray-600">{report.domainType || '—'}</td>
                     <td className="py-4 px-4 text-sm text-gray-600">{report.brandType || '—'}</td>
-                    <td className="py-4 px-4 text-sm text-gray-500">{formatDate(report.createdAt)}</td>
+                    <td className="py-4 px-4 text-sm text-gray-700">{formatDate(report.createdAt)}</td>
                     <td className="py-4 px-4 text-right">
                       <button
                         onClick={() => viewReport(report)}
-                        className="text-gray-400 hover:text-blue-600 transition-colors p-1"
+                        className="text-gray-600 hover:text-blue-600 transition-colors p-1"
                         title="View Report"
                       >
                         <ExternalLink className="w-4 h-4" />
@@ -707,17 +717,6 @@ const DomainProfiler = () => {
           </div>
         )}
       </motion.div>
-      {/* Hidden PDF Template (Rendered off-screen for high-quality capture) */}
-      <div className="absolute -left-[9999px] top-0 pointer-events-none" aria-hidden="true">
-        <div id="domain-profiler-pdf-template">
-          {results && (
-            <DomainProfilerReport 
-              brandName={results.domain || input || 'Domain'} 
-              data={results} 
-            />
-          )}
-        </div>
-      </div>
     </div>
   );
 };

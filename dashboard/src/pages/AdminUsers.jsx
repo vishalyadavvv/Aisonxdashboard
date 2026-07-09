@@ -145,7 +145,7 @@ const AdminUsers = () => {
       active: 'bg-emerald-50 text-emerald-600 border-emerald-100',
       trialing: 'bg-blue-50 text-blue-600 border-blue-100',
       expired: 'bg-red-50 text-red-600 border-red-100',
-      inactive: 'bg-slate-50 text-slate-500 border-slate-100'
+      inactive: 'bg-slate-50 text-gray-700 border-slate-100'
     };
     return styles[status?.toLowerCase() || 'inactive'];
   };
@@ -163,8 +163,8 @@ const AdminUsers = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 font-display">User Manager</h1>
-          <p className="text-sm text-slate-500 font-medium mt-1">Search, filter, and manage platform user accounts and subscriptions.</p>
+          <h1 className="text-2xl font-bold text-gray-800 font-display">User Manager</h1>
+          <p className="text-sm text-gray-700 font-medium mt-1">Search, filter, and manage platform user accounts and subscriptions.</p>
         </div>
         <div className="flex items-center gap-3">
           <button 
@@ -175,7 +175,7 @@ const AdminUsers = () => {
           </button>
           <button 
             onClick={fetchUsers}
-            className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all flex items-center gap-2"
+            className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-gray-700 hover:bg-slate-50 transition-all flex items-center gap-2"
           >
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Refresh Users'}
           </button>
@@ -185,7 +185,7 @@ const AdminUsers = () => {
       {/* Control Bar */}
       <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
         <div className="relative flex-1 w-full max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
           <input 
             type="text" 
             placeholder="Search by name or email..."
@@ -196,9 +196,9 @@ const AdminUsers = () => {
         </div>
         
         <div className="flex items-center gap-3 w-full md:w-auto">
-          <span className="text-xs font-bold text-slate-400 uppercase tracking-widest hidden sm:block">Filter:</span>
+          <span className="text-xs font-bold text-gray-600 uppercase tracking-widest hidden sm:block">Filter:</span>
           <select 
-            className="bg-slate-50 border-none rounded-xl text-sm py-2 px-3 outline-none focus:ring-2 focus:ring-blue-100 font-bold text-slate-600 flex-1 md:flex-none"
+            className="bg-slate-50 border-none rounded-xl text-sm py-2 px-3 outline-none focus:ring-2 focus:ring-blue-100 font-bold text-gray-700 flex-1 md:flex-none"
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
           >
@@ -209,7 +209,7 @@ const AdminUsers = () => {
             <option value="inactive">Inactive</option>
           </select>
           <div className="h-8 w-px bg-slate-100 mx-1 hidden sm:block" />
-          <div className="text-xs font-bold text-slate-500 bg-slate-50 px-3 py-2 rounded-xl border border-slate-100">
+          <div className="text-xs font-bold text-gray-700 bg-slate-50 px-3 py-2 rounded-xl border border-slate-100">
             Total: {filteredUsers.length}
           </div>
         </div>
@@ -221,13 +221,13 @@ const AdminUsers = () => {
           <table className="w-full text-left">
             <thead>
               <tr className="bg-slate-50/50">
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">User Details</th>
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Plan</th>
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Contact</th>
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Paid</th>
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Joined Date</th>
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Actions</th>
+                <th className="px-6 py-4 text-[10px] font-bold text-gray-600 uppercase tracking-widest">User Details</th>
+                <th className="px-6 py-4 text-[10px] font-bold text-gray-600 uppercase tracking-widest">Plan</th>
+                <th className="px-6 py-4 text-[10px] font-bold text-gray-600 uppercase tracking-widest">Contact</th>
+                <th className="px-6 py-4 text-[10px] font-bold text-gray-600 uppercase tracking-widest">Total Paid</th>
+                <th className="px-6 py-4 text-[10px] font-bold text-gray-600 uppercase tracking-widest">Status</th>
+                <th className="px-6 py-4 text-[10px] font-bold text-gray-600 uppercase tracking-widest">Joined Date</th>
+                <th className="px-6 py-4 text-[10px] font-bold text-gray-600 uppercase tracking-widest text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
@@ -239,17 +239,17 @@ const AdminUsers = () => {
                 >
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-slate-400 overflow-hidden text-xs">
+                      <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-gray-600 overflow-hidden text-xs">
                         {u.name.substring(0, 2).toUpperCase()}
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-sm font-bold text-slate-800">{u.name}</span>
-                        <span className="text-[11px] text-slate-400 font-medium">{u.email}</span>
+                        <span className="text-sm font-bold text-gray-800">{u.name}</span>
+                        <span className="text-[11px] text-gray-600 font-medium">{u.email}</span>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-[11px] font-black uppercase tracking-tight text-slate-600 flex items-center gap-1">
+                    <span className="text-[11px] font-black uppercase tracking-tight text-gray-700 flex items-center gap-1">
                       {u.subscription.tier === 'professional' && <Star className="w-3 h-3 text-purple-500 fill-purple-500" />}
                       {u.subscription.tier === 'growth' && <Zap className="w-3 h-3 text-blue-500 fill-blue-500" />}
                       {u.subscription.tier === 'starter' && <Rocket className="w-3 h-3 text-emerald-500 fill-emerald-500" />}
@@ -258,8 +258,8 @@ const AdminUsers = () => {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex flex-col">
-                      <span className="text-xs font-bold text-slate-600">{u.phone || 'N/A'}</span>
-                      <span className="text-[10px] text-slate-400 font-medium">Contact Number</span>
+                      <span className="text-xs font-bold text-gray-700">{u.phone || 'N/A'}</span>
+                      <span className="text-[10px] text-gray-600 font-medium">Contact Number</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
@@ -267,7 +267,7 @@ const AdminUsers = () => {
                       <span className="text-xs font-bold text-slate-700">
                         ₹{(u.subscription?.paymentHistory || []).reduce((sum, payment) => sum + (payment.amount || 0), 0).toLocaleString()}
                       </span>
-                      <span className="text-[10px] text-slate-400 font-medium">
+                      <span className="text-[10px] text-gray-600 font-medium">
                         {(u.subscription?.paymentHistory || []).length} payments
                       </span>
                     </div>
@@ -279,10 +279,10 @@ const AdminUsers = () => {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex flex-col">
-                      <span className="text-xs font-bold text-slate-600">
+                      <span className="text-xs font-bold text-gray-700">
                         {new Date(u.createdAt).toLocaleDateString()}
                       </span>
-                      <span className="text-[10px] text-slate-400 font-medium italic">
+                      <span className="text-[10px] text-gray-600 font-medium italic">
                         {u.subscription.expiresAt ? `Ends ${new Date(u.subscription.expiresAt).toLocaleDateString()}` : 'No expiry'}
                       </span>
                     </div>
@@ -301,12 +301,12 @@ const AdminUsers = () => {
           </table>
         </div>
         {filteredUsers.length === 0 && (
-          <div className="p-16 text-center text-slate-400 space-y-4">
+          <div className="p-16 text-center text-gray-600 space-y-4">
             <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto">
               <Users className="w-8 h-8 opacity-20" />
             </div>
             <div className="space-y-1">
-              <p className="font-bold text-slate-900">No users found</p>
+              <p className="font-bold text-gray-800">No users found</p>
               <p className="text-xs font-medium">Try adjusting your search or filters to find what you're looking for.</p>
             </div>
           </div>
@@ -330,18 +330,18 @@ const AdminUsers = () => {
                       <CreditCard className="w-5 h-5 text-blue-600" />
                     </div>
                     <div>
-                      <h2 className="text-xl font-bold text-slate-900">Edit Subscription</h2>
-                      <p className="text-xs font-medium text-slate-500">Updating settings for {editingUser.name}</p>
+                      <h2 className="text-xl font-bold text-gray-800">Edit Subscription</h2>
+                      <p className="text-xs font-medium text-gray-700">Updating settings for {editingUser.name}</p>
                     </div>
                   </div>
-                  <button onClick={() => setEditingUser(null)} className="text-slate-400 hover:text-slate-600 p-2">
+                  <button onClick={() => setEditingUser(null)} className="text-gray-600 hover:text-gray-700 p-2">
                     <X className="w-5 h-5" />
                   </button>
                 </div>
 
                 <form onSubmit={handleUpdateSubscription} className="space-y-5">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Subscription Tier</label>
+                    <label className="text-[10px] font-bold text-gray-600 uppercase tracking-widest">Subscription Tier</label>
                     <div className="grid grid-cols-2 gap-3">
                       {['none', 'starter', 'growth', 'professional'].map((t) => (
                         <button
@@ -351,7 +351,7 @@ const AdminUsers = () => {
                           className={`px-4 py-2.5 rounded-xl text-xs font-bold border transition-all capitalize ${
                             editForm.tier === t 
                               ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-500/20' 
-                              : 'bg-white text-slate-600 border-slate-200 hover:border-blue-200'
+                              : 'bg-white text-gray-700 border-slate-200 hover:border-blue-200'
                           }`}
                         >
                           {t}
@@ -361,7 +361,7 @@ const AdminUsers = () => {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Account Status</label>
+                    <label className="text-[10px] font-bold text-gray-600 uppercase tracking-widest">Account Status</label>
                     <div className="grid grid-cols-2 gap-3">
                       {['active', 'trialing', 'expired', 'inactive'].map((s) => (
                         <button
@@ -371,7 +371,7 @@ const AdminUsers = () => {
                           className={`px-4 py-2.5 rounded-xl text-xs font-bold border transition-all capitalize ${
                             editForm.status === s 
                               ? 'bg-slate-900 text-white border-slate-900 shadow-md shadow-slate-900/20' 
-                              : 'bg-white text-slate-600 border-slate-200 hover:border-slate-900'
+                              : 'bg-white text-gray-700 border-slate-200 hover:border-slate-900'
                           }`}
                         >
                           {s}
@@ -381,12 +381,12 @@ const AdminUsers = () => {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Expiry Date</label>
+                    <label className="text-[10px] font-bold text-gray-600 uppercase tracking-widest">Expiry Date</label>
                     <div className="relative">
-                      <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
                       <input 
                         type="date" 
-                        className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-100 transition-all font-bold text-slate-600"
+                        className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-100 transition-all font-bold text-gray-700"
                         value={editForm.expiresAt}
                         onChange={(e) => setEditForm({ ...editForm, expiresAt: e.target.value })}
                       />
@@ -397,7 +397,7 @@ const AdminUsers = () => {
                     <button 
                       type="button"
                       onClick={() => setEditingUser(null)}
-                      className="flex-1 px-4 py-3 border border-slate-200 text-slate-600 rounded-2xl text-sm font-bold hover:bg-slate-50 transition-all"
+                      className="flex-1 px-4 py-3 border border-slate-200 text-gray-700 rounded-2xl text-sm font-bold hover:bg-slate-50 transition-all"
                     >
                       Cancel
                     </button>

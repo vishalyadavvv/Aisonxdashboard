@@ -221,7 +221,6 @@ const WebSearch = () => {
     setIsExporting(true);
     const toastId = toast.loading('Generating high-quality PDF report...');
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
       await downloadPDF('web-search-pdf-template', `Web_Visibility_Report_${name}`);
       toast.success('Report downloaded successfully!', { id: toastId });
     } catch (err) {
@@ -240,8 +239,8 @@ const WebSearch = () => {
           <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
           <div className="absolute inset-0 bg-blue-500/20 rounded-3xl animate-ping opacity-20" />
         </div>
-        <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter mb-2 text-center">Synchronizing Intelligence</h2>
-        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] text-center">Syncing live nodes for your project...</p>
+        <h2 className="text-xl font-black text-gray-800 uppercase tracking-tighter mb-2 text-center">Synchronizing Intelligence</h2>
+        <p className="text-gray-600 font-bold uppercase tracking-widest text-[10px] text-center">Syncing live nodes for your project...</p>
       </div>
     );
   }
@@ -251,10 +250,10 @@ const WebSearch = () => {
     return (
       <div className="max-w-6xl mx-auto">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-gray-400 mb-6 pt-6">
+        <div className="flex items-center gap-2 text-sm text-gray-600 mb-6 pt-6">
           <Link to="/dashboard" className="hover:text-gray-600 transition-colors border-b border-transparent hover:border-gray-200">Dashboard</Link>
           <span className="opacity-40">/</span>
-          <span className="text-gray-400 font-medium">AI Module</span>
+          <span className="text-gray-600 font-medium">AI Module</span>
           <span className="opacity-40">/</span>
           <span className="text-gray-600 font-bold bg-gray-100 px-2 py-0.5 rounded-md">Web Visibility</span>
         </div>
@@ -304,7 +303,7 @@ const WebSearch = () => {
             <h1 className="text-2xl font-black mb-2 tracking-tight leading-none">
               {projectId ? `Project Scan: ${project?.name}` : 'Web Search Audit'}
             </h1>
-            <p className="text-gray-400 text-sm font-medium leading-relaxed max-w-2xl">
+            <p className="text-gray-300 text-sm font-medium leading-relaxed max-w-2xl">
               {projectId ? `Crawling live LLM nodes for real-time visibility and mentions of ${project?.brandName}.` : 'Conduct a deep-scan across major LLMs to understand how your brand is perceived and cited.'}
             </p>
           </div>
@@ -321,7 +320,7 @@ const WebSearch = () => {
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <span className="text-3xl font-black text-blue-400 leading-none">{scansUsed}</span>
-                  <span className="text-[10px] text-gray-500 font-bold uppercase mt-1">OF {totalScans}</span>
+                  <span className="text-[10px] text-gray-700 font-bold uppercase mt-1">OF {totalScans}</span>
                 </div>
               </div>
             </div>
@@ -331,7 +330,7 @@ const WebSearch = () => {
         {!projectId ? (
           <form onSubmit={handleAnalyze} className="mt-5 relative group max-w-4xl">
             <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
-              <Globe className="h-5 w-5 text-gray-400 group-hover:text-blue-400 transition-colors" />
+              <Globe className="h-5 w-5 text-gray-600 group-hover:text-blue-400 transition-colors" />
             </div>
             <input
               type="text"
@@ -344,7 +343,7 @@ const WebSearch = () => {
               <button
                 type="submit"
                 disabled={isAnalyzing || !input || isLimitReached}
-                className="inline-flex items-center px-8 py-3.5 border border-transparent text-sm font-black rounded-xl text-slate-900 bg-white hover:bg-gray-100 focus:outline-none transition-all shadow-lg active:scale-95 disabled:opacity-50"
+                className="inline-flex items-center px-8 py-3.5 border border-transparent text-sm font-black rounded-xl text-gray-800 bg-white hover:bg-gray-100 focus:outline-none transition-all shadow-lg active:scale-95 disabled:opacity-50"
               >
                 {isAnalyzing ? 'Searching...' : 'Search Brand'}
               </button>
@@ -397,10 +396,10 @@ const WebSearch = () => {
           className="bg-white border border-gray-200/60 rounded-2xl p-8 shadow-sm"
         >
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-xl font-black text-slate-900 tracking-tight">Recent Scans</h2>
+            <h2 className="text-xl font-black text-gray-800 tracking-tight">Recent Scans</h2>
             {reports.length > 0 && (
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
                 <input
                   type="text"
                   value={searchQuery}
@@ -415,17 +414,17 @@ const WebSearch = () => {
           {reports.length === 0 ? (
             <div className="py-12 text-center bg-slate-50 border border-dashed border-slate-200 rounded-2xl">
               <Globe className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-              <p className="text-sm text-slate-400 font-medium uppercase tracking-widest">No previous scans found</p>
+              <p className="text-sm text-gray-600 font-medium uppercase tracking-widest">No previous scans found</p>
             </div>
           ) : (
             <div className="overflow-x-auto text-left">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-100">
-                    <th className="py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Entity</th>
-                    <th className="py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Score</th>
-                    <th className="py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Date</th>
-                    <th className="py-3 px-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Action</th>
+                    <th className="py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Entity</th>
+                    <th className="py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Score</th>
+                    <th className="py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Date</th>
+                    <th className="py-3 px-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -442,7 +441,7 @@ const WebSearch = () => {
                           {r.results?.score || r.coverageScore || 0}% VISIBILITY
                         </span>
                       </td>
-                      <td className="py-4 px-4 text-sm text-gray-400">{formatDate(r.createdAt)}</td>
+                      <td className="py-4 px-4 text-sm text-gray-600">{formatDate(r.createdAt)}</td>
                       <td className="py-4 px-4 text-right">
                         <button onClick={() => viewReport(r)} className="text-blue-600 hover:text-blue-800 font-bold text-xs uppercase tracking-widest">View Analysis</button>
                       </td>
@@ -515,15 +514,15 @@ const WebSearch = () => {
     return (
       <div className="max-w-6xl mx-auto pb-20" id="report-content">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-gray-400 mb-6 pt-6" data-html2canvas-ignore>
+        <div className="flex items-center gap-2 text-sm text-gray-600 mb-6 pt-6" data-html2canvas-ignore>
           <Link to="/dashboard" className="hover:text-gray-600 transition-colors border-b border-transparent hover:border-gray-200">Dashboard</Link>
           <span className="opacity-40">/</span>
-          <span className="text-gray-400 font-medium">AI Module</span>
+          <span className="text-gray-600 font-medium">AI Module</span>
           <span className="opacity-40">/</span>
           {!projectId ? (
-            <button onClick={() => setResults(null)} className="text-gray-400 hover:text-gray-600 transition-colors font-medium border-b border-transparent hover:border-gray-200">Web Visibility</button>
+            <button onClick={() => setResults(null)} className="text-gray-600 hover:text-gray-600 transition-colors font-medium border-b border-transparent hover:border-gray-200">Web Visibility</button>
           ) : (
-            <span className="text-gray-400 font-medium">Web Visibility</span>
+            <span className="text-gray-600 font-medium">Web Visibility</span>
           )}
           <span className="opacity-40">/</span>
           <span className="text-gray-600 font-bold bg-gray-100 px-2 py-0.5 rounded-md">Report</span>
@@ -573,7 +572,7 @@ const WebSearch = () => {
                 <Globe className="w-3 h-3" /> Live Research Node Synced
               </div>
               <h1 className="text-3xl font-black mb-3 tracking-tight">Web Visibility Summary</h1>
-              <p className="text-gray-400 text-[15px] leading-relaxed mb-8 max-w-2xl font-medium">
+              <p className="text-gray-300 text-[15px] leading-relaxed mb-8 max-w-2xl font-medium">
                 {profile.interpretation || `Real-time scan for brand mentions, sentiment, and semantic authority across the live web nodes. Your authority score is ${score}% based on indexed depth.`}
               </p>
               
@@ -606,7 +605,7 @@ const WebSearch = () => {
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <span className="text-4xl font-black" style={{ color: scoreColor }}>{score}%</span>
-                  <span className="text-[10px] text-gray-500 font-bold uppercase">Visibility</span>
+                  <span className="text-[10px] text-gray-700 font-bold uppercase">Visibility</span>
                 </div>
               </div>
             </div>
@@ -636,7 +635,7 @@ const WebSearch = () => {
             {/* AI Engine Snapshots */}
             <div className="space-y-4">
               <div className="flex items-center justify-between px-2">
-                <h4 className="text-[11px] font-black text-gray-400 h-4 flex items-center gap-2 uppercase tracking-widest">
+                <h4 className="text-[11px] font-black text-gray-600 h-4 flex items-center gap-2 uppercase tracking-widest">
                   <Terminal className="w-3.5 h-3.5 text-blue-600" /> AI Engine Responses
                 </h4>
                 <div className="flex items-center gap-1.5 bg-green-50 px-2 py-0.5 rounded-full border border-green-100">
@@ -677,11 +676,11 @@ const WebSearch = () => {
                 className="bg-white border border-gray-200/60 rounded-2xl shadow-sm overflow-hidden"
               >
                 <div className="p-6 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
-                  <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                  <h4 className="text-[11px] font-black text-gray-600 uppercase tracking-widest flex items-center gap-2">
                     <Target className="w-4 h-4 text-purple-600" /> AI Visibility Assessment
                   </h4>
                   <div className="flex flex-col items-end gap-1">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Overall Level</span>
+                    <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Overall Level</span>
                     <span className={`px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-widest border 
                       ${(profile.aiVisibilityAssessment.overallLevel || '').toLowerCase().includes('high') ? 'bg-green-50 text-green-700 border-green-100' : 
                         (profile.aiVisibilityAssessment.overallLevel || '').toLowerCase().includes('moderate') ? 'bg-blue-50 text-blue-700 border-blue-100' : 
@@ -699,7 +698,7 @@ const WebSearch = () => {
                   <div className="overflow-x-auto rounded-xl border border-gray-100 bg-white/50">
                     <table className="w-full">
                       <thead>
-                        <tr className="bg-gray-50/50 border-b border-gray-100 text-[10px] font-black text-gray-400 uppercase tracking-widest text-left">
+                        <tr className="bg-gray-50/50 border-b border-gray-100 text-[10px] font-black text-gray-600 uppercase tracking-widest text-left">
                           <th className="py-4 px-6">Discovery Metric</th>
                           <th className="py-4 px-6 text-center">Assessment</th>
                           <th className="py-4 px-6 pr-8">Discovery Evidence</th>
@@ -730,7 +729,7 @@ const WebSearch = () => {
                                   {cleanA}
                                 </span>
                               </td>
-                              <td className="py-5 px-6 text-xs text-gray-500 font-medium leading-relaxed group-hover:text-gray-700 transition-colors pr-8 min-w-[200px]">
+                              <td className="py-5 px-6 text-xs text-gray-700 font-medium leading-relaxed group-hover:text-gray-700 transition-colors pr-8 min-w-[200px]">
                                 {c.evidence}
                               </td>
                             </tr>
@@ -754,7 +753,7 @@ const WebSearch = () => {
                   <Sparkles className="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
-                  <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">AI's Interpretation</h4>
+                  <h4 className="text-[11px] font-black text-gray-600 uppercase tracking-widest mb-1">AI's Interpretation</h4>
                   <p className="text-sm text-gray-600 leading-relaxed font-medium">
                     {profile.interpretation || "Deep scanning live web results for brand authority and mentions..."}
                   </p>
@@ -766,7 +765,7 @@ const WebSearch = () => {
                 <div>
                   <div className="flex items-center gap-2 mb-4">
                     <CheckCircle2 className="w-3.2 h-3.5 text-green-600" />
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Strong Presence Around</span>
+                    <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Strong Presence Around</span>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {(profile.prompts || []).map((k, i) => (
@@ -780,17 +779,17 @@ const WebSearch = () => {
                 {/* Synthesis Grid (The key parity element) */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-4 bg-white border border-gray-100 rounded-xl shadow-sm">
-                    <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Domain Type</div>
+                    <div className="text-[9px] font-black text-gray-600 uppercase tracking-widest mb-2">Domain Type</div>
                     <div className="text-xs font-bold text-[#1E293B]">{profile.domainType || profile.brandType || 'Analyzing...'}</div>
                   </div>
                   <div className="p-4 bg-white border border-gray-100 rounded-xl shadow-sm">
-                    <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Brand Sentiment</div>
+                    <div className="text-[9px] font-black text-gray-600 uppercase tracking-widest mb-2">Brand Sentiment</div>
                     <div className={`text-[10px] w-fit font-black uppercase tracking-widest px-2 py-0.5 rounded ${(profile.sentiment || '').toLowerCase().includes('positive') ? 'bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100' : (profile.sentiment || '').toLowerCase().includes('negative') ? 'bg-rose-50 text-rose-600 ring-1 ring-rose-100' : 'bg-amber-50 text-amber-600 ring-1 ring-amber-100'}`}>
                       {profile.sentiment || 'Neutral'}
                     </div>
                   </div>
                   <div className="p-4 bg-white border border-gray-100 rounded-xl shadow-sm col-span-2">
-                    <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Core Offering</div>
+                    <div className="text-[9px] font-black text-gray-600 uppercase tracking-widest mb-2">Core Offering</div>
                     <div className="text-xs font-bold text-[#1E293B]">{profile.coreOffering || profile.interpretation?.slice(0, 100) || 'Analyzing...'}</div>
                   </div>
                 </div>
@@ -801,7 +800,7 @@ const WebSearch = () => {
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}
               className="bg-white border border-gray-200/60 p-8 rounded-2xl shadow-sm"
             >
-              <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+              <h4 className="text-[11px] font-black text-gray-600 uppercase tracking-widest mb-6 flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-green-600" /> Optimization Checklist
               </h4>
               <div className="space-y-3">
@@ -820,7 +819,7 @@ const WebSearch = () => {
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
               className="bg-white border border-gray-200/60 p-8 rounded-2xl shadow-sm"
             >
-              <h4 className="text-[11px] font-black mb-6 text-gray-400 uppercase tracking-widest flex items-center gap-2">
+              <h4 className="text-[11px] font-black mb-6 text-gray-600 uppercase tracking-widest flex items-center gap-2">
                 <ExternalLink className="w-4 h-4 text-blue-600" /> Top AI Sources
               </h4>
               <div className="space-y-3">
@@ -845,7 +844,7 @@ const WebSearch = () => {
                     >
                       <div className="flex flex-col overflow-hidden max-w-[85%]">
                         <span className="text-xs font-bold text-[#1E293B] uppercase tracking-wider truncate">{domainName}</span>
-                        <span className={`text-[10px] truncate mt-0.5 font-medium ${url === '#' ? 'text-gray-400 italic' : 'text-blue-500/70'}`}>
+                        <span className={`text-[10px] truncate mt-0.5 font-medium ${url === '#' ? 'text-gray-600 italic' : 'text-blue-500/70'}`}>
                           {url === '#' ? 'Source Link Unavailable' : url}
                         </span>
                       </div>
@@ -857,17 +856,18 @@ const WebSearch = () => {
             </motion.div>
           </div>
         </div>
-      {/* Hidden PDF Template (Rendered off-screen for high-quality capture) */}
-      <div className="absolute -left-[9999px] top-0 pointer-events-none" aria-hidden="true">
-        <div id="web-search-pdf-template">
-          {results && (
-            <WebSearchReport 
-              brandName={projectId ? (project?.name) : (input || 'Brand')} 
-              data={results} 
-            />
-          )}
+
+        {/* Hidden PDF Template (Rendered off-screen for high-quality capture) */}
+        <div className="absolute -left-[9999px] top-0 pointer-events-none" aria-hidden="true">
+          <div id="web-search-pdf-template">
+            {results && (
+              <WebSearchReport 
+                brandName={projectId ? (project?.name) : (input || 'Brand')} 
+                data={results} 
+              />
+            )}
+          </div>
         </div>
-      </div>
       </div>
     );
   }

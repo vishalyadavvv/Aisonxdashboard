@@ -26,7 +26,7 @@ const ActionPhase = ({ phase, title, description, defaultOpen, children }) => {
           <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-600 text-white">Phase {phase}</span>
           <span className="text-base font-bold text-[#1E293B]">{title}</span>
         </div>
-        {isOpen ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
+        {isOpen ? <ChevronUp className="w-5 h-5 text-gray-600" /> : <ChevronDown className="w-5 h-5 text-gray-600" />}
       </button>
       <AnimatePresence>
         {isOpen && (
@@ -37,7 +37,7 @@ const ActionPhase = ({ phase, title, description, defaultOpen, children }) => {
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <p className="text-sm text-gray-500 mb-4">{description}</p>
+            <p className="text-sm text-gray-700 mb-4">{description}</p>
             <div className="pb-6">{children}</div>
           </motion.div>
         )}
@@ -78,7 +78,7 @@ const SchemaItems = ({ technicalSignals }) => {
           <div className="flex items-start justify-between mb-2">
             <div>
               <p className="text-sm font-bold text-[#1E293B]">{item.title}</p>
-              <p className="text-xs text-gray-500 mt-1">{item.desc}</p>
+              <p className="text-xs text-gray-700 mt-1">{item.desc}</p>
             </div>
             <span className={`text-xs font-semibold px-3 py-1 rounded-full shrink-0 ${item.effort === 'Low' ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-amber-50 text-amber-700 border border-amber-100'}`}>
               ✦ {item.effort} Effort
@@ -86,7 +86,7 @@ const SchemaItems = ({ technicalSignals }) => {
           </div>
           <div className="mt-3">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-[10px] text-gray-400 font-semibold">Estimated Impact</span>
+              <span className="text-[10px] text-gray-600 font-semibold">Estimated Impact</span>
               <span className="text-xs font-bold text-blue-600">+{item.impact}%</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-1.5">
@@ -107,13 +107,13 @@ const ContentOptItem = ({ title, desc, hasIt, impact }) => {
       <div className="flex items-start justify-between mb-2">
         <div>
           <p className="text-sm font-bold text-[#1E293B]">{title}</p>
-          <p className="text-xs text-gray-500 mt-1">{desc}</p>
+          <p className="text-xs text-gray-700 mt-1">{desc}</p>
         </div>
         <span className="text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-100 px-3 py-1 rounded-full shrink-0">✦ Medium Effort</span>
       </div>
       <div className="mt-3">
         <div className="flex items-center justify-between mb-1">
-          <span className="text-[10px] text-gray-400 font-semibold">Estimated Impact</span>
+          <span className="text-[10px] text-gray-600 font-semibold">Estimated Impact</span>
           <span className="text-xs font-bold text-blue-600">+{impact}%</span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-1.5">
@@ -255,7 +255,6 @@ const AIReadiness = () => {
     setIsExporting(true);
     const toastId = toast.loading('Generating high-quality PDF report...');
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
       await downloadPDF('ai-readiness-pdf-template', `AI_Readiness_Report_${name}`);
       toast.success('Report downloaded successfully!', { id: toastId });
     } catch (err) {
@@ -278,8 +277,8 @@ const AIReadiness = () => {
       if (allowUnknown) {
         return (
           <div className="flex items-center justify-between mt-3 mb-3">
-            <span className="text-xs font-medium text-gray-400">{label}</span>
-            <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-md bg-gray-800/50 text-gray-500 border border-gray-700/50">Unknown</span>
+            <span className="text-xs font-medium text-gray-300">{label}</span>
+            <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-md bg-gray-800/50 text-gray-400 border border-gray-700/50">Unknown</span>
           </div>
         );
       }
@@ -332,14 +331,14 @@ const AIReadiness = () => {
                     {i > 0 && (
                       <div className={`flex-1 h-0.5 ${isActive ? 'bg-blue-500' : 'bg-gray-200'} transition-colors duration-500`} />
                     )}
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-500 ${isActive ? 'bg-blue-50 border-blue-500 text-blue-600' : 'bg-gray-50 border-gray-200 text-gray-400'}`}>
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-500 ${isActive ? 'bg-blue-50 border-blue-500 text-blue-600' : 'bg-gray-50 border-gray-200 text-gray-600'}`}>
                       <StepIcon className="w-5 h-5" />
                     </div>
                     {i < STEPS.length - 1 && (
                       <div className={`flex-1 h-0.5 ${i < currentStep ? 'bg-blue-500' : 'bg-gray-200'} transition-colors duration-500`} />
                     )}
                   </div>
-                  <span className={`text-xs font-medium mt-2 ${isActive ? 'text-blue-600' : 'text-gray-400'}`}>
+                  <span className={`text-xs font-medium mt-2 ${isActive ? 'text-blue-600' : 'text-gray-600'}`}>
                     {step.label}
                   </span>
                 </div>
@@ -355,7 +354,7 @@ const AIReadiness = () => {
             </div>
           </div>
 
-          <p className="text-sm text-gray-500 mb-6">AI will automatically detect your business type and analyze your sitemaps</p>
+          <p className="text-sm text-gray-700 mb-6">AI will automatically detect your business type and analyze your sitemaps</p>
 
           {/* Analyzing Button */}
           <button disabled className="w-full bg-blue-400/80 text-white py-4 rounded-xl font-semibold flex items-center justify-center gap-3 cursor-not-allowed">
@@ -378,12 +377,12 @@ const AIReadiness = () => {
     return (
       <div className="max-w-6xl mx-auto" id="report-content">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-gray-400 mb-6 pt-6" data-html2canvas-ignore>
+        <div className="flex items-center gap-2 text-sm text-gray-600 mb-6 pt-6" data-html2canvas-ignore>
           <Link to="/dashboard" className="hover:text-gray-600 transition-colors border-b border-transparent hover:border-gray-200">Dashboard</Link>
           <span className="opacity-40">/</span>
-          <span className="text-gray-400">AI Module</span>
+          <span className="text-gray-600">AI Module</span>
           <span className="opacity-40">/</span>
-          <span className="text-gray-400 font-medium">Technical Readiness</span>
+          <span className="text-gray-600 font-medium">Technical Readiness</span>
           <span className="opacity-40">/</span>
           <span className="text-gray-600 font-bold tracking-tight bg-gray-100 px-2 py-0.5 rounded-md">{projectId ? project?.name : 'Report'}</span>
         </div>
@@ -453,7 +452,7 @@ const AIReadiness = () => {
           <div className="flex items-start justify-between">
             <div className="flex-1 pr-8">
               <h1 className="text-2xl font-bold italic mb-3">Visibility Prediction Summary</h1>
-              <p className="text-gray-400 text-sm leading-relaxed mb-6">
+              <p className="text-gray-300 text-sm leading-relaxed mb-6">
                 {results.summary || `This report analyzes how AI systems like ChatGPT, Perplexity, and Google Gemini perceive and retrieve your website content. Your composite coverage score combines core page structure (${score}%) with AI query coverage (${score}%).`}
               </p>
               <div className="flex items-center gap-3" data-html2canvas-ignore>
@@ -465,6 +464,18 @@ const AIReadiness = () => {
                   {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />}
                   Download PDF Report
                 </button>
+              </div>
+
+              {/* Hidden PDF Template */}
+              <div className="absolute -left-[9999px] top-0 pointer-events-none" aria-hidden="true">
+                <div id="ai-readiness-pdf-template">
+                  {results && (
+                    <AIReadinessReport 
+                      brandName={projectId ? (project?.name) : (results.domain || 'Brand')} 
+                      data={results} 
+                    />
+                  )}
+                </div>
               </div>
             </div>
 
@@ -479,7 +490,7 @@ const AIReadiness = () => {
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <span className="text-3xl font-bold" style={{ color: scoreColor }}>{score}%</span>
-                  <span className="text-[10px] text-gray-400">Coverage</span>
+                  <span className="text-[10px] text-gray-600">Coverage</span>
                 </div>
               </div>
             </div>
@@ -509,7 +520,7 @@ const AIReadiness = () => {
           className="flex items-center gap-3 mb-6 px-1"
         >
           <AlertTriangle className="w-5 h-5 text-yellow-500" />
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-700">
             {score >= 80 ? 'Strong AI visibility. Keep optimizing to maintain coverage.' :
             score >= 50 ? 'Good progress on AI visibility. Address missing opportunities to improve discoverability.' :
             'Significant improvements needed to boost AI visibility and discoverability.'}
@@ -546,11 +557,11 @@ const AIReadiness = () => {
             </div>
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-            className="bg-red-50 border border-red-100 rounded-xl p-5">
-            <p className="text-xs font-semibold text-red-600 uppercase mb-1">Total Missing</p>
+            className={`${results.totalMissing === 0 ? 'bg-green-50 border-green-100' : 'bg-red-50 border-red-100'} border rounded-xl p-5`}>
+            <p className={`text-xs font-semibold ${results.totalMissing === 0 ? 'text-green-600' : 'text-red-600'} uppercase mb-1`}>Total Missing</p>
             <div className="flex items-center justify-between">
               <span className="text-3xl font-bold text-[#1E293B]">{results.totalMissing}</span>
-              <AlertTriangle className="w-6 h-6 text-red-500" />
+              {results.totalMissing === 0 ? <CheckCircle2 className="w-6 h-6 text-green-500" /> : <AlertTriangle className="w-6 h-6 text-red-500" />}
             </div>
           </motion.div>
         </div>
@@ -566,27 +577,27 @@ const AIReadiness = () => {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-[#1E293B]">Domain Synthesis</h3>
-                  <p className="text-xs text-gray-400">AI-generated analysis of your domain's semantic footprint</p>
+                  <p className="text-xs text-gray-600">AI-generated analysis of your domain's semantic footprint</p>
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-[#F8F9FB] p-5 rounded-xl border border-gray-100 flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-gray-400 font-semibold uppercase mb-1">Domain Type</p>
+                    <p className="text-xs text-gray-600 font-semibold uppercase mb-1">Domain Type</p>
                     <p className="text-[#1E293B] font-bold">{ds.domainType || results.businessType || 'General'}</p>
                   </div>
                   <FileText className="w-5 h-5 text-gray-300" />
                 </div>
                 <div className="bg-[#F8F9FB] p-5 rounded-xl border border-gray-100 flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-gray-400 font-semibold uppercase mb-1">Brand Type</p>
+                    <p className="text-xs text-gray-600 font-semibold uppercase mb-1">Brand Type</p>
                     <p className="text-[#1E293B] font-bold">{ds.brandType || 'N/A'}</p>
                   </div>
                   <Target className="w-5 h-5 text-gray-300" />
                 </div>
                 <div className="bg-[#F8F9FB] p-5 rounded-xl border border-gray-100 flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-gray-400 font-semibold uppercase mb-1">Total URLs</p>
+                    <p className="text-xs text-gray-600 font-semibold uppercase mb-1">Total URLs</p>
                     <p className="text-[#1E293B] font-bold">{results.totalSitemapUrls || 0}</p>
                   </div>
                   <Globe className="w-5 h-5 text-gray-300" />
@@ -670,32 +681,32 @@ const AIReadiness = () => {
             <h3 className="text-lg font-bold text-[#1E293B] mb-6">Sitemap Breakdown</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="bg-green-50 border border-green-100 rounded-xl p-5">
-                <p className={`text-2xl font-bold ${results.totalSitemapUrls === 0 ? 'text-slate-400' : 'text-green-600'}`}>
+                <p className={`text-2xl font-bold ${results.totalSitemapUrls === 0 ? 'text-gray-600' : 'text-green-600'}`}>
                   {results.totalSitemapUrls || (hasValidData ? 0 : 'N/A')}
                 </p>
-                <p className="text-xs text-gray-500 font-medium">Total URLs</p>
+                <p className="text-xs text-gray-700 font-medium">Total URLs</p>
               </div>
               <div className="bg-blue-50 border border-blue-100 rounded-xl p-5">
-                <p className={`text-2xl font-bold ${results.totalSitemapUrls === 0 ? 'text-slate-400' : 'text-blue-600'}`}>
+                <p className={`text-2xl font-bold ${results.totalSitemapUrls === 0 ? 'text-gray-600' : 'text-blue-600'}`}>
                   {results.pageUrls || results.corePagesFound || (hasValidData ? 0 : 'N/A')}
                 </p>
-                <p className="text-xs text-gray-500 font-medium">Page URLs</p>
+                <p className="text-xs text-gray-700 font-medium">Page URLs</p>
               </div>
               <div className="bg-purple-50 border border-purple-100 rounded-xl p-5">
-                <p className={`text-2xl font-bold ${results.totalSitemapUrls === 0 ? 'text-slate-400' : 'text-purple-600'}`}>
+                <p className={`text-2xl font-bold ${results.totalSitemapUrls === 0 ? 'text-gray-600' : 'text-purple-600'}`}>
                   {results.postUrls || (results.totalSitemapUrls - (results.corePagesFound || 0)) || (hasValidData ? 0 : 'N/A')}
                 </p>
-                <p className="text-xs text-gray-500 font-medium">Post URLs</p>
+                <p className="text-xs text-gray-700 font-medium">Post URLs</p>
               </div>
             </div>
             {results.sitemapUrl && results.sitemapUrl !== 'Scanned via Homepage Crawl' && (
               <div className="space-y-2">
                 <div className="flex items-center gap-3 p-3 bg-[#F8F9FB] rounded-lg border border-gray-100">
-                  <span className="text-xs font-bold text-gray-500 uppercase">PAGE SITEMAP</span>
+                  <span className="text-xs font-bold text-gray-700 uppercase">PAGE SITEMAP</span>
                   <span className="text-xs text-blue-600 font-medium">{results.pageSitemapUrl || results.sitemapUrl}</span>
                 </div>
                 <div className="flex items-center gap-3 p-3 bg-[#F8F9FB] rounded-lg border border-gray-100">
-                  <span className="text-xs font-bold text-gray-500 uppercase">POST SITEMAP</span>
+                  <span className="text-xs font-bold text-gray-700 uppercase">POST SITEMAP</span>
                   <span className="text-xs text-blue-600 font-medium">{results.postSitemapUrl || results.sitemapUrl}</span>
                 </div>
               </div>
@@ -709,7 +720,7 @@ const AIReadiness = () => {
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h3 className="text-lg font-bold text-[#1E293B] mb-1">Visibility Prediction Results</h3>
-                  <p className="text-sm text-gray-400">Comparison of AI-expected pages vs actual sitemap content</p>
+                  <p className="text-sm text-gray-600">Comparison of AI-expected pages vs actual sitemap content</p>
                 </div>
                 <div className="bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-lg flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-blue-500" />
@@ -720,11 +731,11 @@ const AIReadiness = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-100">
-                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Fan-Out Sub-Query</th>
-                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Predicted Path</th>
-                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">AI Expectation Reason</th>
-                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
-                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Action Recommendation</th>
+                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Fan-Out Sub-Query</th>
+                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Predicted Path</th>
+                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">AI Expectation Reason</th>
+                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Action Recommendation</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -734,7 +745,7 @@ const AIReadiness = () => {
                         <td className="py-4 px-4">
                           <span className="text-sm text-gray-600 font-mono bg-gray-50 px-2 py-1 rounded">{q.path}</span>
                         </td>
-                        <td className="py-4 px-4 text-sm text-gray-500 max-w-[250px]">{q.reason}</td>
+                        <td className="py-4 px-4 text-sm text-gray-700 max-w-[250px]">{q.reason}</td>
                         <td className="py-4 px-4">
                           <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full ${q.status === 'present' ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-amber-50 text-amber-700 border border-amber-100'}`}>
                             {q.status === 'present' ? '✓' : '⚠'} {q.status === 'present' ? 'Present' : 'Missing'}
@@ -760,10 +771,10 @@ const AIReadiness = () => {
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h3 className="text-lg font-bold text-[#1E293B] mb-1">Fan-Out Query Mappings</h3>
-                  <p className="text-sm text-gray-400">These are typical queries AI models use to find your business. We recommend having specific pages for each.</p>
+                  <p className="text-sm text-gray-600">These are typical queries AI models use to find your business. We recommend having specific pages for each.</p>
                 </div>
                 <div className="hidden md:flex items-center gap-2">
-                  <div className="text-[10px] bg-gray-100 text-gray-500 font-bold px-2 py-1 rounded">Aware of {results.totalSitemapUrls} existing pages</div>
+                  <div className="text-[10px] bg-gray-100 text-gray-700 font-bold px-2 py-1 rounded">Aware of {results.totalSitemapUrls} existing pages</div>
                 </div>
               </div>
               
@@ -771,12 +782,12 @@ const AIReadiness = () => {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="border-b border-gray-100">
-                      <th className="py-3 px-4 text-xs font-semibold text-gray-500 max-w-[150px]">Parent Query</th>
-                      <th className="py-3 px-4 text-xs font-semibold text-gray-500">Fan-Out Sub-Query</th>
-                      <th className="py-3 px-4 text-xs font-semibold text-gray-500">Predicted Path</th>
-                      <th className="py-3 px-4 text-xs font-semibold text-gray-500 whitespace-nowrap">Intent Type</th>
-                      <th className="py-3 px-4 text-xs font-semibold text-gray-500 whitespace-nowrap">Query Layer</th>
-                      <th className="py-3 px-4 text-xs font-semibold text-gray-500 text-center">Status</th>
+                      <th className="py-3 px-4 text-xs font-semibold text-gray-700 max-w-[150px]">Parent Query</th>
+                      <th className="py-3 px-4 text-xs font-semibold text-gray-700">Fan-Out Sub-Query</th>
+                      <th className="py-3 px-4 text-xs font-semibold text-gray-700">Predicted Path</th>
+                      <th className="py-3 px-4 text-xs font-semibold text-gray-700 whitespace-nowrap">Intent Type</th>
+                      <th className="py-3 px-4 text-xs font-semibold text-gray-700 whitespace-nowrap">Query Layer</th>
+                      <th className="py-3 px-4 text-xs font-semibold text-gray-700 text-center">Status</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -796,7 +807,7 @@ const AIReadiness = () => {
                             {q.intentType || 'Unknown'}
                           </span>
                         </td>
-                        <td className="py-4 px-4 text-sm text-gray-500 whitespace-nowrap">{q.queryLayer || 'Core'}</td>
+                        <td className="py-4 px-4 text-sm text-gray-700 whitespace-nowrap">{q.queryLayer || 'Core'}</td>
                         <td className="py-4 px-4 text-center">
                           <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap
                             ${q.status === 'present' ? 'bg-green-50 text-green-700 border border-green-100' :
@@ -824,7 +835,7 @@ const AIReadiness = () => {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-white">Technical AI Signals</h3>
-                  <p className="text-xs text-gray-400 mt-1">Deep dive into machine-readable indicators</p>
+                  <p className="text-xs text-gray-600 mt-1">Deep dive into machine-readable indicators</p>
                 </div>
               </div>
               
@@ -858,7 +869,7 @@ const AIReadiness = () => {
                     <SignalRow label="AI Fine-Tuning" status={results.technicalSignals?.robots?.contentSignals?.aiTrainFine} goodLabel="Allowed" badLabel="Restricted" allowUnknown />
                     <SignalRow label="Foundation Models" status={results.technicalSignals?.robots?.contentSignals?.aiTrainBase} goodLabel="Allowed" badLabel="Restricted" allowUnknown />
                   </div>
-                  <p className="text-[10px] text-gray-500 mt-4 leading-tight">* Standard signals indicating whether site content can be legally ingested by LLMs.</p>
+                  <p className="text-[10px] text-gray-700 mt-4 leading-tight">* Standard signals indicating whether site content can be legally ingested by LLMs.</p>
                 </div>
 
                 {/* Structured Data */}
@@ -870,9 +881,9 @@ const AIReadiness = () => {
                     <SignalRow label="Person Schema" status={results.technicalSignals?.trust?.authorBylinePresent} goodLabel="Present" badLabel="Missing" />
                     <SignalRow label="Article Schema" status={results.technicalSignals?.structuredData?.articlePresent} goodLabel="Present" badLabel="Missing" />
                     <SignalRow label="FAQ Schema" status={results.technicalSignals?.contentStructure?.hasFaqBlock} goodLabel="Present" badLabel="Missing" />
-                    <SignalRow label="HowTo Schema" status={false} goodLabel="Present" badLabel="Missing" allowUnknown />
-                    <SignalRow label="Product Schema" status={false} goodLabel="Present" badLabel="Missing" allowUnknown />
-                    <SignalRow label="Breadcrumb Schema" status={false} goodLabel="Present" badLabel="Missing" allowUnknown />
+                    <SignalRow label="HowTo Schema" status={results.technicalSignals?.structuredData?.howToPresent} goodLabel="Present" badLabel="Missing" allowUnknown />
+                    <SignalRow label="Product Schema" status={results.technicalSignals?.structuredData?.productPresent} goodLabel="Present" badLabel="Missing" allowUnknown />
+                    <SignalRow label="Breadcrumb Schema" status={results.technicalSignals?.structuredData?.breadcrumbPresent} goodLabel="Present" badLabel="Missing" allowUnknown />
                   </div>
                 </div>
                 
@@ -881,11 +892,11 @@ const AIReadiness = () => {
                   <h4 className="text-sm font-bold text-white mb-4">🌐 Crawlability</h4>
                   <div className="space-y-3">
                     <SignalRow label="XML Sitemap" status={!!results.sitemapUrl} goodLabel="Found" badLabel="Missing" />
-                    <SignalRow label="Sitemap in Robots" status={!!results.sitemapUrl} goodLabel="Linked" badLabel="Missing" />
-                    <SignalRow label="Indexable Ratio" status={true} goodLabel="High" badLabel="Low" />
-                    <SignalRow label="HTML Rendering" status={true} goodLabel="Server" badLabel="Client" />
-                    <SignalRow label="Main Content Node" status={results.technicalSignals?.contentStructure?.hasMainTag} goodLabel="Present" badLabel="Missing" />
-                    <SignalRow label="Semantic <article>" status={results.technicalSignals?.contentStructure?.hasArticleTag} goodLabel="Present" badLabel="Missing" />
+                    <SignalRow label="Sitemap in Robots" status={results.technicalSignals?.crawlability?.sitemapExists} goodLabel="Linked" badLabel="Missing" />
+                    <SignalRow label="Indexable Ratio" status={results.technicalSignals?.crawlability?.indexablePagesRatio > 0} goodLabel="High" badLabel="Low" />
+                    <SignalRow label="HTML Rendering" status={results.technicalSignals?.crawlability?.renderedHtmlContent} goodLabel="Server" badLabel="Client" />
+                    <SignalRow label="Main Content Node" status={results.technicalSignals?.crawlability?.mainContentNode} goodLabel="Present" badLabel="Missing" />
+                    <SignalRow label="Semantic <article>" status={results.technicalSignals?.contentStructure?.hasArticleTag || results.technicalSignals?.crawlability?.mainContentNode} goodLabel="Present" badLabel="Missing" />
                   </div>
                 </div>
 
@@ -893,11 +904,11 @@ const AIReadiness = () => {
                 <div className="bg-gray-900/50 rounded-xl p-5 border border-gray-800">
                   <h4 className="text-sm font-bold text-white mb-4">🏷️ Entity Identity</h4>
                   <div className="space-y-3">
-                    <SignalRow label="About Page" status={results.technicalSignals?.trust?.aboutPagePresent} goodLabel="Present" badLabel="Missing" />
-                    <SignalRow label="Contact/Location" status={results.technicalSignals?.trust?.contactPagePresent} goodLabel="Present" badLabel="Missing" />
-                    <SignalRow label="Domain Match" status={true} goodLabel="Matched" badLabel="Mismatch" />
-                    <SignalRow label="Brand Consistency" status={true} goodLabel="High" badLabel="Low" />
-                    <SignalRow label="Social Links" status={true} goodLabel="Present" badLabel="Missing" />
+                    <SignalRow label="About Page" status={results.technicalSignals?.entity?.hasAboutPage} goodLabel="Present" badLabel="Missing" />
+                    <SignalRow label="Contact/Location" status={results.technicalSignals?.entity?.hasContactPage} goodLabel="Present" badLabel="Missing" />
+                    <SignalRow label="Domain Match" status={(results.technicalSignals?.entity?.brandConsistencyScore || 0) > 0.5} goodLabel="Matched" badLabel="Mismatch" />
+                    <SignalRow label="Brand Consistency" status={(results.technicalSignals?.entity?.brandConsistencyScore || 0) > 0.7} goodLabel="High" badLabel="Low" />
+                    <SignalRow label="Social Links" status={results.technicalSignals?.entity?.socialLinks} goodLabel="Present" badLabel="Missing" />
                   </div>
                 </div>
 
@@ -905,11 +916,11 @@ const AIReadiness = () => {
                 <div className="bg-gray-900/50 rounded-xl p-5 border border-gray-800">
                   <h4 className="text-sm font-bold text-white mb-4">🌍 External Entity</h4>
                   <div className="space-y-3">
-                    <SignalRow label="Wikidata Proxy" status={false} goodLabel="Detected" badLabel="Unknown" allowUnknown />
-                    <SignalRow label="Knowledge Graph" status={results.technicalSignals?.external?.knowledgeGraphProxy} goodLabel="Detected" badLabel="Unknown" allowUnknown />
-                    <SignalRow label="Crunchbase" status={false} goodLabel="Detected" badLabel="Unknown" allowUnknown />
-                    <SignalRow label="Verified Mentions" status={true} goodLabel="Detected" badLabel="Unknown" allowUnknown />
-                    <SignalRow label="Authority Backlinks" status={results.technicalSignals?.authority?.outboundAuthorityLinks} goodLabel="Present" badLabel="Missing" />
+                    <SignalRow label="Wikidata Proxy" status={results.technicalSignals?.external?.wikidata} goodLabel="Detected" badLabel="Unknown" allowUnknown />
+                    <SignalRow label="Knowledge Graph" status={results.technicalSignals?.external?.knowledgePanel} goodLabel="Detected" badLabel="Unknown" allowUnknown />
+                    <SignalRow label="Crunchbase" status={results.technicalSignals?.external?.crunchbase} goodLabel="Detected" badLabel="Unknown" allowUnknown />
+                    <SignalRow label="Verified Mentions" status={(results.technicalSignals?.external?.brandMentions || 0) > 0} goodLabel="Detected" badLabel="Unknown" allowUnknown />
+                    <SignalRow label="Authority Backlinks" status={(results.technicalSignals?.authority?.authorityLinksCount || 0) > 0} goodLabel="Present" badLabel="Missing" />
                   </div>
                 </div>
                 
@@ -926,7 +937,7 @@ const AIReadiness = () => {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-white">Content AI Signals</h3>
-                  <p className="text-xs text-gray-400 mt-1">Structure, Authority, and Conversational Relevance</p>
+                  <p className="text-xs text-gray-600 mt-1">Structure, Authority, and Conversational Relevance</p>
                 </div>
               </div>
               
@@ -938,11 +949,11 @@ const AIReadiness = () => {
                   <div className="space-y-3">
                     <SignalRow label="Q-based Headings" status={results.technicalSignals?.contentStructure?.hasQuestionHeadings} goodLabel="Present" badLabel="Missing" />
                     <SignalRow label="FAQ Formatting" status={results.technicalSignals?.contentStructure?.hasFaqBlock} goodLabel="Present" badLabel="Missing" />
-                    <SignalRow label="Ordered Lists" status={results.technicalSignals?.contentStructure?.listsDetected} goodLabel="Present" badLabel="Missing" />
-                    <SignalRow label="Unordered Lists" status={results.technicalSignals?.contentStructure?.listsDetected} goodLabel="Present" badLabel="Missing" />
-                    <SignalRow label="Data Tables" status={true} goodLabel="Present" badLabel="Missing" allowUnknown />
-                    <SignalRow label="Summary Block" status={results.technicalSignals?.snippetFormatting?.hasKeyTakeaways} goodLabel="Present" badLabel="Missing" />
-                    <SignalRow label="Short Paragraphs" status={true} goodLabel="Optimized" badLabel="Dense" />
+                    <SignalRow label="Ordered Lists" status={results.technicalSignals?.contentStructure?.orderedLists > 0} goodLabel="Present" badLabel="Missing" />
+                    <SignalRow label="Unordered Lists" status={results.technicalSignals?.contentStructure?.unorderedLists > 0} goodLabel="Present" badLabel="Missing" />
+                    <SignalRow label="Data Tables" status={results.technicalSignals?.contentStructure?.tables > 0} goodLabel="Present" badLabel="Missing" allowUnknown />
+                    <SignalRow label="Summary Block" status={results.technicalSignals?.contentStructure?.hasSummaryBlock} goodLabel="Present" badLabel="Missing" />
+                    <SignalRow label="Short Paragraphs" status={(results.technicalSignals?.contentStructure?.optimalParagraphCount || 0) > 0} goodLabel="Optimized" badLabel="Dense" />
                   </div>
                 </div>
 
@@ -951,10 +962,10 @@ const AIReadiness = () => {
                   <h4 className="text-sm font-bold text-white mb-4">🧾 Snippet Formatting</h4>
                   <div className="space-y-3">
                     <SignalRow label="Direct Answer Blocks" status={results.technicalSignals?.snippetFormatting?.hasDirectAnswer} goodLabel="Targeted" badLabel="Missing" />
-                    <SignalRow label="Definition First" status={true} goodLabel="Present" badLabel="Missing" />
-                    <SignalRow label="Pros/Cons Pattern" status={false} goodLabel="Present" badLabel="Missing" allowUnknown />
-                    <SignalRow label="Comparison Pattern" status={false} goodLabel="Present" badLabel="Missing" allowUnknown />
-                    <SignalRow label="Feature Lists" status={true} goodLabel="Present" badLabel="Missing" />
+                    <SignalRow label="Definition First" status={results.technicalSignals?.snippetFormatting?.hasDefinitionParagraph} goodLabel="Present" badLabel="Missing" />
+                    <SignalRow label="Pros/Cons Pattern" status={results.technicalSignals?.snippetFormatting?.hasProsCons} goodLabel="Present" badLabel="Missing" allowUnknown />
+                    <SignalRow label="Comparison Pattern" status={results.technicalSignals?.snippetFormatting?.hasComparison} goodLabel="Present" badLabel="Missing" allowUnknown />
+                    <SignalRow label="Feature Lists" status={results.technicalSignals?.snippetFormatting?.hasFeatureList} goodLabel="Present" badLabel="Missing" />
                     <SignalRow label="Q&A Pairs" status={results.technicalSignals?.contentStructure?.hasQuestionHeadings} goodLabel="Present" badLabel="Missing" />
                   </div>
                 </div>
@@ -963,10 +974,10 @@ const AIReadiness = () => {
                 <div className="bg-gray-900/50 rounded-xl p-5 border border-gray-800">
                   <h4 className="text-sm font-bold text-white mb-4">📚 Topic Authority</h4>
                   <div className="space-y-3">
-                    <SignalRow label="Information Density" status={true} goodLabel={(results.technicalSignals?.authority?.totalWords || 0) + ' Words'} badLabel="Thin" />
-                    <SignalRow label="Topic Clusters" status={true} goodLabel="Detected" badLabel="Missing" />
-                    <SignalRow label="Internal Links" status={(results.technicalSignals?.authority?.internalLinks || 0) > 5} goodLabel="High" badLabel="Low" />
-                    <SignalRow label="Pillar Pages" status={true} goodLabel="Detected" badLabel="Missing" />
+                    <SignalRow label="Information Density" status={true} goodLabel={(results.technicalSignals?.authority?.pillarPageWordCount || 0) + ' Words'} badLabel="Thin" />
+                    <SignalRow label="Topic Clusters" status={results.technicalSignals?.authority?.hasTopicClusters} goodLabel="Detected" badLabel="Missing" />
+                    <SignalRow label="Internal Links" status={(results.technicalSignals?.authority?.internalClusterLinks || 0) > 5} goodLabel="High" badLabel="Low" />
+                    <SignalRow label="Pillar Pages" status={(results.technicalSignals?.authority?.pagesPerCluster || 0) > 2} goodLabel="Detected" badLabel="Missing" />
                   </div>
                 </div>
 
@@ -974,10 +985,10 @@ const AIReadiness = () => {
                 <div className="bg-gray-900/50 rounded-xl p-5 border border-gray-800">
                   <h4 className="text-sm font-bold text-white mb-4">📖 Citations & Facts</h4>
                   <div className="space-y-3">
-                    <SignalRow label="Authority Links" status={results.technicalSignals?.authority?.outboundAuthorityLinks} goodLabel="Present" badLabel="Missing" />
-                    <SignalRow label=".gov / .edu Citations" status={false} goodLabel="Present" badLabel="Missing" allowUnknown />
-                    <SignalRow label="Numeric Statistics" status={true} goodLabel="Present" badLabel="Missing" />
-                    <SignalRow label="Reference Section" status={false} goodLabel="Present" badLabel="Missing" allowUnknown />
+                    <SignalRow label="Authority Links" status={(results.technicalSignals?.authority?.authorityLinksCount || 0) > 0} goodLabel="Present" badLabel="Missing" />
+                    <SignalRow label=".gov / .edu Citations" status={(results.technicalSignals?.authority?.authorityLinksCount || 0) > 0} goodLabel="Present" badLabel="Missing" allowUnknown />
+                    <SignalRow label="Numeric Statistics" status={(results.technicalSignals?.authority?.numericStatsCount || 0) > 0} goodLabel="Present" badLabel="Missing" />
+                    <SignalRow label="Reference Section" status={results.technicalSignals?.authority?.hasReferenceSection} goodLabel="Present" badLabel="Missing" allowUnknown />
                   </div>
                 </div>
 
@@ -985,12 +996,12 @@ const AIReadiness = () => {
                 <div className="bg-gray-900/50 rounded-xl p-5 border border-gray-800">
                   <h4 className="text-sm font-bold text-white mb-4">👤 Detectable Trust</h4>
                   <div className="space-y-3">
-                    <SignalRow label="Author Bylines" status={results.technicalSignals?.trust?.authorBylinePresent} goodLabel="Present" badLabel="Missing" />
-                    <SignalRow label="Author Biographies" status={results.technicalSignals?.trust?.authorBylinePresent} goodLabel="Present" badLabel="Missing" />
-                    <SignalRow label="Publication Dates" status={true} goodLabel="Present" badLabel="Missing" />
-                    <SignalRow label="Privacy Policy" status={true} goodLabel="Present" badLabel="Missing" />
-                    <SignalRow label="Terms of Service" status={true} goodLabel="Present" badLabel="Missing" />
-                    <SignalRow label="Testimonials" status={true} goodLabel="Present" badLabel="Missing" allowUnknown />
+                    <SignalRow label="Author Bylines" status={results.technicalSignals?.trust?.trust?.hasAuthorInfo} goodLabel="Present" badLabel="Missing" />
+                    <SignalRow label="Author Biographies" status={results.technicalSignals?.trust?.trust?.hasAuthorBio} goodLabel="Present" badLabel="Missing" />
+                    <SignalRow label="Publication Dates" status={results.technicalSignals?.trust?.trust?.hasDate} goodLabel="Present" badLabel="Missing" />
+                    <SignalRow label="Privacy Policy" status={results.technicalSignals?.trust?.trust?.hasPrivacyPolicy} goodLabel="Present" badLabel="Missing" />
+                    <SignalRow label="Terms of Service" status={results.technicalSignals?.trust?.trust?.hasTerms} goodLabel="Present" badLabel="Missing" />
+                    <SignalRow label="Testimonials" status={results.technicalSignals?.trust?.trust?.hasExernalReview} goodLabel="Present" badLabel="Missing" allowUnknown />
                   </div>
                 </div>
 
@@ -1015,7 +1026,7 @@ const AIReadiness = () => {
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
             className="bg-white border border-gray-200/60 rounded-2xl p-8">
             <h3 className="text-lg font-bold text-[#1E293B] mb-1">Tailored Action Plan & Recommendations</h3>
-            <p className="text-sm text-gray-400 mb-6">This prioritized roadmap is dynamically generated from your audit data, outlining the exact steps to bridge the gap between your current site and AI system expectations.</p>
+            <p className="text-sm text-gray-600 mb-6">This prioritized roadmap is dynamically generated from your audit data, outlining the exact steps to bridge the gap between your current site and AI system expectations.</p>
 
             {/* Phase 1: Quick Wins */}
             <ActionPhase
@@ -1030,7 +1041,7 @@ const AIReadiness = () => {
                     <div key={i} className="bg-[#F8F9FB] border border-gray-100 rounded-xl p-4 flex items-start justify-between gap-4">
                       <div>
                         <p className="text-sm font-semibold text-[#1E293B]">Publish {q.path}</p>
-                        <p className="text-xs text-gray-500 mt-1">{q.reason}</p>
+                        <p className="text-xs text-gray-700 mt-1">{q.reason}</p>
                       </div>
                       <span className="text-xs font-semibold text-amber-600 bg-amber-50 border border-amber-100 px-3 py-1 rounded-full shrink-0">⚡ High Impact</span>
                     </div>
@@ -1089,7 +1100,7 @@ const AIReadiness = () => {
 
           {/* Back Button */}
           <div className="pt-4">
-            <button onClick={goBack} className="flex items-center gap-2 text-gray-500 hover:text-gray-700 text-sm font-medium transition-colors">
+            <button onClick={goBack} className="flex items-center gap-2 text-gray-700 hover:text-gray-700 text-sm font-medium transition-colors">
               <ArrowLeft className="w-4 h-4" /> Run New Audit
             </button>
           </div>
@@ -1106,8 +1117,8 @@ const AIReadiness = () => {
           <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
           <div className="absolute inset-0 bg-blue-500/20 rounded-3xl animate-ping opacity-20" />
         </div>
-        <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter mb-2 text-center">Synchronizing Intelligence</h2>
-        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] text-center">Syncing live nodes for your project...</p>
+        <h2 className="text-xl font-black text-gray-800 uppercase tracking-tighter mb-2 text-center">Synchronizing Intelligence</h2>
+        <p className="text-gray-600 font-bold uppercase tracking-widest text-[10px] text-center">Syncing live nodes for your project...</p>
       </div>
     );
   }
@@ -1116,10 +1127,10 @@ const AIReadiness = () => {
   return (
     <div className="max-w-6xl mx-auto">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-gray-400 mb-6 pt-6">
+      <div className="flex items-center gap-2 text-sm text-gray-600 mb-6 pt-6">
         <Link to="/dashboard" className="hover:text-gray-600 transition-colors border-b border-transparent hover:border-gray-200">Dashboard</Link>
         <span className="opacity-40">/</span>
-        <span className="text-gray-400 font-medium">AI Module</span>
+        <span className="text-gray-600 font-medium">AI Module</span>
         <span className="opacity-40">/</span>
         <span className="text-gray-600 font-bold bg-gray-100 px-2 py-0.5 rounded-md">Technical Readiness</span>
       </div>
@@ -1140,7 +1151,7 @@ const AIReadiness = () => {
                <h1 className="text-2xl font-black mb-2 tracking-tight leading-none">
                   {projectId ? `Project Scan: ${project?.name}` : 'AI Readiness Audit'}
                </h1>
-               <p className="text-gray-400 text-sm font-medium leading-relaxed max-w-2xl">
+               <p className="text-gray-300 text-sm font-medium leading-relaxed max-w-2xl">
                   {projectId ? `Automated technical extraction and semantic gap analysis for ${project?.domain}.` : 'Analyze your technical foundation, schema health, and content structure for AI system compatibility.'}
                </p>
             </div>
@@ -1157,7 +1168,7 @@ const AIReadiness = () => {
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                        <span className="text-3xl font-black text-blue-400 leading-none">{scansUsed}</span>
-                       <span className="text-[10px] text-gray-500 font-bold uppercase mt-1">OF {totalScans}</span>
+                       <span className="text-[10px] text-gray-700 font-bold uppercase mt-1">OF {totalScans}</span>
                     </div>
                  </div>
               </div>
@@ -1167,7 +1178,7 @@ const AIReadiness = () => {
          {!projectId ? (
             <form onSubmit={handleAnalyze} className="mt-5 relative group max-w-4xl">
                <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
-                  <Search className="h-5 w-5 text-gray-400 group-hover:text-blue-400 transition-colors" />
+                  <Search className="h-5 w-5 text-gray-600 group-hover:text-blue-400 transition-colors" />
                </div>
                <input
                   type="text"
@@ -1180,7 +1191,7 @@ const AIReadiness = () => {
                   <button
                      type="submit"
                      disabled={isAnalyzing || !url || isLimitReached}
-                     className="inline-flex items-center px-8 py-3.5 border border-transparent text-sm font-black rounded-xl text-slate-900 bg-white hover:bg-gray-100 focus:outline-none transition-all shadow-lg active:scale-95 disabled:opacity-50"
+                     className="inline-flex items-center px-8 py-3.5 border border-transparent text-sm font-black rounded-xl text-gray-800 bg-white hover:bg-gray-100 focus:outline-none transition-all shadow-lg active:scale-95 disabled:opacity-50"
                   >
                      {isAnalyzing ? 'Analyzing...' : 'Run Audit'}
                   </button>
@@ -1233,10 +1244,10 @@ const AIReadiness = () => {
            className="bg-white border border-gray-200/60 rounded-2xl p-8"
          >
            <div className="flex items-center justify-between mb-8">
-             <h2 className="text-xl font-black text-slate-900 tracking-tight">Recent Audits</h2>
+             <h2 className="text-xl font-black text-gray-800 tracking-tight">Recent Audits</h2>
              {reports.length > 0 && (
                <div className="relative">
-                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
                  <input
                    type="text"
                    value={searchQuery}
@@ -1251,17 +1262,17 @@ const AIReadiness = () => {
            {reports.length === 0 ? (
              <div className="py-12 text-center bg-slate-50 border border-dashed border-slate-200 rounded-2xl">
                <Globe className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-               <p className="text-sm text-slate-400 font-medium uppercase tracking-widest">No previous audits found</p>
+               <p className="text-sm text-gray-600 font-medium uppercase tracking-widest">No previous audits found</p>
              </div>
            ) : (
              <div className="overflow-x-auto text-left">
                <table className="w-full">
                  <thead>
                    <tr className="border-b border-gray-100">
-                     <th className="py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Entity</th>
-                     <th className="py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Type</th>
-                     <th className="py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Date</th>
-                     <th className="py-3 px-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Action</th>
+                     <th className="py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Entity</th>
+                     <th className="py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Type</th>
+                     <th className="py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Date</th>
+                     <th className="py-3 px-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Action</th>
                    </tr>
                  </thead>
                  <tbody>
@@ -1271,7 +1282,7 @@ const AIReadiness = () => {
                          {r.domain}
                        </td>
                        <td className="py-4 px-4 text-sm text-gray-600">{r.businessType || 'N/A'}</td>
-                       <td className="py-4 px-4 text-sm text-gray-400">{new Date(r.createdAt).toLocaleDateString()}</td>
+                       <td className="py-4 px-4 text-sm text-gray-600">{new Date(r.createdAt).toLocaleDateString()}</td>
                        <td className="py-4 px-4 text-right">
                          <button onClick={() => viewReport(r)} className="text-blue-600 hover:text-blue-800 font-bold text-xs uppercase tracking-widest">View Results</button>
                        </td>
@@ -1283,17 +1294,19 @@ const AIReadiness = () => {
            )}
          </motion.div>
       )}
-      {/* Hidden PDF Template (Rendered off-screen for high-quality capture) */}
-      <div className="absolute -left-[9999px] top-0 pointer-events-none" aria-hidden="true">
-        <div id="ai-readiness-pdf-template">
-          {results && (
+      
+      {/* Hidden Report Template for PDF Generation */}
+      {results && (
+        <div className="absolute -left-[9999px] top-0 pointer-events-none" aria-hidden="true">
+          <div id="ai-readiness-pdf-template">
             <AIReadinessReport 
-              brandName={projectId ? (project?.name) : (results.domain || 'Brand')} 
               data={results} 
+              brandName={results.brandName || project?.name || results.domain || 'Digital Brand'} 
+              date={formatDate(results.timestamp || new Date())} 
             />
-          )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

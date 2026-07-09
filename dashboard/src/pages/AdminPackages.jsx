@@ -114,7 +114,7 @@ const AdminPackages = () => {
     emerald: { bg: 'bg-emerald-50 text-emerald-600', border: 'border-emerald-100', text: 'text-emerald-700' },
     blue: { bg: 'bg-blue-50 text-blue-600', border: 'border-blue-100', text: 'text-blue-700' },
     purple: { bg: 'bg-purple-50 text-purple-600', border: 'border-purple-100', text: 'text-purple-700' },
-    slate: { bg: 'bg-slate-50 text-slate-600', border: 'border-slate-100', text: 'text-slate-700' }
+    slate: { bg: 'bg-slate-50 text-gray-700', border: 'border-slate-100', text: 'text-slate-700' }
   };
 
   if (loading) {
@@ -130,11 +130,11 @@ const AdminPackages = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
             <CreditCard className="w-7 h-7 text-blue-600" />
             Pricing Package Manager
           </h1>
-          <p className="text-sm text-slate-500 font-medium mt-1">
+          <p className="text-sm text-gray-700 font-medium mt-1">
             Update SaaS prices, features, limits, and promo configurations dynamically.
           </p>
         </div>
@@ -158,17 +158,17 @@ const AdminPackages = () => {
                   <Icon className="w-6 h-6" />
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">PLAN LEVEL</span>
+                  <span className="text-[10px] font-bold text-gray-600 uppercase tracking-widest block">PLAN LEVEL</span>
                   <span className={`text-xs font-black uppercase tracking-wider ${style.text}`}>{pkg.name}</span>
                 </div>
               </div>
 
               <div>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-extrabold text-slate-900">₹{pkg.price}</span>
-                  <span className="text-slate-400 font-bold text-xs">/ month</span>
+                  <span className="text-3xl font-extrabold text-gray-800">₹{pkg.price}</span>
+                  <span className="text-gray-600 font-bold text-xs">/ month</span>
                 </div>
-                <p className="text-xs font-medium text-slate-500 mt-2">{pkg.description}</p>
+                <p className="text-xs font-medium text-gray-700 mt-2">{pkg.description}</p>
                 {pkg.trial && (
                   <span className="inline-block mt-3 text-[9px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-100">
                     {pkg.trial}
@@ -179,12 +179,12 @@ const AdminPackages = () => {
               {/* Resource limits quick overview */}
               <div className="p-4 bg-slate-50 rounded-2xl space-y-2 text-xs">
                 <div className="flex items-center justify-between">
-                  <span className="font-medium text-slate-500">Monthly AI Scans</span>
-                  <span className="font-extrabold text-slate-800">{pkg.monthlyScans || 10}</span>
+                  <span className="font-medium text-gray-700">Monthly AI Scans</span>
+                  <span className="font-extrabold text-gray-800">{pkg.monthlyScans || 10}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="font-medium text-slate-500">Prompts per Project</span>
-                  <span className="font-extrabold text-slate-800">{pkg.promptsPerProject || 2}</span>
+                  <span className="font-medium text-gray-700">Prompts per Project</span>
+                  <span className="font-extrabold text-gray-800">{pkg.promptsPerProject || 2}</span>
                 </div>
               </div>
 
@@ -211,14 +211,14 @@ const AdminPackages = () => {
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">CONFIGURATION PANEL</span>
-                <h3 className="text-lg font-black text-slate-900 flex items-center gap-2 mt-1">
+                <span className="text-[10px] font-bold text-gray-600 uppercase tracking-widest">CONFIGURATION PANEL</span>
+                <h3 className="text-lg font-black text-gray-800 flex items-center gap-2 mt-1">
                   Edit Plan: {editingPlan.name}
                 </h3>
               </div>
               <button 
                 onClick={() => setEditingPlan(null)}
-                className="p-2 hover:bg-slate-50 rounded-xl text-slate-400 hover:text-slate-600 transition-colors"
+                className="p-2 hover:bg-slate-50 rounded-xl text-gray-600 hover:text-gray-700 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -230,9 +230,9 @@ const AdminPackages = () => {
               {/* Price & Target audience */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Price (INR)</label>
+                  <label className="text-[10px] font-bold text-gray-600 uppercase tracking-wider block">Price (INR)</label>
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">₹</span>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-gray-600">₹</span>
                     <input 
                       type="number"
                       value={formData.price}
@@ -244,7 +244,7 @@ const AdminPackages = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Promo / Trial Tag</label>
+                  <label className="text-[10px] font-bold text-gray-600 uppercase tracking-wider block">Promo / Trial Tag</label>
                   <input 
                     type="text"
                     value={formData.trial}
@@ -258,7 +258,7 @@ const AdminPackages = () => {
               {/* Uptime Limits */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Monthly AI Scans Limit</label>
+                  <label className="text-[10px] font-bold text-gray-600 uppercase tracking-wider block">Monthly AI Scans Limit</label>
                   <input 
                     type="number"
                     value={formData.monthlyScans}
@@ -269,7 +269,7 @@ const AdminPackages = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Prompts per Project Limit</label>
+                  <label className="text-[10px] font-bold text-gray-600 uppercase tracking-wider block">Prompts per Project Limit</label>
                   <input 
                     type="number"
                     value={formData.promptsPerProject}
@@ -281,7 +281,7 @@ const AdminPackages = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Target Best For</label>
+                <label className="text-[10px] font-bold text-gray-600 uppercase tracking-wider block">Target Best For</label>
                 <input 
                   type="text"
                   value={formData.bestFor}
@@ -292,7 +292,7 @@ const AdminPackages = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Plan Description</label>
+                <label className="text-[10px] font-bold text-gray-600 uppercase tracking-wider block">Plan Description</label>
                 <textarea 
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -304,10 +304,10 @@ const AdminPackages = () => {
 
               {/* Feature Limits / Text Configs */}
               <div className="space-y-4 pt-4 border-t border-slate-100">
-                <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">Feature Text & Limits</h4>
+                <h4 className="text-xs font-black text-gray-800 uppercase tracking-wider">Feature Text & Limits</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">AI Engines Included</label>
+                    <label className="text-[10px] font-bold text-gray-600 uppercase tracking-wider block">AI Engines Included</label>
                     <input 
                       type="text"
                       value={formData.features['AI Engines Included'] || ''}
@@ -317,7 +317,7 @@ const AdminPackages = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Regions Included</label>
+                    <label className="text-[10px] font-bold text-gray-600 uppercase tracking-wider block">Regions Included</label>
                     <input 
                       type="text"
                       value={formData.features['Regions Included'] || ''}
@@ -327,7 +327,7 @@ const AdminPackages = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Analytics Dashboards</label>
+                    <label className="text-[10px] font-bold text-gray-600 uppercase tracking-wider block">Analytics Dashboards</label>
                     <input 
                       type="text"
                       value={formData.features['Analytics Dashboards'] || ''}
@@ -337,7 +337,7 @@ const AdminPackages = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Advanced Visibility Insights</label>
+                    <label className="text-[10px] font-bold text-gray-600 uppercase tracking-wider block">Advanced Visibility Insights</label>
                     <input 
                       type="text"
                       value={formData.features['Advanced Visibility Insights'] || ''}
@@ -350,10 +350,10 @@ const AdminPackages = () => {
 
               {/* Dynamic Benefits / Features Checklist */}
               <div className="space-y-4 pt-4 border-t border-slate-100">
-                <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">Features Checklist Override</h4>
+                <h4 className="text-xs font-black text-gray-800 uppercase tracking-wider">Features Checklist Override</h4>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                    <span className="text-[11px] font-bold text-slate-600">Unlimited Users</span>
+                    <span className="text-[11px] font-bold text-gray-700">Unlimited Users</span>
                     <input 
                       type="checkbox"
                       checked={!!formData.features['Unlimited Users']}
@@ -363,7 +363,7 @@ const AdminPackages = () => {
                   </div>
 
                   <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                    <span className="text-[11px] font-bold text-slate-600">AI Visibility Audit Tool</span>
+                    <span className="text-[11px] font-bold text-gray-700">AI Visibility Audit Tool</span>
                     <input 
                       type="checkbox"
                       checked={!!formData.features['AI Visibility Audit Tool']}
@@ -373,7 +373,7 @@ const AdminPackages = () => {
                   </div>
 
                   <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                    <span className="text-[11px] font-bold text-slate-600">AI Domain Analyzer</span>
+                    <span className="text-[11px] font-bold text-gray-700">AI Domain Analyzer</span>
                     <input 
                       type="checkbox"
                       checked={!!formData.features['AI Domain Analyzer']}
@@ -383,7 +383,7 @@ const AdminPackages = () => {
                   </div>
 
                   <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                    <span className="text-[11px] font-bold text-slate-600">Brand Authority Score</span>
+                    <span className="text-[11px] font-bold text-gray-700">Brand Authority Score</span>
                     <input 
                       type="checkbox"
                       checked={!!formData.features['Brand Authority Score']}
@@ -393,7 +393,7 @@ const AdminPackages = () => {
                   </div>
 
                   <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                    <span className="text-[11px] font-bold text-slate-600">Check LLM Entity Visibility</span>
+                    <span className="text-[11px] font-bold text-gray-700">Check LLM Entity Visibility</span>
                     <input 
                       type="checkbox"
                       checked={!!formData.features['Check LLM Entity Visibility']}
@@ -403,7 +403,7 @@ const AdminPackages = () => {
                   </div>
 
                   <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                    <span className="text-[11px] font-bold text-slate-600">Check LLM Live Visibility</span>
+                    <span className="text-[11px] font-bold text-gray-700">Check LLM Live Visibility</span>
                     <input 
                       type="checkbox"
                       checked={!!formData.features['Check LLM Live Visibility']}
@@ -419,7 +419,7 @@ const AdminPackages = () => {
                 <button 
                   type="button"
                   onClick={() => setEditingPlan(null)}
-                  className="flex-1 py-3 border border-slate-200 hover:bg-slate-50 rounded-xl text-xs font-bold text-slate-600 transition-all text-center"
+                  className="flex-1 py-3 border border-slate-200 hover:bg-slate-50 rounded-xl text-xs font-bold text-gray-700 transition-all text-center"
                 >
                   Cancel
                 </button>

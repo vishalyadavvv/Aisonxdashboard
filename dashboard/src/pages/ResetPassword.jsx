@@ -56,7 +56,7 @@ const ResetPassword = () => {
             <CheckCircle2 className="text-green-500 w-8 h-8" />
           </div>
           <h1 className="text-3xl font-bold text-[#1E293B] mb-2">Password Reset!</h1>
-          <p className="text-gray-500 font-medium mb-8">Your password has been successfully reset. You can now login with your new password.</p>
+          <p className="text-gray-700 font-medium mb-8">Your password has been successfully reset. You can now login with your new password.</p>
           <button
             onClick={() => navigate('/login')}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-blue-500/25 flex items-center justify-center"
@@ -86,7 +86,7 @@ const ResetPassword = () => {
             <Sparkles className="text-blue-600 w-7 h-7" />
           </div>
           <h1 className="text-3xl font-bold text-[#1E293B] mb-2 tracking-tight">Set New Password</h1>
-          <p className="text-gray-500 font-medium">Please enter your new password below.</p>
+          <p className="text-gray-700 font-medium">Please enter your new password below.</p>
         </div>
 
         {error && (
@@ -97,13 +97,13 @@ const ResetPassword = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">New Password</label>
+            <label className="text-xs font-bold text-gray-600 uppercase tracking-widest ml-1">New Password</label>
             <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 w-5 h-5" />
               <input
                 type="password"
                 required
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 pl-12 pr-4 text-[#1E293B] font-medium placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/40 transition-all"
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 pl-12 pr-4 text-[#1E293B] font-medium placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/40 transition-all"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -112,13 +112,13 @@ const ResetPassword = () => {
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Confirm New Password</label>
+            <label className="text-xs font-bold text-gray-600 uppercase tracking-widest ml-1">Confirm New Password</label>
             <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 w-5 h-5" />
               <input
                 type="password"
                 required
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 pl-12 pr-4 text-[#1E293B] font-medium placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/40 transition-all"
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 pl-12 pr-4 text-[#1E293B] font-medium placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/40 transition-all"
                 placeholder="••••••••"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -140,7 +140,7 @@ const ResetPassword = () => {
         </form>
 
         <div className="mt-8 pt-6 border-t border-gray-100 text-center">
-          <Link to="/login" className="text-gray-500 text-sm font-medium hover:text-blue-600 transition-colors">
+          <Link to="/login" className="text-gray-700 text-sm font-medium hover:text-blue-600 transition-colors">
             Back to login
           </Link>
         </div>

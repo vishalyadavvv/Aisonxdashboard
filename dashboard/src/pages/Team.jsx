@@ -44,8 +44,8 @@ const Team = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Team Members</h1>
-          <p className="text-sm text-slate-500 font-medium">Manage your team and their access permissions.</p>
+          <h1 className="text-2xl font-bold text-gray-800">Team Members</h1>
+          <p className="text-sm text-gray-700 font-medium">Manage your team and their access permissions.</p>
         </div>
         <button 
           onClick={() => setIsInviteModalOpen(true)}
@@ -63,8 +63,8 @@ const Team = () => {
             <Users className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Active Members</p>
-            <p className="text-xl font-bold text-slate-900">{teamMembers.length} / 1</p>
+            <p className="text-xs font-bold text-gray-600 uppercase tracking-widest">Active Members</p>
+            <p className="text-xl font-bold text-gray-800">{teamMembers.length} / 1</p>
           </div>
         </div>
         <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-4">
@@ -72,8 +72,8 @@ const Team = () => {
             <Shield className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Plan Limit</p>
-            <p className="text-xl font-bold text-slate-900 capitalize">{user?.subscription?.tier || 'Free'}</p>
+            <p className="text-xs font-bold text-gray-600 uppercase tracking-widest">Plan Limit</p>
+            <p className="text-xl font-bold text-gray-800 capitalize">{user?.subscription?.tier || 'Free'}</p>
           </div>
         </div>
       </div>
@@ -81,16 +81,16 @@ const Team = () => {
       {/* Team List */}
       <div className="bg-white border border-slate-100 rounded-3xl overflow-hidden shadow-sm">
         <div className="p-6 border-b border-slate-50">
-          <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest text-[10px] text-slate-400">Total Members ({teamMembers.length})</h3>
+          <h3 className="text-sm font-bold text-gray-800 uppercase tracking-widest text-[10px] text-gray-600">Total Members ({teamMembers.length})</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
               <tr className="bg-slate-50/50">
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">User</th>
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Role</th>
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Actions</th>
+                <th className="px-6 py-4 text-[10px] font-bold text-gray-600 uppercase tracking-widest">User</th>
+                <th className="px-6 py-4 text-[10px] font-bold text-gray-600 uppercase tracking-widest">Role</th>
+                <th className="px-6 py-4 text-[10px] font-bold text-gray-600 uppercase tracking-widest">Status</th>
+                <th className="px-6 py-4 text-[10px] font-bold text-gray-600 uppercase tracking-widest text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
@@ -98,18 +98,18 @@ const Team = () => {
                 <tr key={member.id} className="hover:bg-slate-50/50 transition-colors">
                   <td className="px-6 py-5">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-slate-400 text-sm">
+                      <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-gray-600 text-sm">
                         {member.name.substring(0, 2).toUpperCase()}
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-sm font-bold text-slate-800">{member.name}</span>
-                        <span className="text-xs text-slate-400 font-medium">{member.email}</span>
+                        <span className="text-sm font-bold text-gray-800">{member.name}</span>
+                        <span className="text-xs text-gray-600 font-medium">{member.email}</span>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-5">
                     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${
-                      member.role === 'Owner' ? 'bg-blue-50 text-blue-600' : 'bg-slate-50 text-slate-600'
+                      member.role === 'Owner' ? 'bg-blue-50 text-blue-600' : 'bg-slate-50 text-gray-700'
                     }`}>
                       {member.role === 'Owner' && <Shield className="w-3 h-3" />}
                       {member.role}
@@ -122,7 +122,7 @@ const Team = () => {
                     </span>
                   </td>
                   <td className="px-6 py-5 text-right">
-                    <button className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-all">
+                    <button className="p-2 text-gray-600 hover:text-gray-700 hover:bg-slate-50 rounded-lg transition-all">
                       <MoreVertical className="w-4 h-4" />
                     </button>
                   </td>
@@ -146,19 +146,19 @@ const Team = () => {
               <div className="p-8 space-y-6">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <h2 className="text-xl font-bold text-slate-900">Invite Team Member</h2>
-                    <p className="text-xs text-slate-500 font-medium">Add a new collaborator to your project.</p>
+                    <h2 className="text-xl font-bold text-gray-800">Invite Team Member</h2>
+                    <p className="text-xs text-gray-700 font-medium">Add a new collaborator to your project.</p>
                   </div>
-                  <button onClick={() => setIsInviteModalOpen(false)} className="text-slate-400 hover:text-slate-600 font-bold p-1">
+                  <button onClick={() => setIsInviteModalOpen(false)} className="text-gray-600 hover:text-gray-700 font-bold p-1">
                     <X className="w-5 h-5" />
                   </button>
                 </div>
 
                 <form onSubmit={handleInvite} className="space-y-4">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Email Address</label>
+                    <label className="text-xs font-bold text-gray-700 uppercase tracking-widest">Email Address</label>
                     <div className="relative">
-                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
                       <input 
                         type="email" 
                         placeholder="colleague@company.com"
@@ -171,7 +171,7 @@ const Team = () => {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Assign Role</label>
+                    <label className="text-xs font-bold text-gray-700 uppercase tracking-widest">Assign Role</label>
                     <div className="grid grid-cols-2 gap-3">
                       {['Member', 'Admin'].map((role) => (
                         <button
@@ -181,7 +181,7 @@ const Team = () => {
                           className={`px-4 py-3 rounded-xl border text-sm font-bold transition-all ${
                             inviteRole === role 
                               ? 'border-blue-600 bg-blue-50 text-blue-600 ring-2 ring-blue-100' 
-                              : 'border-slate-200 text-slate-500 hover:bg-slate-50'
+                              : 'border-slate-200 text-gray-700 hover:bg-slate-50'
                           }`}
                         >
                           {role}
@@ -203,7 +203,7 @@ const Team = () => {
                         </>
                       )}
                     </button>
-                    <p className="text-[10px] text-center text-slate-400 font-medium px-4">
+                    <p className="text-[10px] text-center text-gray-600 font-medium px-4">
                       Team members will be able to view and manage projects based on their assigned role.
                     </p>
                   </div>

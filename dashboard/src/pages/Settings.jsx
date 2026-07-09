@@ -92,8 +92,8 @@ const Settings = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Account Settings</h1>
-        <p className="text-sm text-slate-500">Manage your profile, billing, and security preferences.</p>
+        <h1 className="text-2xl font-bold text-gray-800">Account Settings</h1>
+        <p className="text-sm text-gray-700">Manage your profile, billing, and security preferences.</p>
       </div>
 
       <div className="flex flex-col md:flex-row gap-8">
@@ -106,7 +106,7 @@ const Settings = () => {
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
                 activeTab === tab.id 
                   ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' 
-                  : 'text-slate-500 hover:bg-white hover:text-slate-900 border border-transparent hover:border-slate-200'
+                  : 'text-gray-700 hover:bg-white hover:text-gray-800 border border-transparent hover:border-slate-200'
               }`}
             >
               <tab.icon className="w-4 h-4" />
@@ -129,31 +129,31 @@ const Settings = () => {
                 <form onSubmit={handleProfileUpdate} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Full Name</label>
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-gray-600">Full Name</label>
                       <input 
                         type="text" 
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-100 transition-all font-medium text-slate-900"
+                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-100 transition-all font-medium text-gray-800"
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Email Address</label>
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-gray-600">Email Address</label>
                       <input 
                         type="email" 
                         defaultValue={user?.email}
                         disabled
-                        className="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm text-slate-500 font-medium cursor-not-allowed"
+                        className="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm text-gray-700 font-medium cursor-not-allowed"
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Phone Number</label>
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-gray-600">Phone Number</label>
                       <input 
                         type="text" 
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-100 transition-all font-medium text-slate-900"
+                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-100 transition-all font-medium text-gray-800"
                         required
                       />
                     </div>
@@ -180,25 +180,25 @@ const Settings = () => {
                 className="space-y-8"
               >
                 <form onSubmit={handlePasswordUpdate} className="space-y-6">
-                  <h3 className="text-lg font-bold text-slate-900">Change Password</h3>
+                  <h3 className="text-lg font-bold text-gray-800">Change Password</h3>
                   <div className="space-y-4 max-w-md">
                     <div className="space-y-2">
-                      <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Current Password</label>
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-gray-600">Current Password</label>
                       <input 
                         type="password" 
                         value={currentPassword}
                         onChange={(e) => setCurrentPassword(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-100 transition-all text-slate-900" 
+                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-100 transition-all text-gray-800" 
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">New Password</label>
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-gray-600">New Password</label>
                       <input 
                         type="password" 
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-100 transition-all text-slate-900" 
+                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-100 transition-all text-gray-800" 
                         required
                       />
                     </div>
@@ -216,8 +216,8 @@ const Settings = () => {
                 </form>
 
                 {/* <div className="pt-4 border-t border-slate-100">
-                  <h3 className="text-lg font-bold text-slate-900 mb-2">Two-Factor Authentication</h3>
-                  <p className="text-sm text-slate-500 font-medium mb-4">Add an extra layer of security to your account.</p>
+                  <h3 className="text-lg font-bold text-gray-800 mb-2">Two-Factor Authentication</h3>
+                  <p className="text-sm text-gray-700 font-medium mb-4">Add an extra layer of security to your account.</p>
                   <button className="px-4 py-2 border border-slate-200 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all">
                     Enable 2FA
                   </button>
@@ -251,15 +251,15 @@ const Settings = () => {
                 </div>
 
                 <div className="space-y-4">
-                  <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest text-[10px] text-slate-400">Recent Invoices</h3>
+                  <h3 className="text-sm font-bold text-gray-800 uppercase tracking-widest text-[10px] text-gray-600">Recent Invoices</h3>
                   {billingLoading ? (
-                    <div className="flex items-center gap-2 text-slate-400 py-4">
+                    <div className="flex items-center gap-2 text-gray-600 py-4">
                       <div className="w-4 h-4 border-2 border-slate-200 border-t-slate-400 rounded-full animate-spin" />
                       <span className="text-xs font-medium">Loading transactions...</span>
                     </div>
                   ) : invoices.length === 0 ? (
                     <div className="text-center py-8 border border-dashed border-slate-200 rounded-xl">
-                      <p className="text-xs text-slate-400 font-medium">No recent transactions found</p>
+                      <p className="text-xs text-gray-600 font-medium">No recent transactions found</p>
                     </div>
                   ) : (
                     <div className="border border-slate-100 rounded-xl divide-y divide-slate-50">
@@ -268,11 +268,11 @@ const Settings = () => {
                           <div className="flex items-center gap-3">
                             <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                             <div>
-                              <p className="text-sm font-bold text-slate-800 capitalize">{inv.planName || 'Subscription'} Plan</p>
-                              <p className="text-[10px] text-slate-400 font-medium">{new Date(inv.paidAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                              <p className="text-sm font-bold text-gray-800 capitalize">{inv.planName || 'Subscription'} Plan</p>
+                              <p className="text-[10px] text-gray-600 font-medium">{new Date(inv.paidAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}</p>
                             </div>
                           </div>
-                          <span className="text-sm font-bold text-slate-900">₹{Number(inv.amount).toFixed(2)}</span>
+                          <span className="text-sm font-bold text-gray-800">₹{Number(inv.amount).toFixed(2)}</span>
                         </div>
                       ))}
                     </div>

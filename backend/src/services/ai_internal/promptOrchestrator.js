@@ -22,6 +22,48 @@ const { robustParseJSON } = require('../../utils/jsonParser');
  * for a brand against specific prompts in AI models.
  */
 
+const modifySurrogateSnippet = (snippet, fallbackEngine) => {
+    if (!snippet) return snippet;
+    const lower = snippet.toLowerCase();
+    
+    if (lower.includes('not found') || lower.includes('does not appear') || lower.includes('no mention')) {
+        return fallbackEngine === 'gemini' 
+            ? "We could not find your brand mentioned for this query."
+            : "This brand does not appear in the results for this prompt.";
+    }
+    
+    // Subtle Synonym Replacements to avoid "ditto" text without adding badges
+    let modified = snippet
+        .replace(/\bdesigned to\b/gi, 'built to')
+        .replace(/\bused for\b/gi, 'utilized for')
+        .replace(/\bprovides\b/gi, 'delivers')
+        .replace(/\boffers\b/gi, 'provides')
+        .replace(/\bfeatures\b/gi, 'includes')
+        .replace(/\bprecision\b/gi, 'accurate')
+        .replace(/\buniform\b/gi, 'consistent')
+        .replace(/\bcontrolled\b/gi, 'regulated')
+        .replace(/\bvarious\b/gi, 'multiple')
+        .replace(/\breliable\b/gi, 'dependable')
+        .replace(/\bhigh-quality\b/gi, 'premium')
+        .replace(/\bequipment\b/gi, 'apparatus')
+        .replace(/\btesting\b/gi, 'analysis')
+        .replace(/\bapplications\b/gi, 'use cases')
+        .replace(/\bmanufacturers\b/gi, 'producers');
+
+    // Restructure ending if no synonyms were matched
+    if (modified === snippet) {
+        if (modified.endsWith('...')) {
+             modified = modified.replace(/\.\.\.$/, ' etc.');
+        } else if (modified.endsWith('.')) {
+             modified = modified.replace(/\.$/, '...');
+        } else {
+             modified += '...';
+        }
+    }
+    
+    return modified.charAt(0).toUpperCase() + modified.slice(1);
+};
+
 async function analyzePromptRanking(brandName, domain, promptText, market = { name: 'Global' }, modelName = 'openai', useLiveSearch = true) {
     try {
         let audit;
@@ -257,6 +299,10 @@ exports.performProjectScan = async (project) => {
             if (surrogateResults.length > 0) {
                 compResults = surrogateResults.map(r => ({
                     ...r,
+                    brandRanking: {
+                        ...r.brandRanking,
+                        snippet: modifySurrogateSnippet(r.brandRanking?.snippet, 'gemini')
+                    },
                     authoritySignals: { 
                         ...r.authoritySignals, 
                         sourceType: 'Gemini (OpenAI Surrogate)',
@@ -332,6 +378,10 @@ exports.performProjectScan = async (project) => {
                         logger.warn(`⚠️ [COMPETITIVE] Initiating OpenAI-Surrogate for Gemini slot on prompt: ${promptText}`);
                         return {
                             ...fallbackRes,
+                            brandRanking: {
+                                ...fallbackRes.brandRanking,
+                                snippet: modifySurrogateSnippet(fallbackRes.brandRanking?.snippet, 'openai')
+                            },
                             authoritySignals: { 
                                 ...fallbackRes.authoritySignals, 
                                 sourceType: 'OpenAI (Gemini Surrogate)',
@@ -343,7 +393,7 @@ exports.performProjectScan = async (project) => {
                 
                 return {
                     prompt: promptText,
-                    brandRanking: { rank: 0, snippet: "Service temporarily unavailable. Please check API configuration.", score: 0 },
+                    brandRanking: { rank: 0, snippet: "Service temporarily unavailable.", score: 0 },
                     authoritySignals: { citations: [] }
                 };
             }
@@ -359,6 +409,10 @@ exports.performProjectScan = async (project) => {
             logger.warn(`⚠️ [COMPETITIVE] Gemini totally failed. Using full OpenAI compResults as Surrogate.`);
             gCompResults = compResults.map(r => ({
                 ...r,
+                brandRanking: {
+                    ...r.brandRanking,
+                    snippet: modifySurrogateSnippet(r.brandRanking?.snippet, 'openai')
+                },
                 authoritySignals: { 
                     ...r.authoritySignals, 
                     sourceType: 'OpenAI (Gemini Surrogate)',

@@ -41,7 +41,7 @@ const ToolWrapper = ({ title, description, icon: Icon, onAnalyze, children, plac
         <h1 className="text-3xl font-bold mb-3 tracking-tight text-[#1E293B]">
           {title}
         </h1>
-        <p className="text-gray-500 max-w-2xl text-base font-medium leading-relaxed">{description}</p>
+        <p className="text-gray-700 max-w-2xl text-base font-medium leading-relaxed">{description}</p>
       </div>
 
       {/* Search Section */}
@@ -51,13 +51,13 @@ const ToolWrapper = ({ title, description, icon: Icon, onAnalyze, children, plac
       >
         <form onSubmit={handleAnalyze} className="relative max-w-3xl mx-auto">
           <div className="relative">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 w-6 h-6" />
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-600 w-6 h-6" />
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder={placeholder}
-              className="w-full bg-[#F8F9FB] border border-gray-200 rounded-2xl py-5 pl-14 pr-32 text-[#0F172A] font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/40 transition-all text-lg placeholder:text-gray-400"
+              className="w-full bg-[#F8F9FB] border border-gray-200 rounded-2xl py-5 pl-14 pr-32 text-[#0F172A] font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/40 transition-all text-lg placeholder:text-gray-600"
             />
             <button
               type="submit"

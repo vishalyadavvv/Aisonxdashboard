@@ -29,10 +29,10 @@ class ErrorBoundary extends Component {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M12 3a9 9 0 110 18A9 9 0 0112 3z" />
               </svg>
             </div>
-            <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">
+            <h2 className="text-xl font-black text-gray-800 uppercase tracking-tight mb-2">
               Something went wrong
             </h2>
-            <p className="text-sm text-slate-500 font-medium mb-6 leading-relaxed">
+            <p className="text-sm text-gray-700 font-medium mb-6 leading-relaxed">
               An unexpected error occurred. Your data is safe — please refresh the page to continue.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">

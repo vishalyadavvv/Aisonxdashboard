@@ -76,7 +76,7 @@ const AdminScans = () => {
       case 'Web Search Report':
         return 'bg-indigo-50 text-indigo-600 border-indigo-100';
       default:
-        return 'bg-slate-50 text-slate-600 border-slate-100';
+        return 'bg-slate-50 text-gray-700 border-slate-100';
     }
   };
 
@@ -159,11 +159,11 @@ const AdminScans = () => {
       {/* Header Deck */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
             <Terminal className="w-7 h-7 text-indigo-600" />
             Audit Log & Scan Explorer
           </h1>
-          <p className="text-sm text-slate-500 font-medium mt-1">
+          <p className="text-sm text-gray-700 font-medium mt-1">
             Monitor and track real-time visibility crawls, LLM search executions, and readiness scoring.
           </p>
         </div>
@@ -171,7 +171,7 @@ const AdminScans = () => {
           <button 
             onClick={() => fetchLogs(true, currentPage)}
             disabled={isRefreshing}
-            className="px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl text-xs font-bold text-slate-600 transition-all flex items-center gap-2 disabled:opacity-50"
+            className="px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl text-xs font-bold text-gray-700 transition-all flex items-center gap-2 disabled:opacity-50"
           >
             {isRefreshing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Refresh Stream'}
           </button>
@@ -190,7 +190,7 @@ const AdminScans = () => {
         
         {/* Search */}
         <div className="relative w-full lg:w-96">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4" />
           <input 
             type="text"
             value={searchTerm}
@@ -209,7 +209,7 @@ const AdminScans = () => {
               className={`px-4 py-2.5 rounded-xl text-xs font-bold border transition-all shrink-0 ${
                 activeFilter === type
                   ? 'bg-slate-900 border-slate-950 text-white shadow-lg'
-                  : 'bg-slate-50 border-slate-100 text-slate-500 hover:bg-slate-100'
+                  : 'bg-slate-50 border-slate-100 text-gray-700 hover:bg-slate-100'
               }`}
             >
               {type}
@@ -223,7 +223,7 @@ const AdminScans = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50/50">
+              <tr className="border-b border-slate-100 text-[10px] font-bold text-gray-600 uppercase tracking-widest bg-slate-50/50">
                 <th className="py-4 px-6">Tool / Scan Type</th>
                 <th className="py-4 px-6">User Account</th>
                 <th className="py-4 px-6">Target Brand / Domain</th>
@@ -270,12 +270,12 @@ const AdminScans = () => {
                     {/* User */}
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-[10px] text-slate-600 uppercase">
+                        <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-[10px] text-gray-700 uppercase">
                           {log.user?.name ? log.user.name.substring(0, 2) : 'SY'}
                         </div>
                         <div className="flex flex-col">
-                          <span className="text-sm font-bold text-slate-800">{log.user?.name || 'System'}</span>
-                          <span className="text-[10px] font-medium text-slate-400">{log.user?.email || 'automated'}</span>
+                          <span className="text-sm font-bold text-gray-800">{log.user?.name || 'System'}</span>
+                          <span className="text-[10px] font-medium text-gray-600">{log.user?.email || 'automated'}</span>
                         </div>
                       </div>
                     </td>
@@ -286,7 +286,7 @@ const AdminScans = () => {
                     </td>
 
                     {/* Context Meta */}
-                    <td className="py-4 px-6 text-xs text-slate-500 font-medium max-w-md break-words">
+                    <td className="py-4 px-6 text-xs text-gray-700 font-medium max-w-md break-words">
                       {log.meta || 'N/A'}
                     </td>
 
@@ -295,7 +295,7 @@ const AdminScans = () => {
                       {typeof log.score === 'number' && log.score >= 0 ? (
                         <div className="flex items-center gap-2">
                           <span className={`w-1.5 h-1.5 rounded-full ${log.score >= 70 ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
-                          <span className="text-xs font-extrabold text-slate-800">{log.score}%</span>
+                          <span className="text-xs font-extrabold text-gray-800">{log.score}%</span>
                         </div>
                       ) : (
                         <span className="text-xs text-slate-300 font-medium">—</span>
@@ -303,7 +303,7 @@ const AdminScans = () => {
                     </td>
 
                     {/* Execution Date */}
-                    <td className="py-4 px-6 text-right text-xs font-semibold text-slate-400 font-mono">
+                    <td className="py-4 px-6 text-right text-xs font-semibold text-gray-600 font-mono">
                       {new Date(log.createdAt).toLocaleDateString(undefined, { 
                         month: 'short', 
                         day: 'numeric', 
@@ -321,7 +321,7 @@ const AdminScans = () => {
                 <tr>
                   <td colSpan={6} className="py-12 text-center space-y-3">
                     <AlertCircle className="w-8 h-8 mx-auto text-slate-300" />
-                    <p className="text-sm font-medium text-slate-400">
+                    <p className="text-sm font-medium text-gray-600">
                       No matching platform scan logs found in this query scope.
                     </p>
                   </td>
@@ -334,11 +334,11 @@ const AdminScans = () => {
         {/* Pagination Deck */}
         <div className="flex items-center justify-between border-t border-slate-100 bg-white px-6 py-4 rounded-b-2xl shadow-sm border border-slate-100/50">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">
-              Showing <span className="text-slate-800 font-extrabold">{filteredLogs.length}</span> logs
+            <span className="text-xs text-gray-700 font-bold uppercase tracking-wider">
+              Showing <span className="text-gray-800 font-extrabold">{filteredLogs.length}</span> logs
             </span>
             <span className="text-slate-200">|</span>
-            <span className="text-xs text-slate-400 font-semibold">
+            <span className="text-xs text-gray-600 font-semibold">
               Total logs: {totalLogs}
             </span>
           </div>
@@ -350,7 +350,7 @@ const AdminScans = () => {
             >
               Previous
             </button>
-            <div className="px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-lg text-xs font-black text-slate-600 uppercase tracking-widest min-w-[80px] text-center">
+            <div className="px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-lg text-xs font-black text-gray-700 uppercase tracking-widest min-w-[80px] text-center">
               Page {currentPage} of {totalPages}
             </div>
             <button

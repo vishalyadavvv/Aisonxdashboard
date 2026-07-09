@@ -90,7 +90,7 @@ const ForgotPassword = () => {
                 </div>
                 <div>
                   <h3 className="text-white font-semibold text-sm mb-1">Need immediate help?</h3>
-                  <p className="text-gray-400 text-xs">
+                  <p className="text-gray-600 text-xs">
                     Contact our support team at{" "}
                     <a href="mailto:contact@dgtlmart.com" className="text-blue-400 underline">
                       contact@dgtlmart.com
@@ -118,10 +118,10 @@ const ForgotPassword = () => {
                 <div className="flex justify-center mb-6">
                   <img src="https://res.cloudinary.com/dbbll23jz/image/upload/v1777897134/AISONX_Logo_Final_rzzvfr.png" className="h-16 w-auto object-contain" alt="AISONX Logo" />
                 </div>
-                <h2 className="text-xl font-bold text-gray-900 mb-1">
+                <h2 className="text-xl font-bold text-gray-800 mb-1">
                   {isSent ? 'Check Your Email' : 'Reset Password'}
                 </h2>
-                <p className="text-gray-500 text-sm">
+                <p className="text-gray-700 text-sm">
                   {isSent
                     ? `We've sent a reset link to ${email}`
                     : 'Enter your email to receive a reset link'}
@@ -150,15 +150,15 @@ const ForgotPassword = () => {
                     className="space-y-3"
                   >
                     <div className="space-y-1">
-                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1">
+                      <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider ml-1">
                         Email Address
                       </label>
                       <div className="relative">
-                        <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4" />
                         <input
                           type="email"
                           required
-                          className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 transition-all text-sm"
+                          className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-gray-800 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 transition-all text-sm"
                           placeholder="name@company.com"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
@@ -221,7 +221,7 @@ const ForgotPassword = () => {
               <div className="mt-4 pt-4 border-t border-gray-100 text-center">
                 <Link
                   to="/login"
-                  className="inline-flex items-center justify-center gap-2 text-gray-500 text-sm font-medium hover:text-blue-500 transition-colors group"
+                  className="inline-flex items-center justify-center gap-2 text-gray-700 text-sm font-medium hover:text-blue-500 transition-colors group"
                 >
                   <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                   Back to login
@@ -229,7 +229,7 @@ const ForgotPassword = () => {
               </div>
 
               {/* Trust Badges */}
-              <div className="mt-3 flex justify-center items-center gap-3 text-xs text-gray-400">
+              <div className="mt-3 flex justify-center items-center gap-3 text-xs text-gray-600">
                 <div className="flex items-center gap-1">
                   <ShieldCheck className="w-3 h-3" />
                   <span>Secure Reset</span>

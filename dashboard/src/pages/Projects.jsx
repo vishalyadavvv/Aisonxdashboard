@@ -250,8 +250,8 @@ const Projects = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Projects</h1>
-            <p className="text-sm text-slate-500 font-medium mt-1">Manage and monitor your brand visibility projects</p>
+            <h1 className="text-2xl font-bold text-gray-800">Projects</h1>
+            <p className="text-sm text-gray-700 font-medium mt-1">Manage and monitor your brand visibility projects</p>
           </div>
           
           <div className="flex flex-col items-end">
@@ -274,13 +274,13 @@ const Projects = () => {
         {/* Search Bar */}
         <div className="mb-6">
           <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
             <input
               type="text"
               placeholder="Search projects..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-900 outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all shadow-sm"
+              className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-gray-800 outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all shadow-sm"
             />
           </div>
         </div>
@@ -289,7 +289,7 @@ const Projects = () => {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <Loader2 className="w-8 h-8 text-blue-600 animate-spin mb-4" />
-            <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Loading your projects...</p>
+            <p className="text-xs text-gray-600 font-bold uppercase tracking-widest">Loading your projects...</p>
           </div>
         ) : showOnboardingHero ? (
           <motion.div 
@@ -306,11 +306,11 @@ const Projects = () => {
                 <img src="https://res.cloudinary.com/dbbll23jz/image/upload/v1777897134/AISONX_Logo_Final_rzzvfr.png" className="w-full h-full object-contain" alt="AISONX Logo" />
               </div>
               
-              <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4 tracking-tight leading-tight">
+              <h2 className="text-3xl md:text-4xl font-black text-gray-800 mb-4 tracking-tight leading-tight">
                 Unlock Your Brand's <span className="text-blue-600">AI Visibility</span>
               </h2>
               
-              <p className="text-lg text-slate-600 font-medium mb-10 leading-relaxed">
+              <p className="text-lg text-gray-700 font-medium mb-10 leading-relaxed">
                 Welcome to AIsonx. Get started by creating your first project to monitor how AI models like ChatGPT and Gemini perceive your brand across the web.
               </p>
 
@@ -326,7 +326,7 @@ const Projects = () => {
                 {!hasActivePlan && (
                   <button 
                     onClick={() => navigate('/dashboard/pricing')}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 bg-white text-slate-900 text-base font-black rounded-2xl border-2 border-slate-100 hover:bg-slate-50 transition-all hover:scale-105 active:scale-95"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 bg-white text-gray-800 text-base font-black rounded-2xl border-2 border-slate-100 hover:bg-slate-50 transition-all hover:scale-105 active:scale-95"
                   >
                     <Zap className="w-5 h-5 text-blue-600 fill-blue-600" />
                     {user?.subscription?.trialUsed ? 'Upgrade Plan' : 'Start Free Trial'}
@@ -337,15 +337,15 @@ const Projects = () => {
               <div className="mt-12 pt-8 border-t border-slate-100 flex flex-wrap justify-center gap-8 md:gap-12">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                  <span className="text-sm font-bold text-slate-500 uppercase tracking-widest">Multi-Model Audit</span>
+                  <span className="text-sm font-bold text-gray-700 uppercase tracking-widest">Multi-Model Audit</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                  <span className="text-sm font-bold text-slate-500 uppercase tracking-widest">Live Search Tracking</span>
+                  <span className="text-sm font-bold text-gray-700 uppercase tracking-widest">Live Search Tracking</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                  <span className="text-sm font-bold text-slate-500 uppercase tracking-widest">Market Context</span>
+                  <span className="text-sm font-bold text-gray-700 uppercase tracking-widest">Market Context</span>
                 </div>
               </div>
             </div>
@@ -353,13 +353,13 @@ const Projects = () => {
         ) : filteredProjects.length === 0 ? (
           <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center shadow-sm">
             <Folder className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-lg font-black text-slate-900 mb-2 uppercase tracking-tight">No results matched</h3>
-            <p className="text-sm text-slate-500 font-bold mb-6">
+            <h3 className="text-lg font-black text-gray-800 mb-2 uppercase tracking-tight">No results matched</h3>
+            <p className="text-sm text-gray-700 font-bold mb-6">
               Try adjusting your search term to find what you're looking for.
             </p>
             <button 
               onClick={() => setSearchTerm('')}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-600 text-sm font-bold rounded-lg hover:bg-slate-200 transition-all"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 text-gray-700 text-sm font-bold rounded-lg hover:bg-slate-200 transition-all"
             >
               Clear Search
             </button>
@@ -381,14 +381,14 @@ const Projects = () => {
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3 min-w-0 flex-1">
                       <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center shrink-0">
-                        <Globe className="w-5 h-5 text-slate-600" />
+                        <Globe className="w-5 h-5 text-gray-700" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <h3 className="font-bold text-slate-900 text-base group-hover:text-blue-600 transition-colors truncate" title={project.name}>{project.name}</h3>
+                        <h3 className="font-bold text-gray-800 text-base group-hover:text-blue-600 transition-colors truncate" title={project.name}>{project.name}</h3>
                         <div className="flex items-center gap-2 mt-0.5">
                           <div className="flex items-center gap-1 min-w-0">
-                            <Building2 className="w-3 h-3 text-slate-400 shrink-0" />
-                            <span className="text-xs text-slate-500 font-medium uppercase tracking-tight truncate">{project.brandName}</span>
+                            <Building2 className="w-3 h-3 text-gray-600 shrink-0" />
+                            <span className="text-xs text-gray-700 font-medium uppercase tracking-tight truncate">{project.brandName}</span>
                           </div>
                           {project.competitors?.length > 0 && (
                             <span className="px-1.5 py-0.5 bg-blue-50 text-blue-600 text-[8px] font-black rounded-full uppercase tracking-widest border border-blue-100 shrink-0">
@@ -413,11 +413,11 @@ const Projects = () => {
                             />
                           </svg>
                           <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="text-[10px] font-black text-slate-900">{(project.latestScore || 0)}%</span>
+                            <span className="text-[10px] font-black text-gray-800">{(project.latestScore || 0)}%</span>
                           </div>
                         </div>
                         <div className="text-left hidden sm:block">
-                          <div className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none">
+                          <div className="text-[8px] font-black text-gray-600 uppercase tracking-widest leading-none">
                             GEO INDEX
                           </div>
                         </div>
@@ -432,7 +432,7 @@ const Projects = () => {
                           }}
                           className="p-1 hover:bg-slate-50 rounded transition-colors"
                         >
-                          <MoreHorizontal className="w-4 h-4 text-slate-400 hover:text-slate-600" />
+                          <MoreHorizontal className="w-4 h-4 text-gray-600 hover:text-gray-700" />
                         </button>
                         
                         {activeMenu === project._id && (
@@ -472,8 +472,8 @@ const Projects = () => {
 
                   {/* Engine Favorability & Domain */}
                   <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2 text-xs text-slate-600 font-medium">
-                      <Globe className="w-3 h-3 text-slate-400" />
+                    <div className="flex items-center gap-2 text-xs text-gray-700 font-medium">
+                      <Globe className="w-3 h-3 text-gray-600" />
                       <span className="truncate max-w-[200px]">{project.domain}</span>
                     </div>
                     <div className="flex items-center gap-2 px-2 py-1 bg-slate-50 rounded-lg border border-slate-100">
@@ -491,20 +491,20 @@ const Projects = () => {
                   {project.prompts && project.prompts.length > 0 && (
                     <div className="mb-4">
                       <div className="flex items-center gap-1 mb-2">
-                        <Hash className="w-3 h-3 text-slate-400" />
-                        <span className="text-xs text-slate-500 font-bold uppercase tracking-tight">Prompts</span>
+                        <Hash className="w-3 h-3 text-gray-600" />
+                        <span className="text-xs text-gray-700 font-bold uppercase tracking-tight">Prompts</span>
                       </div>
                       <div className="flex flex-wrap gap-1">
                         {project.prompts.slice(0, 2).map((promptText, idx) => (
                           <span
                             key={idx}
-                            className="px-2 py-0.5 bg-slate-50 border border-slate-100 text-slate-600 text-[10px] font-semibold rounded"
+                            className="px-2 py-0.5 bg-slate-50 border border-slate-100 text-gray-700 text-[10px] font-semibold rounded"
                           >
                             {promptText.length > 20 ? promptText.substring(0, 20) + '...' : promptText}
                           </span>
                         ))}
                         {project.prompts.length > 2 && (
-                          <span className="px-2 py-0.5 bg-slate-50 border border-slate-100 text-slate-400 text-[10px] font-semibold rounded">
+                          <span className="px-2 py-0.5 bg-slate-50 border border-slate-100 text-gray-600 text-[10px] font-semibold rounded">
                             +{project.prompts.length - 2}
                           </span>
                         )}
@@ -514,7 +514,7 @@ const Projects = () => {
 
                   {/* Footer */}
                   <div className="flex items-center justify-between pt-3 border-t border-slate-50">
-                    <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
+                    <div className="flex items-center gap-1.5 text-xs text-gray-600 font-medium">
                       <Clock className="w-3 h-3" />
                       <span>
                         {project.lastScanAt 
@@ -547,13 +547,13 @@ const Projects = () => {
                   <h3 className={`${stat.isTierCard ? 'text-xl capitalize' : 'text-2xl'} font-bold tracking-tight ${stat.highlight ? 'text-blue-600' : 'text-[#1E293B]'}`}>
                     {stat.value}
                   </h3>
-                  {stat.total && <span className="text-gray-400 font-semibold text-sm">/ {stat.total}</span>}
+                  {stat.total && <span className="text-gray-600 font-semibold text-sm">/ {stat.total}</span>}
                 </div>
                 {stat.details && (
                   <div className="flex gap-3 mt-2 border-t border-gray-100 pt-2">
                     {stat.details.map((d, idx) => (
                       <div key={idx} className="flex flex-col">
-                        <span className="text-[9px] text-gray-400 uppercase font-semibold">{d.label}</span>
+                        <span className="text-[9px] text-gray-600 uppercase font-semibold">{d.label}</span>
                         <span className="text-xs font-bold text-gray-700">{d.value}</span>
                       </div>
                     ))}
@@ -585,12 +585,12 @@ const Projects = () => {
                 <div className="p-6 border-b border-gray-100">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h2 className="text-xl font-bold text-slate-900 uppercase tracking-tight">Create Project</h2>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Define brand & localization</p>
+                      <h2 className="text-xl font-bold text-gray-800 uppercase tracking-tight">Create Project</h2>
+                      <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest mt-0.5">Define brand & localization</p>
                     </div>
                     <button
                       onClick={() => setIsModalOpen(false)}
-                      className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-all"
+                      className="p-2 text-gray-600 hover:text-gray-700 hover:bg-slate-50 rounded-full transition-all"
                     >
                       <X className="w-5 h-5" />
                     </button>
@@ -600,7 +600,7 @@ const Projects = () => {
                 <div className="flex-1 overflow-y-auto p-6 pt-2 custom-scrollbar">
                   <form onSubmit={handleCreateProject} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
+                      <label className="block text-[10px] font-bold text-gray-700 uppercase tracking-widest mb-1.5">
                         Project Name
                       </label>
                       <input
@@ -609,12 +609,12 @@ const Projects = () => {
                         placeholder="e.g. Nike Performance"
                         value={newProject.name}
                         onChange={(e) => setNewProject({...newProject, name: e.target.value})}
-                        className="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-50 transition-all outline-none"
+                        className="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl text-sm font-medium text-gray-800 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-50 transition-all outline-none"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
+                      <label className="block text-[10px] font-bold text-gray-700 uppercase tracking-widest mb-1.5">
                         Brand Name
                       </label>
                       <input
@@ -623,12 +623,12 @@ const Projects = () => {
                         placeholder="e.g. Nike"
                         value={newProject.brandName}
                         onChange={(e) => setNewProject({...newProject, brandName: e.target.value})}
-                        className="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-50 transition-all outline-none"
+                        className="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl text-sm font-medium text-gray-800 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-50 transition-all outline-none"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
+                      <label className="block text-[10px] font-bold text-gray-700 uppercase tracking-widest mb-1.5">
                         Domain / Website
                       </label>
                       <input
@@ -637,12 +637,12 @@ const Projects = () => {
                         placeholder="e.g. nike.in"
                         value={newProject.domain}
                         onChange={(e) => setNewProject({...newProject, domain: e.target.value})}
-                        className="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-50 transition-all outline-none"
+                        className="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl text-sm font-medium text-gray-800 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-50 transition-all outline-none"
                       />
                     </div>
 
                     <div className="space-y-4 pt-2 border-t border-gray-50 mt-2 md:col-span-2">
-                       <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                       <label className="block text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-1">
                         Market Selection Strategy
                       </label>
                       
@@ -653,7 +653,7 @@ const Projects = () => {
                             setMarketType('country');
                             setNewProject({ ...newProject, market: markets.find(m => m.type === 'country') });
                           }}
-                          className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all ${marketType === 'country' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                          className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all ${marketType === 'country' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-700'}`}
                         >
                           Specific Country
                         </button>
@@ -663,14 +663,14 @@ const Projects = () => {
                             setMarketType('region');
                             setNewProject({ ...newProject, market: markets.find(m => m.type === 'region') });
                           }}
-                          className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all ${marketType === 'region' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                          className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all ${marketType === 'region' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-700'}`}
                         >
                           Region
                         </button>
                       </div>
 
                       <div className="space-y-2">
-                        <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest flex justify-between">
+                        <label className="block text-[10px] font-bold text-gray-700 uppercase tracking-widest flex justify-between">
                           <span>{marketType === 'region' ? 'Select Region' : 'Select Country'}</span>
                           <span className="text-blue-500 lowercase font-medium">{newProject.market?.name}</span>
                         </label>
@@ -681,7 +681,7 @@ const Projects = () => {
                               const market = markets.find(m => m.code === e.target.value);
                               setNewProject({ ...newProject, market });
                             }}
-                            className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:border-blue-400 focus:ring-4 focus:ring-blue-50 transition-all outline-none appearance-none cursor-pointer"
+                            className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-gray-800 focus:border-blue-400 focus:ring-4 focus:ring-blue-50 transition-all outline-none appearance-none cursor-pointer"
                           >
                             {marketType === 'region' ? (
                               markets.filter(m => m.type === 'region').map(m => (
@@ -693,16 +693,16 @@ const Projects = () => {
                               ))
                             )}
                           </select>
-                          <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none rotate-90" />
+                          <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 pointer-events-none rotate-90" />
                         </div>
-                        <p className="text-[10px] text-slate-400 font-medium italic">
+                        <p className="text-[10px] text-gray-600 font-medium italic">
                           {newProject.market?.context || 'AI results will be tailored for this market.'}
                         </p>
                       </div>
                     </div>
 
                     <div className="space-y-2 md:col-span-2">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center justify-between">
+                      <label className="text-[10px] font-bold text-gray-600 uppercase tracking-widest flex items-center justify-between">
                         <span>Audit Prompts</span>
                         <span className="text-blue-600">
                           Max: {user?.subscription?.tier === 'professional' ? 25 : user?.subscription?.tier === 'growth' ? 10 : 2}
@@ -724,29 +724,29 @@ const Projects = () => {
                           setNewProject({...newProject, prompts: val});
                         }}
                       />
-                      <p className="text-[10px] text-slate-400 font-medium mt-1.5">Separate multiple prompts with commas</p>
+                      <p className="text-[10px] text-gray-600 font-medium mt-1.5">Separate multiple prompts with commas</p>
                     </div>
 
                     <div className="space-y-2 md:col-span-2">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center justify-between">
+                      <label className="text-[10px] font-bold text-gray-600 uppercase tracking-widest flex items-center justify-between">
                         <span>Competitors (Optional)</span>
-                        <span className="text-xs normal-case font-medium text-slate-500">Leave blank for AI discovery</span>
+                        <span className="text-xs normal-case font-medium text-gray-700">Leave blank for AI discovery</span>
                       </label>
                       <input
                         type="text"
                         placeholder="e.g. competitor1.com, competitor2.com"
                         value={newProject.competitors}
                         onChange={(e) => setNewProject({...newProject, competitors: e.target.value})}
-                        className="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-50 transition-all outline-none"
+                        className="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl text-sm font-medium text-gray-800 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-50 transition-all outline-none"
                       />
-                      <p className="text-[10px] text-slate-400 font-medium mt-1.5">Domains separated by commas</p>
+                      <p className="text-[10px] text-gray-600 font-medium mt-1.5">Domains separated by commas</p>
                     </div>
 
                     <div className="flex gap-3 pt-6 md:col-span-2">
                       <button
                         type="button"
                         onClick={() => setIsModalOpen(false)}
-                        className="flex-1 px-4 py-2 text-sm font-bold text-slate-500 bg-slate-100 rounded-xl hover:bg-slate-200 transition-all"
+                        className="flex-1 px-4 py-2 text-sm font-bold text-gray-700 bg-slate-100 rounded-xl hover:bg-slate-200 transition-all"
                       >
                         Cancel
                       </button>

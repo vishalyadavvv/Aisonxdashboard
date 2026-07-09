@@ -138,8 +138,7 @@ const ProjectDetail = () => {
     setIsExporting(true);
     const toastId = toast.loading('Generating comprehensive intelligence report...');
     try {
-      // Small delay to ensure template is ready
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Allow downloadPDF to handle its own fonts/rendering delays synchronously within the gesture window
       await downloadPDF('project-detail-pdf-template', `${project?.name || 'Project'}_Full_Report`);
       toast.success('Report downloaded successfully!', { id: toastId });
     } catch (err) {
@@ -267,8 +266,8 @@ const ProjectDetail = () => {
           <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
           <div className="absolute inset-0 bg-blue-500/20 rounded-3xl animate-ping opacity-20" />
        </div>
-       <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter mb-2">Synchronizing Intelligence</h2>
-       <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Syncing live nodes for your project...</p>
+       <h2 className="text-xl font-black text-gray-800 uppercase tracking-tighter mb-2">Synchronizing Intelligence</h2>
+       <p className="text-gray-600 font-bold uppercase tracking-widest text-[10px]">Syncing live nodes for your project...</p>
     </div>
   );
 
@@ -307,25 +306,25 @@ const ProjectDetail = () => {
         
         {/* Breadcrumbs & Actions */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-sm text-slate-500 font-medium overflow-x-auto whitespace-nowrap pb-2 md:pb-0">
+          <div className="flex items-center gap-2 text-sm text-gray-700 font-medium overflow-x-auto whitespace-nowrap pb-2 md:pb-0">
             <span className="hover:text-blue-600 transition-colors cursor-pointer" onClick={() => navigate('/dashboard/projects')}>Dashboard</span>
             <span>&gt;</span>
             <span className="hover:text-blue-600 transition-colors cursor-pointer">{project?.domain || 'Loading...'}</span>
             <span>&gt;</span>
-            <span className="text-slate-900 font-semibold underline underline-offset-4 decoration-blue-500/30">Analytics</span>
+            <span className="text-gray-800 font-semibold underline underline-offset-4 decoration-blue-500/30">Analytics</span>
           </div>
           
           <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
             <div className="flex bg-white border border-slate-200 rounded-xl p-1 shadow-sm w-full sm:w-auto justify-center">
               <button 
                 onClick={() => setActiveMainTab('overview')}
-                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex-1 sm:flex-none ${activeMainTab === 'overview' ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'text-slate-500 hover:text-slate-700'}`}
+                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex-1 sm:flex-none ${activeMainTab === 'overview' ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'text-gray-700 hover:text-slate-700'}`}
               >
                 Overview
               </button>
               <button 
                 onClick={() => setActiveMainTab('competitors')}
-                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex-1 sm:flex-none ${activeMainTab === 'competitors' ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'text-slate-500 hover:text-slate-700'}`}
+                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex-1 sm:flex-none ${activeMainTab === 'competitors' ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'text-gray-700 hover:text-slate-700'}`}
               >
                 Competitors
               </button>
@@ -383,23 +382,23 @@ const ProjectDetail = () => {
         {/* Title Section */}
         <div className="space-y-4">
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-slate-900">Dashboard Overview</h1>
-            <Info className="w-4 h-4 text-slate-400" />
+            <h1 className="text-2xl font-bold text-gray-800">Dashboard Overview</h1>
+            <Info className="w-4 h-4 text-gray-600" />
           </div>
           
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-xs font-bold ring-1 ring-emerald-100">
               {history.length > 0 ? 'Live data' : 'Pending Scan'}
             </div>
-            <div className="text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-1 rounded-full flex items-center gap-1.5">
-              <Globe className="w-3 h-3 text-slate-400" />
+            <div className="text-xs font-semibold text-gray-700 bg-slate-100 px-3 py-1 rounded-full flex items-center gap-1.5">
+              <Globe className="w-3 h-3 text-gray-600" />
               {project?.market?.name || 'Global Market'}
             </div>
-            <div className="text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-1 rounded-full">
+            <div className="text-xs font-semibold text-gray-700 bg-slate-100 px-3 py-1 rounded-full">
               {project?.prompts?.length || 0} prompts
             </div>
-            <div className="text-xs font-medium text-slate-500">
-              Last update <span className="text-slate-900 font-bold">{project?.lastScanAt ? new Date(project?.lastScanAt).toLocaleDateString() : 'Never'}</span>
+            <div className="text-xs font-medium text-gray-700">
+              Last update <span className="text-gray-800 font-bold">{project?.lastScanAt ? new Date(project?.lastScanAt).toLocaleDateString() : 'Never'}</span>
             </div>
           </div>
         </div>
@@ -408,7 +407,7 @@ const ProjectDetail = () => {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-4 py-2 h-10 shadow-sm">
-              <Globe className="w-4 h-4 text-slate-400" />
+              <Globe className="w-4 h-4 text-gray-600" />
               <select 
                 value={selectedEngine}
                 onChange={(e) => setSelectedEngine(e.target.value)}
@@ -422,7 +421,7 @@ const ProjectDetail = () => {
           </div>
           
           {activeMainTab === 'overview' && (
-            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
+            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-600">
               <Activity className="w-3.5 h-3.5" />
               Real-time Analysis Mode
             </div>
@@ -440,7 +439,7 @@ const ProjectDetail = () => {
                 className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4"
               >
                 <div className="flex items-center justify-between">
-                  <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
+                  <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-700 flex items-center gap-1.5">
                     Overall GEO Score
                     <Info className="w-3 h-3 text-slate-300" />
                   </h3>
@@ -464,12 +463,12 @@ const ProjectDetail = () => {
                       />
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <span className="text-2xl font-black text-slate-900 leading-none tracking-tight">{stats.overallScore}%</span>
-                      <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1">Health</span>
+                      <span className="text-2xl font-black text-gray-800 leading-none tracking-tight">{stats.overallScore}%</span>
+                      <span className="text-[8px] font-black text-gray-600 uppercase tracking-widest mt-1">Health</span>
                     </div>
                   </div>
                   <div className="w-full h-24 bg-slate-50/80 border border-slate-100 rounded-xl p-3 flex flex-col items-center justify-center text-center">
-                    <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest leading-tight">True Search<br/>Visibility</span>
+                    <span className="text-[9px] font-black text-gray-700 uppercase tracking-widest leading-tight">True Search<br/>Visibility</span>
                     <span className="text-2xl font-black text-blue-600 leading-none mt-2">{stats.rawVisibility}%</span>
                   </div>
                 </div>
@@ -482,7 +481,7 @@ const ProjectDetail = () => {
                 className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4"
               >
                 <div className="flex items-center justify-between">
-                  <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
+                  <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-700 flex items-center gap-1.5">
                     Engine Breakdown
                     <Info className="w-3 h-3 text-slate-300" />
                   </h3>
@@ -508,8 +507,8 @@ const ProjectDetail = () => {
                     return (
                       <div key={engine.name} className="space-y-1">
                         <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider">
-                          <span className="text-slate-500">{engine.name}</span>
-                          <span className="text-slate-900">{score}%</span>
+                          <span className="text-gray-700">{engine.name}</span>
+                          <span className="text-gray-800">{score}%</span>
                         </div>
                         <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                           <motion.div 
@@ -531,7 +530,7 @@ const ProjectDetail = () => {
                 className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4"
               >
                 <div className="flex items-center justify-between">
-                  <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
+                  <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-700 flex items-center gap-1.5">
                     Visibility Detail
                     <Info className="w-3 h-3 text-slate-300" />
                   </h3>
@@ -539,15 +538,15 @@ const ProjectDetail = () => {
                 <div className="space-y-6">
                   <div>
                     <div className="flex items-baseline gap-2">
-                      <span className="text-2xl font-bold text-slate-900">{stats.mention}%</span>
-                      <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">MENTION</span>
+                      <span className="text-2xl font-bold text-gray-800">{stats.mention}%</span>
+                      <span className="text-[8px] font-black text-gray-600 uppercase tracking-widest">MENTION</span>
                     </div>
                     <div className="h-px bg-slate-100 mt-2" />
                   </div>
                   <div>
                     <div className="flex items-baseline gap-2">
-                      <span className="text-2xl font-bold text-slate-900">{stats.link}%</span>
-                      <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">LINK</span>
+                      <span className="text-2xl font-bold text-gray-800">{stats.link}%</span>
+                      <span className="text-[8px] font-black text-gray-600 uppercase tracking-widest">LINK</span>
                     </div>
                   </div>
                 </div>
@@ -560,16 +559,16 @@ const ProjectDetail = () => {
                 className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4"
               >
                 <div className="flex items-center justify-between">
-                  <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
+                  <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-700 flex items-center gap-1.5">
                     Sources Web-Grounding
                     <Info className="w-3 h-3 text-slate-300" />
                   </h3>
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-baseline gap-3">
-                    <span className="text-3xl font-bold text-slate-900">{stats.sources}%</span>
+                    <span className="text-3xl font-bold text-gray-800">{stats.sources}%</span>
                   </div>
-                  <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider leading-tight">Grounded on web evidence</p>
+                  <p className="text-[9px] text-gray-600 font-bold uppercase tracking-wider leading-tight">Grounded on web evidence</p>
                   
                   <div className="h-16 w-full bg-slate-50 relative overflow-hidden rounded-xl border border-slate-100/50 mt-2">
                     <svg className="absolute bottom-0 left-0 w-full h-12" preserveAspectRatio="none" viewBox="0 0 100 40">
@@ -588,7 +587,7 @@ const ProjectDetail = () => {
                   <button 
                     onClick={() => setActiveTab('score')}
                     className={`px-6 py-4 text-[10px] font-black uppercase tracking-widest transition-all border-b-2 ${
-                      activeTab === 'score' || activeTab === 'mention' ? 'border-blue-600 text-black' : 'border-transparent text-slate-900 hover:text-blue-600'
+                      activeTab === 'score' || activeTab === 'mention' ? 'border-blue-600 text-black' : 'border-transparent text-gray-800 hover:text-blue-600'
                     }`}
                   >
                     Historical Trend
@@ -632,18 +631,18 @@ const ProjectDetail = () => {
                               const data = payload[0].payload;
                               return (
                                 <div className="bg-white border border-slate-200 p-4 rounded-2xl shadow-xl space-y-3 min-w-[180px]">
-                                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-2">{data.fullDate}</p>
+                                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-600 border-b border-slate-100 pb-2">{data.fullDate}</p>
                                   <div className="space-y-2">
                                     <div className="flex items-center justify-between gap-4">
-                                      <span className="text-[10px] font-bold text-slate-500 uppercase">Overall Score</span>
+                                      <span className="text-[10px] font-bold text-gray-700 uppercase">Overall Score</span>
                                       <span className="text-sm font-black text-blue-600">{data.score}%</span>
                                     </div>
                                     <div className="flex items-center justify-between gap-4">
-                                      <span className="text-[10px] font-bold text-slate-500 uppercase">Mentions</span>
+                                      <span className="text-[10px] font-bold text-gray-700 uppercase">Mentions</span>
                                       <span className="text-sm font-black text-emerald-600">{data.mention}%</span>
                                     </div>
                                     <div className="flex items-center justify-between gap-4">
-                                      <span className="text-[10px] font-bold text-slate-500 uppercase">Links</span>
+                                      <span className="text-[10px] font-bold text-gray-700 uppercase">Links</span>
                                       <span className="text-sm font-black text-indigo-600">{data.link}%</span>
                                     </div>
                                   </div>
@@ -680,8 +679,8 @@ const ProjectDetail = () => {
                   ) : (
                     <div className="h-full flex flex-col items-center justify-center bg-slate-50/50 rounded-xl border border-dashed border-slate-200">
                       <BarChart3 className="w-8 h-8 text-slate-300 mb-2" />
-                      <p className="text-slate-500 font-medium text-xs uppercase tracking-widest">{project?.market?.name || 'Global Market'}</p>
-                      <p className="text-sm text-slate-400 font-medium uppercase tracking-wider">No trend data available yet</p>
+                      <p className="text-gray-700 font-medium text-xs uppercase tracking-widest">{project?.market?.name || 'Global Market'}</p>
+                      <p className="text-sm text-gray-600 font-medium uppercase tracking-wider">No trend data available yet</p>
                     </div>
                   )}
                 </div>
@@ -691,7 +690,7 @@ const ProjectDetail = () => {
             {/* Analyzed Prompts Table */}
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
               <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                <h3 className="text-lg font-bold text-slate-900">Analyzed Prompts</h3>
+                <h3 className="text-lg font-bold text-gray-800">Analyzed Prompts</h3>
               </div>
               
               <div className="p-6 space-y-6">
@@ -699,17 +698,17 @@ const ProjectDetail = () => {
                   <table className="w-full border-collapse">
                     <thead>
                       <tr className="bg-slate-50/80 border-b border-slate-300">
-                        <th className="px-6 py-4 text-[10px] font-bold text-slate-600 uppercase tracking-widest text-left">Prompt</th>
+                        <th className="px-6 py-4 text-[10px] font-bold text-gray-700 uppercase tracking-widest text-left">Prompt</th>
                         {tableHistory.length > 0 ? tableHistory.map((h, i) => (
-                          <th key={i} className="px-2 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-center border-l border-slate-300 min-w-[90px]">
+                          <th key={i} className="px-2 py-4 text-[10px] font-bold text-gray-700 uppercase tracking-widest text-center border-l border-slate-300 min-w-[90px]">
                             {new Date(h.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }).toUpperCase()}
-                            <div className="grid grid-cols-2 gap-1 mt-2 font-bold text-[7px] uppercase tracking-tight text-slate-400 px-0.5 border-t border-slate-100 pt-1">
+                            <div className="grid grid-cols-2 gap-1 mt-2 font-bold text-[7px] uppercase tracking-tight text-gray-600 px-0.5 border-t border-slate-100 pt-1">
                               <span className="text-left">MENTION</span>
                               <span className="text-right">LINK</span>
                             </div>
                           </th>
                         )) : (
-                          <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-center border-l border-slate-100">
+                          <th className="px-6 py-4 text-[10px] font-bold text-gray-700 uppercase tracking-widest text-center border-l border-slate-100">
                             PENDING
                           </th>
                         )}
@@ -731,9 +730,9 @@ const ProjectDetail = () => {
                           >
                             <td className="px-4 py-4 min-w-[280px] max-w-[500px]">
                               <div className="flex items-start gap-2">
-                                {expandedPrompt === promptText ? <ChevronUp className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" /> : <ChevronDown className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />}
+                                {expandedPrompt === promptText ? <ChevronUp className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" /> : <ChevronDown className="w-4 h-4 text-gray-600 shrink-0 mt-0.5" />}
                                 <span 
-                                  className="text-sm font-bold text-slate-900 leading-snug" 
+                                  className="text-sm font-bold text-gray-800 leading-snug" 
                                   title={promptText}
                                 >
                                   {promptText}
@@ -827,7 +826,7 @@ const ProjectDetail = () => {
                                     <div className="mb-4 flex items-center justify-between">
                                       <div className="flex items-center gap-2">
                                         <MessageSquare className="w-4 h-4 text-blue-600" />
-                                        <h4 className="text-sm font-bold text-slate-900">Per-Engine Insights</h4>
+                                        <h4 className="text-sm font-bold text-gray-800">Per-Engine Insights</h4>
                                       </div>
                                       <div className="text-[10px] font-semibold text-blue-600  px-3 py-1 rounded-full uppercase tracking-widest">
                                         Viewing Scan: {new Date(tableHistory[activeSnapshotIndex].date).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
@@ -852,10 +851,10 @@ const ProjectDetail = () => {
                                       return (
                                         <div key={engine} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                                           <div className="flex items-center justify-between">
-                                            <span className="font-bold text-slate-900 capitalize text-sm">{engine}</span>
+                                            <span className="font-bold text-gray-800 capitalize text-sm">{engine}</span>
                                             <span 
                                               title={!isFound && res?.score > 0 ? "Has Content (Verified via detailed market analysis)" : ""}
-                                              className={`text-[10px] font-bold px-2 py-1 rounded-md uppercase transition-all ${res?.rank > 0 && res?.rank <= 5 ? 'bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100' : isFound ? 'bg-amber-50 text-amber-600 ring-1 ring-amber-100' : (!isFound && res?.score > 0) ? 'bg-blue-50 text-blue-600 ring-1 ring-blue-100' : 'bg-slate-50 text-slate-400'}`}
+                                              className={`text-[10px] font-bold px-2 py-1 rounded-md uppercase transition-all ${res?.rank > 0 && res?.rank <= 5 ? 'bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100' : isFound ? 'bg-amber-50 text-amber-600 ring-1 ring-amber-100' : (!isFound && res?.score > 0) ? 'bg-blue-50 text-blue-600 ring-1 ring-blue-100' : 'bg-slate-50 text-gray-600'}`}
                                             >
                                               {res?.rank > 0 && res?.rank <= 5 ? 'Recommended' : isFound ? (res?.rank > 0 ? `Rank #${res.rank}` : 'Mentioned') : (!isFound && res?.score > 0 ? 'Verified Mention' : 'Not Found')}
                                             </span>
@@ -863,13 +862,13 @@ const ProjectDetail = () => {
                                           <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-3">
                                             {isFound || (res?.score > 0 && hasCitations) ? (
                                               <>
-                                                <p className="text-xs text-slate-600 leading-relaxed italic break-all overflow-wrap-anywhere">
+                                                <p className="text-xs text-gray-700 leading-relaxed italic break-all overflow-wrap-anywhere">
                                                   "{res?.snippet || 'No specific insight captured.'}"
                                                 </p>
                                                 
                                                 {(isFound || hasCitations) && (
                                                   <div className="pt-2 border-t border-slate-200/50 space-y-1.5">
-                                                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Verified Sources</p>
+                                                    <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">Verified Sources</p>
                                                     <div className="flex flex-wrap gap-2">
                                                       {(() => {
                                                         // Build citation list: project domain + actual citations
@@ -907,13 +906,13 @@ const ProjectDetail = () => {
                                               <>
                                                 {res?.snippet && res.snippet.toLowerCase() !== 'n/a' ? (
                                                   <>
-                                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Market Insight</p>
-                                                    <p className="text-xs text-slate-500 leading-relaxed italic">
+                                                    <p className="text-[9px] font-bold text-gray-600 uppercase tracking-widest mb-1">Market Insight</p>
+                                                    <p className="text-xs text-gray-700 leading-relaxed italic">
                                                       "{res.snippet}"
                                                     </p>
                                                   </>
                                                 ) : (
-                                                  <p className="text-xs text-gray-500 leading-relaxed text-center py-2">
+                                                  <p className="text-xs text-gray-700 leading-relaxed text-center py-2">
                                                     Your brand was not found for this prompt.
                                                   </p>
                                                 )}
@@ -1002,24 +1001,24 @@ const ProjectDetail = () => {
                     
                     <div className="space-y-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center font-black text-slate-400">
+                        <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center font-black text-gray-600">
                           {comp.name?.[0] || '?'}
                         </div>
                         <div>
-                          <h4 className="font-bold text-slate-900">{comp.name || 'Unknown Comp'}</h4>
-                          <p className="text-xs text-slate-500 font-medium">{comp.domain}</p>
+                          <h4 className="font-bold text-gray-800">{comp.name || 'Unknown Comp'}</h4>
+                          <p className="text-xs text-gray-700 font-medium">{comp.domain}</p>
                         </div>
                       </div>
 
                       <div className="pt-4 space-y-4">
                         <div className="flex justify-between items-end">
                           <div className="space-y-1">
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Visibility Score</span>
-                            <div className="text-3xl font-black text-slate-900">{compScore}%</div>
+                            <span className="text-[10px] font-bold text-gray-600 uppercase tracking-widest">Visibility Score</span>
+                            <div className="text-3xl font-black text-gray-800">{compScore}%</div>
                           </div>
                           <div className="text-right">
-                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Market Stage</span>
-                             <div className="text-sm font-bold text-slate-600 mt-1">{getMarketStatus(compScore)}</div>
+                             <span className="text-[10px] font-bold text-gray-600 uppercase tracking-widest leading-none">Market Stage</span>
+                             <div className="text-sm font-bold text-gray-700 mt-1">{getMarketStatus(compScore)}</div>
                           </div>
                         </div>
 
@@ -1035,8 +1034,8 @@ const ProjectDetail = () => {
               {(!project?.competitors || project?.competitors?.length === 0) && (
                 <div className="col-span-full py-20 text-center bg-white border border-dashed border-slate-200 rounded-3xl">
                   <Activity className="w-12 h-12 text-slate-200 mx-auto mb-4" />
-                  <h4 className="text-lg font-bold text-slate-900">Discovering Market Rivals...</h4>
-                  <p className="text-sm text-slate-500 mt-2">The AI is currently analyzing your industry to identify top competitors.</p>
+                  <h4 className="text-lg font-bold text-gray-800">Discovering Market Rivals...</h4>
+                  <p className="text-sm text-gray-700 mt-2">The AI is currently analyzing your industry to identify top competitors.</p>
                 </div>
               )}
             </div>
@@ -1046,7 +1045,7 @@ const ProjectDetail = () => {
               <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden mt-8">
                 <div className="p-8 border-b border-slate-100 flex items-center justify-between">
                   <div>
-                    <h3 className="text-xl font-bold text-slate-900">Head-to-Head Comparison</h3>
+                    <h3 className="text-xl font-bold text-gray-800">Head-to-Head Comparison</h3>
                     <p className="text-sm text-gray-600 mt-1">Direct visibility comparison for your target prompts</p>
                   </div>
                 </div>
@@ -1055,10 +1054,10 @@ const ProjectDetail = () => {
                   <table className="w-full text-left">
                     <thead>
                       <tr className="bg-slate-50/50">
-                        <th className="px-8 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Prompt / Entity</th>
+                        <th className="px-8 py-4 text-[10px] font-bold text-gray-700 uppercase tracking-widest">Prompt / Entity</th>
                         <th className="px-8 py-4 text-[10px] font-bold text-blue-600 uppercase tracking-widest">YOU ({userRawVisibility}%)</th>
                         {project?.competitors?.map((comp, idx) => (
-                           <th key={idx} className="px-8 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                           <th key={idx} className="px-8 py-4 text-[10px] font-bold text-gray-700 uppercase tracking-widest">
                              {comp.name}
                            </th>
                         ))}
@@ -1079,7 +1078,7 @@ const ProjectDetail = () => {
                         return (
                         <tr key={pIdx} className="hover:bg-slate-50/50 transition-colors">
                           <td className="px-8 py-6">
-                            <span className="text-sm font-bold text-slate-900">{promptText}</span>
+                            <span className="text-sm font-bold text-gray-800">{promptText}</span>
                           </td>
                           <td className="px-8 py-6">
                              <div className="flex items-center gap-3">
@@ -1088,7 +1087,7 @@ const ProjectDetail = () => {
                                    <div className={`px-2 py-1 rounded-lg text-xs font-black ${brandAvgRank <= 3 ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : brandAvgRank <= 7 ? 'bg-amber-50 text-amber-600 border border-amber-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
                                      #{brandAvgRank}
                                    </div>
-                                   <span className="text-[10px] font-bold text-slate-400">{brandAvgScore}%</span>
+                                   <span className="text-[10px] font-bold text-gray-600">{brandAvgScore}%</span>
                                  </div>
                                ) : (
                                  <span 
@@ -1130,7 +1129,7 @@ const ProjectDetail = () => {
                                        <div className={`px-2 py-1 rounded-lg text-xs font-black ${isAhead ? 'bg-rose-50 text-rose-600 border border-rose-200' : 'bg-emerald-50 text-emerald-600 border border-emerald-200'}`}>
                                          #{compAvgRank}
                                        </div>
-                                       <span className="text-[10px] font-bold text-slate-400">{compAvgScore}%</span>
+                                       <span className="text-[10px] font-bold text-gray-600">{compAvgScore}%</span>
                                      </div>
                                    ) : (
                                      <span 

@@ -105,7 +105,7 @@ const Inquiries = () => {
       case 'resolved': return 'bg-emerald-50 text-emerald-600 ring-emerald-100';
       case 'pending': return 'bg-amber-50 text-amber-600 ring-amber-100';
       case 'in-progress': return 'bg-blue-50 text-blue-600 ring-blue-100';
-      default: return 'bg-slate-50 text-slate-600 ring-slate-100';
+      default: return 'bg-slate-50 text-gray-700 ring-slate-100';
     }
   };
 
@@ -119,10 +119,10 @@ const Inquiries = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">
+          <h1 className="text-2xl font-bold text-gray-800">
             {isAdmin ? 'Platform Support Center' : 'My Inquiries'}
           </h1>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-gray-700">
             {isAdmin 
               ? 'Manage and respond to support tickets from all users.' 
               : 'Track and manage your support tickets and inquiries.'}
@@ -151,8 +151,8 @@ const Inquiries = () => {
               <stat.icon className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{stat.label}</p>
-              <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-600">{stat.label}</p>
+              <p className="text-2xl font-bold text-gray-800">{stat.value}</p>
             </div>
           </div>
         ))}
@@ -167,7 +167,7 @@ const Inquiries = () => {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`text-xs font-bold uppercase tracking-widest pb-1 transition-all border-b-2 ${
-                  activeTab === tab ? 'border-blue-600 text-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'
+                  activeTab === tab ? 'border-blue-600 text-gray-800' : 'border-transparent text-gray-600 hover:text-gray-700'
                 }`}
               >
                 {tab}
@@ -175,7 +175,7 @@ const Inquiries = () => {
             ))}
           </div>
           <div className="relative flex-1 max-w-xs">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
             <input 
               type="text" 
               placeholder="Search tickets..." 
@@ -188,12 +188,12 @@ const Inquiries = () => {
           <table className="w-full text-left">
             <thead>
               <tr className="bg-slate-50/50">
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">ID</th>
-                {isAdmin && <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">User</th>}
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Subject</th>
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Category</th>
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Status</th>
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right">Actions</th>
+                <th className="px-6 py-4 text-[10px] font-bold text-gray-700 uppercase tracking-widest">ID</th>
+                {isAdmin && <th className="px-6 py-4 text-[10px] font-bold text-gray-700 uppercase tracking-widest">User</th>}
+                <th className="px-6 py-4 text-[10px] font-bold text-gray-700 uppercase tracking-widest">Subject</th>
+                <th className="px-6 py-4 text-[10px] font-bold text-gray-700 uppercase tracking-widest">Category</th>
+                <th className="px-6 py-4 text-[10px] font-bold text-gray-700 uppercase tracking-widest">Status</th>
+                <th className="px-6 py-4 text-[10px] font-bold text-gray-700 uppercase tracking-widest text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -206,21 +206,21 @@ const Inquiries = () => {
                   className="hover:bg-slate-50/50 transition-colors cursor-pointer"
                   onClick={() => setExpandedId(expandedId === inq._id ? null : inq._id)}
                 >
-                  <td className="px-6 py-4 font-mono text-xs font-bold text-slate-400">{inq._id.substring(inq._id.length - 8).toUpperCase()}</td>
+                  <td className="px-6 py-4 font-mono text-xs font-bold text-gray-600">{inq._id.substring(inq._id.length - 8).toUpperCase()}</td>
                   {isAdmin && (
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
-                        <span className="text-sm font-bold text-slate-800">{inq.user?.name || 'Unknown'}</span>
-                        <span className="text-[10px] text-slate-400">{inq.user?.email}</span>
-                        {inq.user?.phone && <span className="text-[10px] text-slate-400">📞 {inq.user.phone}</span>}
+                        <span className="text-sm font-bold text-gray-800">{inq.user?.name || 'Unknown'}</span>
+                        <span className="text-[10px] text-gray-600">{inq.user?.email}</span>
+                        {inq.user?.phone && <span className="text-[10px] text-gray-600">📞 {inq.user.phone}</span>}
                       </div>
                     </td>
                   )}
                   <td className="px-6 py-4">
-                    <span className="text-sm font-bold text-slate-900">{inq.subject}</span>
+                    <span className="text-sm font-bold text-gray-800">{inq.subject}</span>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-xs font-medium text-slate-600">{inq.category}</span>
+                    <span className="text-xs font-medium text-gray-700">{inq.category}</span>
                   </td>
                   <td className="px-6 py-4">
                     <span className={`px-3 py-1 rounded-full text-[10px] font-bold ring-1 ${getStatusColor(inq.status)}`}>
@@ -229,7 +229,7 @@ const Inquiries = () => {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <span className="text-xs font-bold text-slate-400 mr-2">{new Date(inq.createdAt).toLocaleDateString()}</span>
+                      <span className="text-xs font-bold text-gray-600 mr-2">{new Date(inq.createdAt).toLocaleDateString()}</span>
                       {isAdmin && inq.status !== 'resolved' && (
                         <button 
                           onClick={(e) => { e.stopPropagation(); openReplyModal(inq); }}
@@ -268,7 +268,7 @@ const Inquiries = () => {
                       >
                         {/* User's original message */}
                         <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Message</p>
+                          <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-1">Message</p>
                           <p className="text-sm text-slate-700 leading-relaxed">{inq.message}</p>
                         </div>
 
@@ -286,7 +286,7 @@ const Inquiries = () => {
                         {/* If resolved but no reply */}
                         {inq.status === 'resolved' && !inq.adminReply && (
                           <div className="bg-slate-50 rounded-xl p-3 border border-slate-100">
-                            <p className="text-xs text-slate-400 italic">This inquiry was resolved without a response message.</p>
+                            <p className="text-xs text-gray-600 italic">This inquiry was resolved without a response message.</p>
                           </div>
                         )}
                       </motion.div>
@@ -311,13 +311,13 @@ const Inquiries = () => {
             >
               <div className="p-8 space-y-6">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-bold text-slate-900">New Inquiry</h2>
-                  <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600 font-bold px-2">✕</button>
+                  <h2 className="text-xl font-bold text-gray-800">New Inquiry</h2>
+                  <button onClick={() => setIsModalOpen(false)} className="text-gray-600 hover:text-gray-700 font-bold px-2">✕</button>
                 </div>
 
                 <form onSubmit={handleCreateInquiry} className="space-y-4">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Subject</label>
+                    <label className="text-xs font-bold text-gray-700 uppercase tracking-widest">Subject</label>
                     <input 
                       type="text" 
                       placeholder="e.g., Billing Issue, Technical Support"
@@ -330,7 +330,7 @@ const Inquiries = () => {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Category</label>
+                      <label className="text-xs font-bold text-gray-700 uppercase tracking-widest">Category</label>
                       <select 
                         className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-100 transition-all"
                         value={newInquiry.category}
@@ -344,7 +344,7 @@ const Inquiries = () => {
                       </select>
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Priority</label>
+                      <label className="text-xs font-bold text-gray-700 uppercase tracking-widest">Priority</label>
                       <select 
                         className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-100 transition-all"
                         value={newInquiry.priority}
@@ -358,7 +358,7 @@ const Inquiries = () => {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Message</label>
+                    <label className="text-xs font-bold text-gray-700 uppercase tracking-widest">Message</label>
                     <textarea 
                       placeholder="Describe your issue in detail..."
                       rows={4}
@@ -373,7 +373,7 @@ const Inquiries = () => {
                     <button 
                       type="button"
                       onClick={() => setIsModalOpen(false)}
-                      className="flex-1 px-4 py-3 border border-slate-200 text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all"
+                      className="flex-1 px-4 py-3 border border-slate-200 text-gray-700 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all"
                     >
                       Cancel
                     </button>
@@ -405,10 +405,10 @@ const Inquiries = () => {
               <div className="p-8 space-y-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-xl font-bold text-slate-900">Reply & Resolve</h2>
-                    <p className="text-xs text-slate-400 mt-1">Respond to: <span className="font-bold text-slate-600">{replyModal.inquiry?.subject}</span></p>
+                    <h2 className="text-xl font-bold text-gray-800">Reply & Resolve</h2>
+                    <p className="text-xs text-gray-600 mt-1">Respond to: <span className="font-bold text-gray-700">{replyModal.inquiry?.subject}</span></p>
                   </div>
-                  <button onClick={() => { setReplyModal({ open: false, inquiry: null }); setReplyText(''); }} className="text-slate-400 hover:text-slate-600 font-bold px-2">✕</button>
+                  <button onClick={() => { setReplyModal({ open: false, inquiry: null }); setReplyText(''); }} className="text-gray-600 hover:text-gray-700 font-bold px-2">✕</button>
                 </div>
 
                 {/* User's message preview */}
@@ -419,15 +419,15 @@ const Inquiries = () => {
                     </div>
                     <div>
                       <p className="text-xs font-bold text-slate-700">{replyModal.inquiry?.user?.name}</p>
-                      <p className="text-[10px] text-slate-400">{replyModal.inquiry?.user?.email}</p>
+                      <p className="text-[10px] text-gray-600">{replyModal.inquiry?.user?.email}</p>
                     </div>
                   </div>
-                  <p className="text-sm text-slate-600 leading-relaxed">{replyModal.inquiry?.message}</p>
+                  <p className="text-sm text-gray-700 leading-relaxed">{replyModal.inquiry?.message}</p>
                 </div>
 
                 {/* Admin reply textarea */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Your Response</label>
+                  <label className="text-xs font-bold text-gray-700 uppercase tracking-widest">Your Response</label>
                   <textarea 
                     placeholder="Type your solution or response here..."
                     rows={4}
@@ -442,7 +442,7 @@ const Inquiries = () => {
                   <button 
                     type="button"
                     onClick={() => { setReplyModal({ open: false, inquiry: null }); setReplyText(''); }}
-                    className="flex-1 px-4 py-3 border border-slate-200 text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all"
+                    className="flex-1 px-4 py-3 border border-slate-200 text-gray-700 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all"
                   >
                     Cancel
                   </button>

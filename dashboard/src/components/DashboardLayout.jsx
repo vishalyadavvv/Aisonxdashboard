@@ -37,7 +37,7 @@ const DashboardLayout = () => {
               className="p-2 -ml-1 rounded-xl text-slate-700 hover:bg-slate-50 md:hidden transition-colors border border-slate-200/80 bg-white shadow-sm flex items-center justify-center shrink-0"
               aria-label="Open Menu"
             >
-              <Menu className="w-5 h-5 text-slate-800" />
+              <Menu className="w-5 h-5 text-gray-800" />
             </button>
             <h2 className="text-sm font-medium text-gray-600 hidden md:block">
               Welcome back, <span className="text-[#1E293B] font-semibold">{user?.name}</span>
@@ -86,8 +86,8 @@ const DashboardLayout = () => {
                   <AlertTriangle className="w-6 h-6 text-amber-600" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900">Your free trial has expired</h3>
-                  <p className="text-sm text-slate-600 font-medium">Upgrade your plan to continue using AIsonx's powerful audit tools and insights.</p>
+                  <h3 className="text-lg font-bold text-gray-800">Your free trial has expired</h3>
+                  <p className="text-sm text-gray-700 font-medium">Upgrade your plan to continue using AIsonx's powerful audit tools and insights.</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 w-full md:w-auto">
@@ -104,7 +104,7 @@ const DashboardLayout = () => {
                       logout();
                     }
                   }}
-                  className="flex-1 md:flex-none px-6 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all"
+                  className="flex-1 md:flex-none px-6 py-3 bg-white border border-slate-200 text-gray-700 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all"
                 >
                   Sign Out
                 </button>

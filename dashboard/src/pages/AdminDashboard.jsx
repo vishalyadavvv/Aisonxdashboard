@@ -116,14 +116,14 @@ const AdminDashboard = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Admin Command Center</h1>
-          <p className="text-sm text-slate-500 font-medium">Track registrations, subscriptions, and platform usage.</p>
+          <h1 className="text-2xl font-bold text-gray-800">Admin Command Center</h1>
+          <p className="text-sm text-gray-700 font-medium">Track registrations, subscriptions, and platform usage.</p>
         </div>
         <div className="flex items-center gap-3">
           <button 
             onClick={() => fetchData(true)}
             disabled={isRefreshing}
-            className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all flex items-center gap-2 disabled:opacity-50"
+            className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-gray-700 hover:bg-slate-50 transition-all flex items-center gap-2 disabled:opacity-50"
           >
             {isRefreshing ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Refresh Data'}
           </button>
@@ -179,24 +179,24 @@ const AdminDashboard = () => {
               <Cpu className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Live System Health</h3>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Active resources & latencies</p>
+              <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider">Live System Health</h3>
+              <p className="text-[10px] text-gray-600 font-bold uppercase tracking-tight">Active resources & latencies</p>
             </div>
           </div>
           
           <div className="space-y-4">
             <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
               <div className="flex items-center gap-3">
-                <Cpu className="w-5 h-5 text-slate-400" />
-                <span className="text-xs font-bold text-slate-600">Memory Heap</span>
+                <Cpu className="w-5 h-5 text-gray-600" />
+                <span className="text-xs font-bold text-gray-700">Memory Heap</span>
               </div>
-              <span className="text-sm font-black text-slate-800">{stats?.diagnostics?.memoryUsage || 0} MB</span>
+              <span className="text-sm font-black text-gray-800">{stats?.diagnostics?.memoryUsage || 0} MB</span>
             </div>
 
             <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
               <div className="flex items-center gap-3">
-                <Globe className="w-5 h-5 text-slate-400" />
-                <span className="text-xs font-bold text-slate-600">DB Latency</span>
+                <Globe className="w-5 h-5 text-gray-600" />
+                <span className="text-xs font-bold text-gray-700">DB Latency</span>
               </div>
               <span className={`text-sm font-black ${stats?.diagnostics?.dbLatency < 50 ? 'text-emerald-600' : 'text-amber-600'}`}>
                 {stats?.diagnostics?.dbLatency || 0} ms
@@ -205,10 +205,10 @@ const AdminDashboard = () => {
 
             <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
               <div className="flex items-center gap-3">
-                <Clock className="w-5 h-5 text-slate-400" />
-                <span className="text-xs font-bold text-slate-600">Server Uptime</span>
+                <Clock className="w-5 h-5 text-gray-600" />
+                <span className="text-xs font-bold text-gray-700">Server Uptime</span>
               </div>
-              <span className="text-xs font-black text-slate-800">
+              <span className="text-xs font-black text-gray-800">
                 {stats?.diagnostics?.uptime ? formatUptime(stats.diagnostics.uptime) : '0s'}
               </span>
             </div>
@@ -223,8 +223,8 @@ const AdminDashboard = () => {
                 <Activity className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Redis Background Queue</h3>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Active crawlers status & jobs waitlist</p>
+                <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider">Redis Background Queue</h3>
+                <p className="text-[10px] text-gray-600 font-bold uppercase tracking-tight">Active crawlers status & jobs waitlist</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -249,24 +249,24 @@ const AdminDashboard = () => {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="p-4 bg-slate-50 rounded-2xl text-center space-y-1">
-              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Active Scans</p>
-              <p className={`text-2xl font-black ${stats?.queue?.active > 0 ? 'text-indigo-600 animate-pulse' : 'text-slate-800'}`}>
+              <p className="text-[9px] font-bold text-gray-600 uppercase tracking-wider">Active Scans</p>
+              <p className={`text-2xl font-black ${stats?.queue?.active > 0 ? 'text-indigo-600 animate-pulse' : 'text-gray-800'}`}>
                 {stats?.queue?.active || 0}
               </p>
             </div>
             
             <div className="p-4 bg-slate-50 rounded-2xl text-center space-y-1">
-              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Pending Waitlist</p>
-              <p className="text-2xl font-black text-slate-800">{stats?.queue?.waiting || 0}</p>
+              <p className="text-[9px] font-bold text-gray-600 uppercase tracking-wider">Pending Waitlist</p>
+              <p className="text-2xl font-black text-gray-800">{stats?.queue?.waiting || 0}</p>
             </div>
 
             <div className="p-4 bg-slate-50 rounded-2xl text-center space-y-1">
-              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Scans Succeeded</p>
+              <p className="text-[9px] font-bold text-gray-600 uppercase tracking-wider">Scans Succeeded</p>
               <p className="text-2xl font-black text-emerald-600">{stats?.queue?.completed || 0}</p>
             </div>
 
             <div className="p-4 bg-slate-50 rounded-2xl text-center space-y-1">
-              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Failed Jobs</p>
+              <p className="text-[9px] font-bold text-gray-600 uppercase tracking-wider">Failed Jobs</p>
               <p className="text-2xl font-black text-red-500">{stats?.queue?.failed || 0}</p>
             </div>
           </div>
@@ -278,7 +278,7 @@ const AdminDashboard = () => {
         <div className="bg-slate-900 rounded-[32px] p-8 text-white space-y-8">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-bold">Plan Distribution</h3>
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
+            <div className="flex items-center gap-2 text-xs font-bold text-gray-600 uppercase tracking-widest">
               Live updates <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             </div>
           </div>
@@ -293,7 +293,7 @@ const AdminDashboard = () => {
         {/* Feature Usage Overview */}
         <div className="bg-white rounded-[32px] border border-slate-100 p-8 shadow-sm space-y-8">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold text-slate-900">Feature Usage</h3>
+            <h3 className="text-lg font-bold text-gray-800">Feature Usage</h3>
             <button 
               onClick={() => setShowUsageModal(true)}
               className="text-xs font-bold text-blue-600 hover:underline"
@@ -318,12 +318,12 @@ const AdminDashboard = () => {
                   <Mail className="w-4 h-4 text-blue-600" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-xs font-bold text-slate-900">Open Tickets</span>
-                  <span className="text-[10px] text-slate-500 font-medium tracking-tight">Requires admin attention</span>
+                  <span className="text-xs font-bold text-gray-800">Open Tickets</span>
+                  <span className="text-[10px] text-gray-700 font-medium tracking-tight">Requires admin attention</span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-lg font-black text-slate-900">{stats?.inquiries.open}</span>
+                <span className="text-lg font-black text-gray-800">{stats?.inquiries.open}</span>
                 <ChevronRight className="w-4 h-4 text-slate-300 group-hover/tickets:text-blue-500 transition-colors" />
               </div>
             </div>
@@ -339,8 +339,8 @@ const AdminDashboard = () => {
               <Activity className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Recent Platform Signups</h3>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Real-time pulse of registrations & active levels</p>
+              <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider">Recent Platform Signups</h3>
+              <p className="text-[10px] text-gray-600 font-bold uppercase tracking-tight">Real-time pulse of registrations & active levels</p>
             </div>
           </div>
         </div>
@@ -348,7 +348,7 @@ const AdminDashboard = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+              <tr className="border-b border-slate-100 text-[10px] font-bold text-gray-600 uppercase tracking-widest">
                 <th className="py-3 px-4">User</th>
                 <th className="py-3 px-4">Email Address</th>
                 <th className="py-3 px-4">Current Package</th>
@@ -359,8 +359,8 @@ const AdminDashboard = () => {
             <tbody>
               {stats?.recentUsers?.map((userObj) => (
                 <tr key={userObj._id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
-                  <td className="py-4 px-4 font-bold text-slate-800 text-sm">{userObj.name}</td>
-                  <td className="py-4 px-4 text-slate-500 text-sm">{userObj.email}</td>
+                  <td className="py-4 px-4 font-bold text-gray-800 text-sm">{userObj.name}</td>
+                  <td className="py-4 px-4 text-gray-700 text-sm">{userObj.email}</td>
                   <td className="py-4 px-4">
                     <span className="text-xs font-black uppercase tracking-wider text-slate-700">
                       {userObj.subscription?.tier || 'Free'}
@@ -369,14 +369,14 @@ const AdminDashboard = () => {
                   <td className="py-4 px-4">
                     <StatusBadge status={userObj.subscription?.status || 'inactive'} />
                   </td>
-                  <td className="py-4 px-4 text-right text-xs font-semibold text-slate-400 font-mono">
+                  <td className="py-4 px-4 text-right text-xs font-semibold text-gray-600 font-mono">
                     {new Date(userObj.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                   </td>
                 </tr>
               ))}
               {(!stats?.recentUsers || stats.recentUsers.length === 0) && (
                 <tr>
-                  <td colSpan={5} className="py-8 text-center text-sm font-medium text-slate-400">
+                  <td colSpan={5} className="py-8 text-center text-sm font-medium text-gray-600">
                     No recent user activity recorded yet.
                   </td>
                 </tr>
@@ -399,14 +399,14 @@ const AdminDashboard = () => {
               <div className="p-8 space-y-8">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-xl font-bold text-slate-900">Feature Usage Reports</h3>
-                    <p className="text-sm text-slate-500 font-medium">Detailed breakdown of AI tool utilization across the platform.</p>
+                    <h3 className="text-xl font-bold text-gray-800">Feature Usage Reports</h3>
+                    <p className="text-sm text-gray-700 font-medium">Detailed breakdown of AI tool utilization across the platform.</p>
                   </div>
                   <button 
                     onClick={() => setShowUsageModal(false)}
                     className="p-2 hover:bg-slate-100 rounded-xl transition-all"
                   >
-                    <X className="w-5 h-5 text-slate-400" />
+                    <X className="w-5 h-5 text-gray-600" />
                   </button>
                 </div>
 
@@ -442,17 +442,17 @@ const AdminDashboard = () => {
                 </div>
 
                 <div className="bg-slate-50 rounded-2xl p-6 space-y-4">
-                  <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Platform Efficiency</h4>
+                  <h4 className="text-xs font-bold text-gray-600 uppercase tracking-widest">Platform Efficiency</h4>
                   <div className="flex items-end justify-between">
                     <div>
-                      <p className="text-2xl font-black text-slate-900">{stats?.usage.totalReports || 0}</p>
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Total reports generated to date</p>
+                      <p className="text-2xl font-black text-gray-800">{stats?.usage.totalReports || 0}</p>
+                      <p className="text-[10px] font-bold text-gray-700 uppercase tracking-tight">Total reports generated to date</p>
                     </div>
                     <div className="text-right">
                       <p className={`text-sm font-bold flex items-center justify-end gap-1 ${stats?.usage.systemStatus === 'Healthy' ? 'text-emerald-600' : 'text-amber-600'}`}>
                         <TrendingUp className="w-4 h-4" /> {stats?.usage.systemStatus || 'Healthy'}
                       </p>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">System Status</p>
+                      <p className="text-[10px] font-bold text-gray-600 uppercase tracking-tight">System Status</p>
                     </div>
                   </div>
                 </div>
@@ -492,8 +492,8 @@ const StatCard = ({ title, value, icon: Icon, color }) => {
         </div>
       </div>
       <div>
-        <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{title}</h4>
-        <p className="text-2xl font-black text-slate-900">{displayValue || '0'}</p>
+        <h4 className="text-[10px] font-bold text-gray-600 uppercase tracking-widest">{title}</h4>
+        <p className="text-2xl font-black text-gray-800">{displayValue || '0'}</p>
       </div>
     </div>
   );
@@ -504,7 +504,7 @@ const StatusBadge = ({ status }) => {
     active: 'bg-emerald-50 text-emerald-600 border-emerald-100',
     trialing: 'bg-blue-50 text-blue-600 border-blue-100',
     expired: 'bg-red-50 text-red-600 border-red-100',
-    inactive: 'bg-slate-50 text-slate-500 border-slate-100'
+    inactive: 'bg-slate-50 text-gray-700 border-slate-100'
   };
 
   return (
@@ -519,7 +519,7 @@ const PlanProgress = ({ label, count, total, color }) => {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between text-[11px] font-bold">
-        <span className="text-slate-400 uppercase tracking-widest">{label}</span>
+        <span className="text-gray-600 uppercase tracking-widest">{label}</span>
         <span>{count} ({Math.round(percentage)}%)</span>
       </div>
       <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
@@ -535,9 +535,9 @@ const PlanProgress = ({ label, count, total, color }) => {
 
 const UsageMetric = ({ label, value, icon: Icon }) => (
   <div className="p-4 bg-slate-50 rounded-2xl text-center space-y-1">
-    <Icon className="w-4 h-4 mx-auto text-slate-400" />
-    <p className="text-xs font-bold text-slate-900">{value?.toLocaleString() || '0'}</p>
-    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{label}</p>
+    <Icon className="w-4 h-4 mx-auto text-gray-600" />
+    <p className="text-xs font-bold text-gray-800">{value?.toLocaleString() || '0'}</p>
+    <p className="text-[9px] font-bold text-gray-600 uppercase tracking-widest">{label}</p>
   </div>
 );
 
@@ -555,14 +555,14 @@ const ReportDetailItem = ({ label, count, total, icon: Icon, color }) => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-slate-50">
-            <Icon className="w-4 h-4 text-slate-600" />
+            <Icon className="w-4 h-4 text-gray-700" />
           </div>
-          <span className="text-sm font-bold text-slate-800">{label}</span>
+          <span className="text-sm font-bold text-gray-800">{label}</span>
         </div>
-        <span className="text-sm font-black text-slate-900">{count || 0}</span>
+        <span className="text-sm font-black text-gray-800">{count || 0}</span>
       </div>
       <div className="space-y-1.5">
-        <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-slate-400">
+        <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-gray-600">
           <span>Utilization</span>
           <span>{percentage}%</span>
         </div>

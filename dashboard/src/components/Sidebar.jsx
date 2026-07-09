@@ -46,16 +46,16 @@ const RailItem = ({ to, icon: Icon, label, badge, active, onClick }) => (
     onClick={onClick}
     className={cn(
       "group relative flex flex-col items-start w-full py-4 pl-2.5 transition-all duration-300",
-      active ? "text-white" : "text-gray-500 hover:text-gray-300"
+      active ? "text-white" : "text-gray-700 hover:text-gray-300"
     )}
   >
     <div className={cn(
       "p-2.5 rounded-2xl transition-all duration-300 mb-1",
-      active ? "bg-white/10 shadow-lg text-white" : "text-gray-500 group-hover:text-gray-300 group-hover:bg-white/5"
+      active ? "bg-white/10 shadow-lg text-white" : "text-gray-700 group-hover:text-gray-300 group-hover:bg-white/5"
     )}>
       <Icon className="w-5 h-5 stroke-[1.5]" />
     </div>
-    <span className={cn("text-[10px] font-bold tracking-tight", active ? "text-white" : "text-gray-500")}>{label}</span>
+    <span className={cn("text-[10px] font-bold tracking-tight", active ? "text-white" : "text-gray-700")}>{label}</span>
     {badge && (
       <span className="absolute top-4 right-4 w-2 h-2 bg-blue-500 rounded-full border-2 border-[#0a0e1a]" />
     )}
@@ -81,7 +81,7 @@ const ContextItem = ({ to, icon: Icon, label, badge, isChild, end, onClick }) =>
     {({ isActive }) => (
       <>
         <div className="flex items-center gap-3">
-          {Icon && <Icon className={cn("w-4 h-4 stroke-[1.5]", isActive ? "text-white" : "text-slate-500 group-hover:text-slate-300")} />}
+          {Icon && <Icon className={cn("w-4 h-4 stroke-[1.5]", isActive ? "text-white" : "text-gray-700 group-hover:text-slate-300")} />}
           <span>{label}</span>
         </div>
         {badge && (
@@ -96,7 +96,7 @@ const ContextItem = ({ to, icon: Icon, label, badge, isChild, end, onClick }) =>
 
 const SidebarSection = ({ title, children }) => (
   <div className="mb-4 last:mb-0">
-    <h3 className="px-2 text-[10px] font-bold text-slate-500 uppercase tracking-[0.15em] mb-2">
+    <h3 className="px-2 text-[10px] font-bold text-gray-700 uppercase tracking-[0.15em] mb-2">
       {title}
     </h3>
     <div className="space-y-1">
@@ -197,7 +197,7 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
           {/* Mobile Close Button */}
           <button 
             onClick={() => setIsOpen(false)}
-            className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white md:hidden z-50 bg-white/5 rounded-lg border border-white/10"
+            className="absolute top-4 right-4 p-2 text-gray-600 hover:text-white md:hidden z-50 bg-white/5 rounded-lg border border-white/10"
           >
             <X className="w-5 h-5" />
           </button>
@@ -281,7 +281,7 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
                 </div>
                 <div className="flex flex-col overflow-hidden">
                   <span className="text-xs font-bold text-white truncate">{user?.name}</span>
-                  <span className="text-[9px] font-semibold text-slate-500 truncate">{user?.email}</span>
+                  <span className="text-[9px] font-semibold text-gray-700 truncate">{user?.email}</span>
                 </div>
               </div>
               <button 
@@ -291,7 +291,7 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
                     logout();
                   }
                 }}
-                className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all shrink-0"
+                className="p-2 text-gray-600 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all shrink-0"
                 title="Sign Out"
               >
                 <LogOut className="w-5 h-5" />
@@ -356,7 +356,7 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
               onClick={() => setIsOpen(false)}
               className={cn(
                 "w-full flex justify-center py-2 transition-colors",
-                location.pathname === '/dashboard/settings' ? "text-blue-400" : "text-gray-500 hover:text-white"
+                location.pathname === '/dashboard/settings' ? "text-blue-400" : "text-gray-700 hover:text-white"
               )}
             >
               <Settings className="w-6 h-6" />
@@ -368,7 +368,7 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
                   logout();
                 }
               }}
-              className="w-full flex justify-center text-gray-500 hover:text-red-400 transition-colors pb-4"
+              className="w-full flex justify-center text-gray-700 hover:text-red-400 transition-colors pb-4"
             >
               <LogOut className="w-6 h-6" />
             </button>
@@ -382,7 +382,7 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
           {/* Mobile Close Button */}
           <button 
             onClick={() => setIsOpen(false)}
-            className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white md:hidden z-50 bg-white/5 rounded-lg border border-white/10"
+            className="absolute top-4 right-4 p-2 text-gray-600 hover:text-white md:hidden z-50 bg-white/5 rounded-lg border border-white/10"
           >
             <X className="w-5 h-5" />
           </button>
@@ -396,7 +396,7 @@ const Sidebar = ({ logout, isOpen, setIsOpen }) => {
                 transition={{ duration: 0.2 }}
               >
           {/* Section Header */}
-          <h2 className="text-lg font-bold text-slate-400 mb-8 text-[10px] uppercase tracking-[0.2em] px-0 opacity-60">
+          <h2 className="text-lg font-bold text-gray-600 mb-8 text-[10px] uppercase tracking-[0.2em] px-0 opacity-60">
             {category === 'projects' ? 'Platform' : 'AI Module'}
           </h2>
           

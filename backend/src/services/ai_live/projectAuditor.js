@@ -56,7 +56,8 @@ INSTRUCTIONS:
    - Rank 1-10: For brands with organic presence, authoritative mentions, or verified specialized content.
    - Rank 0: ONLY if the brand is genuinely invisible or completely irrelevant.
 
-OUTPUT FORMAT (JSON ARRAY):
+OUTPUT FORMAT:
+Return ONLY a valid JSON array. No markdown formatting (no markdown code blocks), no explanations, no conversational text before or after.
 [
   {
     "prompt": "prompt text",
@@ -122,7 +123,7 @@ INSTRUCTIONS:
 2. VERIFIED DISCOVERY: Even if Rank is 0, you MUST find the brand's verified domain and citations to prove it was audited.
 3. SNIPPET: Provide a professional summary of the brand's position and offering.
 4. CITATIONS: Provide 1-3 valid 'https://' links for evidence.
-5. RETURN ONLY RAW JSON.
+5. RETURN ONLY RAW JSON. No markdown formatting (no markdown code blocks), no explanations, no conversational text before or after.
 
 {
   "prompt": "${promptText}",
@@ -177,7 +178,7 @@ STRICT INSTRUCTIONS:
    - "snippet": A 1-2 sentence professional analysis of their standing + specific offering.
    - "citations": You MUST return valid 'https://' URLs found for this brand.
 4. 🚨 PROOF RULES: Never return empty citations if the brand exists online.
-5. FORMAT: RETURN ONLY RAW JSON.
+5. FORMAT: RETURN ONLY RAW JSON. No markdown formatting (no markdown code blocks), no explanations, no conversational text before or after.
 
 {
   "prompt": "${promptText}",
@@ -292,7 +293,8 @@ INSTRUCTIONS:
    - Mentioned but unranked: Rank 0, Score 15-40.
    - Not found/mentioned: Rank 0, Score 0.
 
-OUTPUT FORMAT (JSON ARRAY):
+OUTPUT FORMAT:
+Return ONLY a valid JSON array. No markdown formatting (no markdown code blocks), no explanations, no conversational text before or after.
     [
       {
         "prompt": "Exact prompt text",
@@ -428,7 +430,8 @@ INSTRUCTIONS:
    - Mentioned but unranked: Rank 0, Score 15-40.
    - Not found/mentioned: Rank 0, Score 0.
 
-OUTPUT FORMAT (JSON ONLY):
+OUTPUT FORMAT:
+Return ONLY a valid JSON object. No markdown formatting (no markdown code blocks), no explanations, no conversational text before or after.
 {
   "prompt": "${promptText}",
   "rankings": [

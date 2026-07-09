@@ -2,8 +2,8 @@ import React from 'react';
 import BaseReportLayout from './BaseReportLayout';
 
 /**
- * DomainProfilerReport
- * Print-optimized template for Strategic Domain Intelligence.
+ * DomainProfilerReport — Premium PDF Template
+ * Strategic Domain Intelligence & Perceptual Mapping
  */
 const DomainProfilerReport = ({ brandName, data, date }) => {
   const topics = data?.topics || [];
@@ -11,118 +11,180 @@ const DomainProfilerReport = ({ brandName, data, date }) => {
   const prompts = data?.prompts || [];
   const competitors = data?.competitors || [];
 
+  const clusterGroups = [
+    { label: 'Topic Matrix', items: topics, color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE', badgeCls: 'rpt-badge-blue' },
+    { label: 'AI Search Prompts', items: prompts, color: '#7C3AED', bg: '#F5F3FF', border: '#DDD6FE', badgeCls: 'rpt-badge-purple' },
+    { label: 'Competitor Landscape', items: competitors, color: '#DC2626', bg: '#FEF2F2', border: '#FECACA', badgeCls: 'rpt-badge-red' },
+  ].filter(g => g.items.length > 0);
+
   return (
-    <BaseReportLayout 
-      title="Domain Architecture Profile" 
+    <BaseReportLayout
+      title="Domain Architecture Profile"
       subtitle="Strategic Positioning & Perceptual Mapping"
       brandName={brandName}
       date={date}
+      reportType="Domain Profile"
+      accentColor="#0891B2"
     >
-      {/* Brand DNA Section */}
-      <section className="mb-12">
-        <div className="flex items-end justify-between mb-8">
-           <h2 className="text-2xl font-black border-none p-0 m-0 uppercase tracking-tight">Institutional DNA</h2>
-           <span className="text-[10px] font-black uppercase px-3 py-1 bg-slate-900 text-white rounded-md tracking-widest">
-             Profile ID: {Math.random().toString(36).substring(7).toUpperCase()}
-           </span>
-        </div>
-        
-        <div className="grid grid-cols-2 gap-12">
-          <div className="bg-slate-50 p-10 rounded-3xl border border-slate-100 relative">
-             <div className="absolute top-6 left-6 w-1 h-12 bg-blue-600 rounded-full" />
-             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 ml-4">Domain Synthesis</p>
-             <p className="text-[14px] text-slate-700 leading-relaxed font-bold italic ml-4">
-               "{data.description || data.coreOffering || "Automated synthesis of domain architecture and market positioning nodes."}"
-             </p>
-          </div>
-          <div className="py-4 space-y-5">
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Classification Matrix</p>
-            <div className="flex justify-between border-b border-slate-100 pb-3">
-              <span className="text-xs font-black text-slate-400 uppercase">Architecture</span>
-              <span className="text-xs font-black text-slate-900 uppercase tracking-tight">{data.domainType || 'N/A'}</span>
-            </div>
-            <div className="flex justify-between border-b border-slate-100 pb-3">
-              <span className="text-xs font-black text-slate-400 uppercase">Audience Model</span>
-              <span className="text-xs font-black text-slate-900 uppercase tracking-tight">{data.brandType || 'N/A'}</span>
-            </div>
-            <div className="flex justify-between border-b border-slate-100 pb-3">
-              <span className="text-xs font-black text-slate-400 uppercase">Strategic Focus</span>
-              <span className="text-xs font-black text-blue-600 uppercase tracking-tight">{data.brandFocus || 'Digital Entry'}</span>
-            </div>
-            <div className="flex justify-between border-b border-slate-100 pb-3">
-              <span className="text-xs font-black text-slate-400 uppercase">Perceptual Sentiment</span>
-              <span className="text-xs font-black text-emerald-600 uppercase tracking-tight">{data.sentiment || 'Neutral'}</span>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ── Institutional DNA ─────────────────────────────────────── */}
+      <section style={{ marginBottom: '32px' }}>
+        <div className="rpt-section-title">Institutional DNA</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
 
-      {/* Semantic clusters */}
-      <section className="mb-12">
-        <h2 className="text-lg font-black mb-8 uppercase tracking-tight">Semantic Footprint Clusters</h2>
-        <div className="grid grid-cols-3 gap-8">
-          <div className="border border-slate-100 p-8 rounded-3xl bg-white shadow-sm break-inside-avoid">
-             <div className="flex items-center gap-2 mb-6">
-                <div className="w-2 h-2 bg-blue-600 rounded-full" />
-                <p className="text-[11px] font-black text-slate-900 uppercase tracking-widest">Topic Matrix</p>
-             </div>
-             <div className="flex flex-wrap gap-2">
-                {topics.slice(0, 12).map((t, i) => (
-                  <span key={i} className="text-[10px] font-bold px-3 py-1.5 bg-slate-50 rounded-xl border border-slate-100 text-slate-600 uppercase tracking-tight">{t}</span>
-                ))}
-             </div>
-          </div>
-          <div className="border border-slate-100 p-8 rounded-3xl bg-white shadow-sm break-inside-avoid">
-             <div className="flex items-center gap-2 mb-6">
-                <div className="w-2 h-2 bg-purple-600 rounded-full" />
-                <p className="text-[11px] font-black text-slate-900 uppercase tracking-widest">AI Prompts</p>
-             </div>
-             <div className="flex flex-wrap gap-2">
-                {prompts.slice(0, 12).map((p, i) => (
-                  <span key={i} className="text-[10px] font-bold px-3 py-1.5 bg-purple-50 text-purple-700 rounded-xl border border-purple-100 uppercase tracking-tight">{p}</span>
-                ))}
-             </div>
-          </div>
-          <div className="border border-slate-100 p-8 rounded-3xl bg-white shadow-sm break-inside-avoid">
-             <div className="flex items-center gap-2 mb-6">
-                <div className="w-2 h-2 bg-rose-600 rounded-full" />
-                <p className="text-[11px] font-black text-slate-900 uppercase tracking-widest">Competitors</p>
-             </div>
-             <div className="flex flex-wrap gap-2">
-                {competitors.slice(0, 12).map((c, i) => (
-                  <span key={i} className="text-[10px] font-bold px-3 py-1.5 bg-rose-50 text-rose-700 rounded-xl border border-rose-100 uppercase tracking-tight">{c}</span>
-                ))}
-             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Presence Matrix */}
-      <section className="mb-12 break-inside-avoid">
-        <h2 className="text-lg font-black mb-6 uppercase tracking-tight">Market Presence Matrix</h2>
-        <div className="grid grid-cols-4 gap-4">
-          {presenceTags.map((tag, i) => (
-            <div key={i} className="bg-slate-900 text-white p-4 rounded-2xl flex items-center justify-center text-center">
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] leading-tight">
-                {tag}
-              </span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Strategic Recommendation */}
-      <section className="mt-12 p-8 bg-blue-50 rounded-3xl border border-blue-100">
-        <div className="flex gap-6 items-start">
-           <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm shrink-0">
-              <span className="text-xl">✦</span>
-           </div>
-           <div>
-              <h4 className="text-sm font-black uppercase text-blue-900 mb-2">Strategic Recommendation</h4>
-              <p className="text-xs text-blue-700 leading-relaxed font-medium">
-                Based on your {data.brandFocus} positioning, we recommend prioritizing technical readiness signals for {topics[0] || 'your core services'} to solidify your AI semantic authority.
+          {/* Domain Synthesis */}
+          <div style={{
+            background: '#1F2937', // Solid pure black
+            borderRadius: '16px',
+            padding: '24px',
+            position: 'relative',
+            overflow: 'hidden',
+          }}>
+            <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: '100px', height: '100px', borderRadius: '50%', background: '#0891B220' }} />
+            <div style={{ position: 'absolute', bottom: '-30px', left: '-30px', width: '80px', height: '80px', borderRadius: '50%', background: '#0891B215' }} />
+            <div style={{ position: 'relative' }}>
+              <div style={{ fontSize: '10px', fontWeight: '600', color: '#0891B2', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '10px' }}>Domain Synthesis</div>
+              <p style={{ fontSize: '16px', fontWeight: '600', color: '#ffffff', lineHeight: '1.7', margin: 0, fontStyle: 'italic' }}>
+                "{data.description || data.coreOffering || 'Automated synthesis of domain architecture and market positioning nodes.'}"
               </p>
-           </div>
+            </div>
+          </div>
+
+          {/* Classification Matrix */}
+          <div style={{ border: '1px solid #E2E8F0', borderRadius: '16px', padding: '20px', background: '#FAFBFC' }}>
+            <div style={{ fontSize: '10px', fontWeight: '600', color: '#1F2937', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '14px' }}>Classification Matrix</div>
+            {[
+              { key: 'Architecture', val: data.domainType || 'N/A' },
+              { key: 'Audience Model', val: data.brandType || 'N/A' },
+              { key: 'Total Pages', val: data.totalPages || data.totalUrls || 'N/A' },
+              { key: 'Strategic Focus', val: data.brandFocus || 'Digital Entry', highlight: true },
+              { key: 'Perceptual Sentiment', val: (data.sentiment || 'Neutral').split('.')[0], green: true },
+            ].map((row, i) => (
+              <div key={i} style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                padding: '9px 0', borderBottom: i < 4 ? '1px solid #E2E8F0' : 'none'
+              }}>
+                <span style={{ fontSize: '12px', fontWeight: '700', color: '#1F2937', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{row.key}</span>
+                <span style={{
+                  fontSize: '13px', fontWeight: '600',
+                  color: row.highlight ? '#0891B2' : row.green ? '#059669' : '#1F2937'
+                }}>{row.val}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Brand Sentiment Analysis ───────────────────────────────── */}
+      {data.sentiment && data.sentiment.length > 50 && (
+        <section style={{ marginBottom: '32px', breakInside: 'avoid' }}>
+          <div className="rpt-section-title">Brand Sentiment & Market Perception</div>
+          <div className="rpt-insight" style={{ background: '#ECFDF5', padding: '20px', borderRadius: '14px', border: '1px solid #D1FAE5', borderLeft: '4px solid #10B981' }}>
+            <p style={{ fontSize: '14px', color: '#064E3B', lineHeight: '1.65', fontWeight: '600', margin: 0 }}>
+              {data.sentiment}
+            </p>
+          </div>
+        </section>
+      )}
+
+      {/* ── Target Persona Analysis ───────────────────────────── */}
+      {data.targetPersona && (
+        <section style={{ marginBottom: '32px', breakInside: 'avoid' }}>
+          <div className="rpt-section-title">Audience & Persona Alignment</div>
+          <div className="rpt-insight" style={{ background: '#FFF7ED', padding: '20px', borderRadius: '14px', border: '1px solid #FFEDD5', borderLeft: '4px solid #F97316' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <div style={{ fontSize: '11px', fontWeight: '600', color: '#F97316', textTransform: 'uppercase', letterSpacing: '0.15em' }}>Target Persona</div>
+              {data.confidenceScore && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ fontSize: '10px', fontWeight: '600', color: '#EA580C', backgroundColor: '#FFEDD5', padding: '4px 10px', borderRadius: '12px' }}>
+                    {data.confidenceScore}% Confidence
+                  </div>
+                </div>
+              )}
+            </div>
+            <p style={{ fontSize: '14px', color: '#1F2937', lineHeight: '1.65', fontWeight: '600', margin: 0 }}>
+              {data.targetPersona}
+            </p>
+            {data.confidenceScore && (
+              <div style={{ width: '100%', backgroundColor: '#FFEDD5', borderRadius: '4px', height: '4px', marginTop: '16px' }}>
+                <div style={{ backgroundColor: '#F97316', height: '4px', borderRadius: '4px', width: `${data.confidenceScore}%` }} />
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* ── Semantic Footprint Clusters ───────────────────────────── */}
+      {clusterGroups.length > 0 && (
+        <section style={{ marginBottom: '32px' }}>
+          <div className="rpt-section-title">Semantic Footprint Clusters</div>
+          <div style={{ display: 'grid', gridTemplateColumns: `repeat(${clusterGroups.length}, 1fr)`, gap: '14px' }}>
+            {clusterGroups.map(({ label, items, color, bg, border, badgeCls }, gi) => (
+              <div key={gi} style={{
+                border: `1px solid ${border}`,
+                borderTop: `3px solid ${color}`,
+                borderRadius: '14px',
+                padding: '18px',
+                background: '#ffffff',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                  <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: color }} />
+                  <div style={{ fontSize: '11px', fontWeight: '600', color: color, textTransform: 'uppercase', letterSpacing: '0.15em' }}>{label}</div>
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                  {items.slice(0, 14).map((t, i) => (
+                    <span key={i} className={`rpt-tag ${badgeCls}`}>{t}</span>
+                  ))}
+                  {items.length > 14 && (
+                    <span className="rpt-tag rpt-badge-slate">+{items.length - 14} more</span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ── Market Presence Matrix ───────────────────────────────── */}
+      {presenceTags.length > 0 && (
+        <section style={{ marginBottom: '32px' }}>
+          <div className="rpt-section-title">Market Presence Matrix</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
+            {presenceTags.map((tag, i) => (
+              <div key={i} style={{
+                background: i % 3 === 0 ? '#1F2937' : i % 3 === 1 ? '#0891B2' : '#111827',
+                color: '#ffffff',
+                borderRadius: '12px',
+                padding: '16px 12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                textAlign: 'center',
+              }}>
+                <span style={{ fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.15em', lineHeight: '1.4' }}>{tag}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ── Strategic Recommendation ─────────────────────────────── */}
+      <section style={{
+        background: '#EFF6FF', // Solid background instead of gradient
+        border: '1px solid #BFDBFE',
+        borderLeft: '4px solid #0891B2',
+        borderRadius: '0 16px 16px 0',
+        padding: '22px 24px',
+        breakInside: 'avoid',
+      }}>
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+          <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>✦</div>
+          <div>
+            <div style={{ fontSize: '12px', fontWeight: '700', color: '#0891B2', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '8px' }}>Strategic Recommendation</div>
+            <p style={{ fontSize: '14px', color: '#1F2937', lineHeight: '1.7', margin: 0, fontWeight: '600' }}>
+              Based on your <strong>{data.brandFocus || 'digital'}</strong> positioning, we recommend prioritizing technical readiness signals for{' '}
+              <strong>{topics[0] || 'your core services'}</strong> to solidify your AI semantic authority. Focus on consistent entity signals and comprehensive structured data markup to improve discoverability in AI-generated responses.
+            </p>
+          </div>
         </div>
       </section>
     </BaseReportLayout>

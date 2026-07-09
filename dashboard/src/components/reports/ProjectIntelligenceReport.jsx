@@ -2,143 +2,270 @@ import React from 'react';
 import BaseReportLayout from './BaseReportLayout';
 
 /**
- * ProjectIntelligenceReport
- * Comprehensive report for a full Brand Visibility Project.
- * Combines KPIs, historical trends, and prompt-level performance.
+ * ProjectIntelligenceReport — Premium PDF Template
+ * Full Spectrum GEO Visibility & Perceptual Report
  */
 const ProjectIntelligenceReport = ({ brandName, data, history = [], date }) => {
   const lastSnapshot = history[0] || {};
+  const prevSnapshot = history[1] || {};
   const rankings = lastSnapshot.promptRankings || [];
-  
-  // Calculate top-level stats
+
   const top1 = rankings.filter(r => r.found && r.rank === 1).length;
   const top3 = rankings.filter(r => r.found && r.rank > 0 && r.rank <= 3).length;
   const top10 = rankings.filter(r => r.found && r.rank > 0 && r.rank <= 10).length;
   const total = data?.prompts?.length || rankings.length || 0;
-  
+  const citations = rankings.filter(r => r.linkFound).length;
+
   const score = lastSnapshot.overallScore || 0;
-  const visibility = Math.round(rankings.reduce((a, b) => a + (b.score || 0), 0) / (total || 1));
+  const prevScore = (history[1] || {}).overallScore || 0;
+  const scoreDelta = score - prevScore;
+
+  // Consensus-based KPI calculations mirroring the frontend dashboard
+  const engineNames = ['openai', 'gemini'];
+  let mentionSum = 0;
+  let linkSum = 0;
+  let validEngines = 0;
+
+  engineNames.forEach(eng => {
+    const engRankings = rankings.filter(r => r.engine === eng);
+    if (engRankings.length > 0) {
+      const engMentions = engRankings.filter(r => r.found).length;
+      const engLinks = engRankings.filter(r => r.linkFound).length;
+      mentionSum += (engMentions / engRankings.length);
+      linkSum += (engLinks / engRankings.length);
+      validEngines++;
+    }
+  });
+
+  const mentionRate = validEngines > 0 ? Math.round((mentionSum / validEngines) * 100) : 0;
+  const linkRate = validEngines > 0 ? Math.round((linkSum / validEngines) * 100) : 0;
+  const sources = lastSnapshot.authoritySignals?.webGroundedRecency || 0;
+
+  const engineScores = lastSnapshot.engineScores || {};
+
+  const getStatusTag = (found, rank) => {
+    if (!found) return { cls: 'rpt-badge-red', label: 'Not Found' };
+    if (rank <= 1) return { cls: 'rpt-badge-green', label: `#${rank} Top` };
+    if (rank <= 3) return { cls: 'rpt-badge-blue', label: `#${rank}` };
+    if (rank <= 10) return { cls: 'rpt-badge-amber', label: `#${rank}` };
+    return { cls: 'rpt-badge-slate', label: `#${rank}` };
+  };
 
   return (
-    <BaseReportLayout 
-      title="Brand Intelligence Audit" 
+    <BaseReportLayout
+      title="Brand Intelligence Audit"
       subtitle="Full Spectrum GEO Visibility & Perceptual Report"
       brandName={brandName}
       date={date}
+      reportType="Project Intelligence"
+      accentColor="#F59E0B"
     >
-      {/* Executive Summary Section */}
-      <section className="mb-12">
-        <h2 className="text-xl font-black mb-8 uppercase tracking-tight">Executive Visibility Summary</h2>
-        <div className="grid grid-cols-4 gap-6">
-          <div className="bg-slate-900 text-white p-8 rounded-3xl flex flex-col items-center justify-center text-center shadow-xl">
-             <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-2 opacity-60">GEO Health Index</p>
-             <p className="text-4xl font-black">{score}%</p>
+      {/* ── Executive KPI Summary ─────────────────────────────────── */}
+      <section style={{ marginBottom: '32px' }}>
+        <div className="rpt-section-title">Executive Visibility Summary</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr 1fr 1fr', gap: '10px' }}>
+
+          {/* Main Score Card */}
+          <div style={{
+            background: '#1F2937', // Solid background instead of gradient
+            borderRadius: '16px',
+            padding: '24px 20px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            position: 'relative',
+            overflow: 'hidden',
+          }}>
+            <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: '80px', height: '80px', borderRadius: '50%', background: '#F59E0B20' }} />
+            <div>
+              <div style={{ fontSize: '8px', fontWeight: '700', color: '#555555', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '6px' }}>GEO Health Index</div>
+              <div style={{ fontSize: '42px', fontWeight: '700', color: '#ffffff', letterSpacing: '-2px', lineHeight: 1 }}>{score}%</div>
+            </div>
+            <div style={{ marginTop: '12px' }}>
+              <div style={{ height: '4px', backgroundColor: '#334155', borderRadius: '2px', overflow: 'hidden' }}>
+                <div style={{ width: `${score}%`, height: '100%', backgroundColor: '#F59E0B', borderRadius: '2px' }} />
+              </div>
+              {scoreDelta !== 0 && (
+                <div style={{ marginTop: '8px', fontSize: '9px', fontWeight: '700', color: scoreDelta > 0 ? '#34D399' : '#F87171' }}>
+                  {scoreDelta > 0 ? '▲' : '▼'} {Math.abs(scoreDelta)}% from previous scan
+                </div>
+              )}
+            </div>
           </div>
-          <div className="bg-blue-50 border border-blue-100 p-6 rounded-3xl flex flex-col items-center justify-center text-center">
-             <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2">Search Visibility</p>
-             <p className="text-2xl font-black text-slate-900">{visibility}%</p>
-          </div>
-          <div className="bg-emerald-50 border border-emerald-100 p-6 rounded-3xl flex flex-col items-center justify-center text-center">
-             <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-2">Top 3 Rankings</p>
-             <p className="text-2xl font-black text-slate-900">{top3}</p>
-          </div>
-          <div className="bg-purple-50 border border-purple-100 p-6 rounded-3xl flex flex-col items-center justify-center text-center">
-             <p className="text-[10px] font-black text-purple-600 uppercase tracking-widest mb-2">Market Citations</p>
-             <p className="text-2xl font-black text-slate-900">{rankings.filter(r => r.linkFound).length}</p>
-          </div>
+
+          {[
+            { label: 'Brand Mentions', value: `${mentionRate}%`, color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' },
+            { label: 'Citations (Links)', value: `${linkRate}%`, color: '#059669', bg: '#ECFDF5', border: '#A7F3D0' },
+            { label: 'Web-Grounding', value: `${sources}%`, color: '#7C3AED', bg: '#F5F3FF', border: '#DDD6FE' },
+            { label: 'Top 3 Placements', value: top3, color: '#D97706', bg: '#FFFBEB', border: '#FDE68A' },
+          ].map((kpi, i) => (
+            <div key={i} style={{ background: kpi.bg, border: `1px solid ${kpi.border}`, borderRadius: '16px', padding: '22px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div style={{ fontSize: '8px', fontWeight: '600', color: kpi.color, textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '8px' }}>{kpi.label}</div>
+              <div style={{ fontSize: '30px', fontWeight: '700', color: '#1F2937', letterSpacing: '-0.5px' }}>{kpi.value}</div>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* Engine Comparison */}
-      <section className="mb-12 break-inside-avoid">
-        <h2 className="text-lg font-black mb-6 uppercase tracking-tight">AI Engine Semantic Alignment</h2>
-        <div className="grid grid-cols-2 gap-10">
-          <div className="border border-slate-100 p-8 rounded-3xl bg-white shadow-sm">
-             <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-black uppercase tracking-widest">OpenAI (GPT-4o)</span>
-                <span className="text-sm font-black text-emerald-600">{lastSnapshot.engineScores?.openai || 0}%</span>
-             </div>
-             <div className="h-2 w-full bg-slate-50 rounded-full overflow-hidden">
-                <div className="h-full bg-emerald-500" style={{ width: `${lastSnapshot.engineScores?.openai || 0}%` }} />
-             </div>
-             <p className="text-[10px] text-slate-400 mt-4 font-medium uppercase tracking-tight">Based on organic mention frequency and semantic proximity.</p>
+      {/* ── AI Engine Semantic Alignment ─────────────────────────── */}
+      {(engineScores.openai || engineScores.gemini) && (
+        <section style={{ marginBottom: '32px', breakInside: 'avoid' }}>
+          <div className="rpt-section-title">AI Engine Semantic Alignment</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+            {[
+              { label: 'OpenAI (GPT-4o)', score: engineScores.openai || 0, color: '#10A37F', bg: '#ECFDF5', note: 'Based on organic mention frequency and semantic proximity.' },
+              { label: 'Google Gemini', score: engineScores.gemini || 0, color: '#4285F4', bg: '#EFF6FF', note: 'Based on Search Generative Experience (SGE) grounding.' },
+            ].map((engine, i) => (
+              <div key={i} style={{ border: '1px solid #E2E8F0', borderRadius: '14px', padding: '20px', background: '#FAFBFC' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: '700', color: '#1F2937', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{engine.label}</span>
+                  <span style={{ fontSize: '18px', fontWeight: '700', color: engine.color }}>{engine.score}%</span>
+                </div>
+                <div style={{ height: '6px', backgroundColor: '#E2E8F0', borderRadius: '3px', overflow: 'hidden', marginBottom: '10px' }}>
+                  <div style={{ width: `${engine.score}%`, height: '100%', backgroundColor: engine.color, borderRadius: '3px' }} />
+                </div>
+                <p style={{ fontSize: '11px', color: '#1F2937', fontWeight: '700', lineHeight: '1.5', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  {engine.note}
+                </p>
+              </div>
+            ))}
           </div>
-          <div className="border border-slate-100 p-8 rounded-3xl bg-white shadow-sm">
-             <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-black uppercase tracking-widest">Google Gemini</span>
-                <span className="text-sm font-black text-blue-600">{lastSnapshot.engineScores?.gemini || 0}%</span>
-             </div>
-             <div className="h-2 w-full bg-slate-50 rounded-full overflow-hidden">
-                <div className="h-full bg-blue-500" style={{ width: `${lastSnapshot.engineScores?.gemini || 0}%` }} />
-             </div>
-             <p className="text-[10px] text-slate-400 mt-4 font-medium uppercase tracking-tight">Based on Search Generative Experience (SGE) grounding.</p>
+        </section>
+      )}
+
+      {/* ── Prompt Performance Table ──────────────────────────────── */}
+      <section style={{ marginBottom: '32px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+          <div className="rpt-section-title" style={{ marginBottom: 0 }}>Prompt Performance Matrix</div>
+          <div style={{ display: 'flex', gap: '6px' }}>
+            <span className="rpt-tag rpt-badge-green">Top 3: {top3}</span>
+            <span className="rpt-tag rpt-badge-blue">Top 10: {top10}</span>
+            <span className="rpt-tag rpt-badge-slate">Total: {total}</span>
           </div>
         </div>
-      </section>
 
-      {/* Rankings Detail Table */}
-      <section className="mb-12">
-        <h2 className="text-lg font-black mb-6 uppercase tracking-tight">Prompt Performance Matrix</h2>
-        <table className="w-full text-left border-collapse">
+        <table className="rpt-table">
           <thead>
-            <tr className="border-b-2 border-slate-900">
-              <th className="py-4 text-[11px] font-black uppercase tracking-widest text-slate-400">Audit Parameter</th>
-              <th className="py-4 text-[11px] font-black uppercase tracking-widest text-slate-400 text-center">Rank</th>
-              <th className="py-4 text-[11px] font-black uppercase tracking-widest text-slate-400 text-center">Mention</th>
-              <th className="py-4 text-[11px] font-black uppercase tracking-widest text-slate-400 text-center">Link</th>
-              <th className="py-4 text-[11px] font-black uppercase tracking-widest text-slate-400 text-right">Visibility</th>
+            <tr>
+              <th>Audit Parameter</th>
+              <th style={{ textAlign: 'center' }}>Rank</th>
+              <th style={{ textAlign: 'center' }}>Mention</th>
+              <th style={{ textAlign: 'center' }}>Link</th>
+              <th style={{ textAlign: 'right' }}>Visibility</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
-            {rankings.slice(0, 15).map((r, i) => (
-              <tr key={i} className="group">
-                <td className="py-4">
-                  <p className="text-xs font-bold text-slate-900">{r.prompt}</p>
-                  <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter mt-0.5">{r.engine}</p>
-                </td>
-                <td className="py-4 text-center">
-                  <span className={`text-[11px] font-black px-2 py-1 rounded ${r.rank > 0 && r.rank <= 3 ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500'}`}>
-                    {r.rank > 0 ? `#${r.rank}` : '—'}
-                  </span>
-                </td>
-                <td className="py-4 text-center">
-                  <span className={`text-[10px] font-black ${r.found ? 'text-emerald-600' : 'text-slate-300'}`}>
-                    {r.found ? 'YES' : 'NO'}
-                  </span>
-                </td>
-                <td className="py-4 text-center">
-                  <span className={`text-[10px] font-black ${r.linkFound ? 'text-blue-600' : 'text-slate-300'}`}>
-                    {r.linkFound ? 'YES' : 'NO'}
-                  </span>
-                </td>
-                <td className="py-4 text-right">
-                  <span className="text-xs font-black text-slate-900">{r.score || 0}%</span>
-                </td>
-              </tr>
-            ))}
+          <tbody>
+            {rankings.slice(0, 18).map((r, i) => {
+              const tag = getStatusTag(r.found, r.rank);
+              return (
+                <tr key={i}>
+                  <td>
+                    <div style={{ fontWeight: '600', color: '#1F2937', fontSize: '13px' }}>{r.prompt}</div>
+                    <div style={{ fontSize: '10px', color: '#444444', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: '2px' }}>{r.engine}</div>
+                  </td>
+                  <td style={{ textAlign: 'center' }}>
+                    <span className={`rpt-tag ${tag.cls}`}>{r.found ? `#${r.rank}` : '—'}</span>
+                  </td>
+                  <td style={{ textAlign: 'center' }}>
+                    <span style={{ fontSize: '12px', fontWeight: '600', color: r.found ? '#059669' : '#1F2937' }}>{r.found ? 'YES' : 'NO'}</span>
+                  </td>
+                  <td style={{ textAlign: 'center' }}>
+                    <span style={{ fontSize: '12px', fontWeight: '600', color: r.linkFound ? '#2563EB' : '#1F2937' }}>{r.linkFound ? 'YES' : 'NO'}</span>
+                  </td>
+                  <td style={{ textAlign: 'right' }}>
+                    <span style={{ fontSize: '13px', fontWeight: '700', color: '#1F2937' }}>{r.score || 0}%</span>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
-        {rankings.length > 15 && (
-           <p className="text-[10px] text-slate-400 italic mt-4">* Additional {rankings.length - 15} parameters analyzed but omitted for brevity. View live dashboard for full dataset.</p>
+        {rankings.length > 18 && (
+          <p style={{ fontSize: '9px', color: '#666666', marginTop: '8px', fontStyle: 'italic' }}>
+            * {rankings.length - 18} additional parameters analyzed but omitted for brevity. View live dashboard for full dataset.
+          </p>
         )}
       </section>
 
-      {/* Strategic Outlook */}
-      <section className="mt-12 p-10 bg-slate-900 rounded-[2rem] text-white relative overflow-hidden break-inside-avoid">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px] -mr-32 -mt-32" />
-        <div className="relative z-10">
-           <h3 className="text-sm font-black uppercase tracking-[0.2em] text-blue-400 mb-4">Strategic Outlook</h3>
-           <div className="grid grid-cols-2 gap-12">
+      {/* ── Competitor Benchmarking ──────────────────────────────── */}
+      {data?.competitors?.length > 0 && (
+        <section style={{ marginBottom: '32px', breakInside: 'avoid' }}>
+          <div className="rpt-section-title">Competitor Benchmarking</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px' }}>
+            {data.competitors.map((comp, idx) => {
+              const normalize = (d) => (d || '').toLowerCase().replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '').trim();
+              const targetDomain = normalize(comp.domain);
+              const compRankings = lastSnapshot?.competitorRankings?.filter(cr => {
+                const aiDomain = normalize(cr.competitorDomain);
+                const isDomainMatch = aiDomain && targetDomain && aiDomain === targetDomain;
+                const isNameMatch = cr.competitorName?.toLowerCase() === comp.name?.toLowerCase();
+                return isDomainMatch || isNameMatch;
+              }) || [];
+              const compScoreInput = compRankings.length > 0
+                ? Math.round(compRankings.reduce((a, b) => a + (b.score || 0), 0) / compRankings.length)
+                : 0;
+              const compScore = (compRankings.some(cr => cr.found || cr.rank > 0) && compScoreInput < 15) ? 15 : compScoreInput;
+              const userRawVisibility = lastSnapshot?.rawVisibility || score;
+              const gap = compScore - userRawVisibility;
+
+              return (
+                <div key={idx} style={{ border: '1px solid #E2E8F0', borderRadius: '16px', padding: '20px', background: '#FAFBFC', position: 'relative' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                    <div>
+                      <div style={{ fontSize: '13px', fontWeight: '600', color: '#1F2937' }}>{comp.name}</div>
+                      <div style={{ fontSize: '10px', color: '#555555' }}>{comp.domain}</div>
+                    </div>
+                    <div style={{ fontSize: '20px', fontWeight: '700', color: '#1F2937' }}>{compScore}%</div>
+                  </div>
+                  <div style={{ height: '4px', backgroundColor: '#E2E8F0', borderRadius: '2px', overflow: 'hidden', marginBottom: '12px' }}>
+                    <div style={{ width: `${compScore}%`, height: '100%', backgroundColor: '#2563EB', borderRadius: '2px' }} />
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '9px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#555555' }}>Visibility vs You</span>
+                    <span className={`rpt-tag ${gap > 0 ? 'rpt-badge-red' : 'rpt-badge-green'}`}>
+                      {gap > 0 ? `+${gap}% LEAD` : `${Math.abs(gap)}% GAP`}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* ── Strategic Outlook ─────────────────────────────────────── */}
+      <section style={{
+        background: '#1F2937', // Solid background instead of gradient
+        borderRadius: '18px',
+        padding: '28px 32px',
+        breakInside: 'avoid',
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
+        <div style={{ position: 'absolute', top: '-40px', right: '-40px', width: '150px', height: '150px', borderRadius: '50%', background: '#F59E0B12' }} />
+        <div style={{ position: 'relative' }}>
+          <div style={{ fontSize: '11px', fontWeight: '700', color: '#F59E0B', textTransform: 'uppercase', letterSpacing: '0.25em', marginBottom: '16px' }}>Strategic Outlook</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+            <div>
+              <p style={{ fontSize: '14px', color: '#ffffff', lineHeight: '1.7', margin: 0, fontWeight: '600' }}>
+                Your current visibility index of <strong style={{ color: '#ffffff' }}>{score}%</strong> across your target market indicates{' '}
+                {score >= 70 ? 'a strong foothold' : score >= 40 ? 'growing momentum' : 'significant room for growth'} in AI grounding.
+                Focus on increasing <em style={{ color: '#F59E0B' }}>cited source</em> frequency by optimizing structured data and building entity authority.
+              </p>
+            </div>
+            <div style={{ borderLeft: '1px solid #334155', paddingLeft: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '14px' }}>
               <div>
-                 <p className="text-xs text-slate-300 leading-relaxed font-medium">
-                   Your current visibility index of <strong className="text-white">{score}%</strong> across <strong className="text-white">India</strong> indicates a strong foothold in AI grounding. To further improve, focus on increasing "Cited Source" frequency in Google Gemini responses by optimizing technical structured data.
-                 </p>
+                <div style={{ fontSize: '8px', fontWeight: '700', color: '#555555', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '4px' }}>Next Audit Recommended</div>
+                <div style={{ fontSize: '14px', fontWeight: '600', color: '#ffffff' }}>
+                  {new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                </div>
               </div>
-              <div className="border-l border-white/10 pl-12 flex flex-col justify-center">
-                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Next Audit Recommended</p>
-                 <p className="text-lg font-bold text-white">May 20, 2026</p>
+              <div>
+                <div style={{ fontSize: '8px', fontWeight: '700', color: '#555555', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '4px' }}>Priority Action</div>
+                <div style={{ fontSize: '11px', fontWeight: '700', color: '#F59E0B' }}>Strengthen Citation Depth</div>
               </div>
-           </div>
+            </div>
+          </div>
         </div>
       </section>
     </BaseReportLayout>

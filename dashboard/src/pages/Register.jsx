@@ -192,22 +192,22 @@ const Register = () => {
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <Activity className="w-4 h-4 text-green-400" />
-                  <span className="text-xs text-gray-400">Live Activity</span>
+                  <span className="text-xs text-gray-600">Live Activity</span>
                 </div>
-                <span className="text-xs text-gray-500">Last 24h</span>
+                <span className="text-xs text-gray-700">Last 24h</span>
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-white">1,847</div>
-                  <div className="text-xs text-gray-400">New Users</div>
+                  <div className="text-xs text-gray-600">New Users</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-white">94%</div>
-                  <div className="text-xs text-gray-400">Satisfaction</div>
+                  <div className="text-xs text-gray-600">Satisfaction</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-white">24/7</div>
-                  <div className="text-xs text-gray-400">Support</div>
+                  <div className="text-xs text-gray-600">Support</div>
                 </div>
               </div>
             </div>
@@ -230,11 +230,11 @@ const Register = () => {
                 <div className="flex justify-center mb-6">
                   <img src="https://res.cloudinary.com/dbbll23jz/image/upload/v1777897134/AISONX_Logo_Final_rzzvfr.png" className="h-16 w-auto object-contain" alt="AISONX Logo" />
                 </div>
-                <h2 className="text-xl font-bold text-gray-900 mb-1">
+                <h2 className="text-xl font-bold text-gray-800 mb-1">
                   {otpSent ? 'Verify Your Email' : 'Create Account'}
                 </h2>
                 {otpSent && (
-                  <p className="text-gray-500 text-sm">
+                  <p className="text-gray-700 text-sm">
                     OTP sent to <span className="text-blue-500 font-semibold">{email}</span>
                   </p>
                 )}
@@ -263,15 +263,15 @@ const Register = () => {
                   >
                     {/* Name */}
                     <div className="space-y-1">
-                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1">
+                      <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider ml-1">
                         Full Name
                       </label>
                       <div className="relative">
-                        <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4" />
                         <input
                           type="text"
                           required
-                          className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 transition-all text-sm"
+                          className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-gray-800 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 transition-all text-sm"
                           placeholder="John Doe"
                           value={name}
                           onChange={(e) => setName(e.target.value)}
@@ -281,15 +281,15 @@ const Register = () => {
 
                     {/* Email */}
                     <div className="space-y-1">
-                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1">
+                      <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider ml-1">
                         Email Address
                       </label>
                       <div className="relative">
-                        <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4" />
                         <input
                           type="email"
                           required
-                          className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 transition-all text-sm"
+                          className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-gray-800 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 transition-all text-sm"
                           placeholder="name@company.com"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
@@ -299,17 +299,17 @@ const Register = () => {
 
                     {/* Phone */}
                     <div className="space-y-1">
-                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1">
+                      <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider ml-1">
                         Phone Number
                       </label>
                       <div className="relative">
-                        <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4" />
                         <input
                           type="tel"
                           required
                           pattern="[0-9]{10}"
                           title="Please enter a valid 10-digit phone number"
-                          className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 transition-all text-sm"
+                          className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-gray-800 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 transition-all text-sm"
                           placeholder="10-digit mobile number"
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
@@ -319,15 +319,15 @@ const Register = () => {
 
                     {/* Password */}
                     <div className="space-y-1">
-                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1">
+                      <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider ml-1">
                         Password
                       </label>
                       <div className="relative">
-                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4" />
                         <input
                           type={showPassword ? "text" : "password"}
                           required
-                          className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-10 pr-10 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 transition-all text-sm"
+                          className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-10 pr-10 text-gray-800 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 transition-all text-sm"
                           placeholder="••••••••"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
@@ -335,7 +335,7 @@ const Register = () => {
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-600 transition-colors"
                         >
                           {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
@@ -363,7 +363,7 @@ const Register = () => {
                     className="space-y-5"
                   >
                     <div className="space-y-3">
-                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block text-center">
+                      <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider block text-center">
                         Enter 6-digit OTP
                       </label>
                       <div className="flex justify-center gap-2" onPaste={handleOtpPaste}>
@@ -380,7 +380,7 @@ const Register = () => {
                             className={`w-10 h-12 text-center text-lg font-bold rounded-xl border-2 transition-all outline-none
                               ${digit
                                 ? 'border-blue-500 bg-blue-50 text-blue-600'
-                                : 'border-gray-200 bg-gray-50 text-gray-900'
+                                : 'border-gray-200 bg-gray-50 text-gray-800'
                               }
                               focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20`}
                           />
@@ -403,14 +403,14 @@ const Register = () => {
                     <div className="flex items-center justify-between text-sm">
                       <button
                         onClick={handleEditDetails}
-                        className="text-gray-500 hover:text-blue-500 font-medium transition-colors"
+                        className="text-gray-700 hover:text-blue-500 font-medium transition-colors"
                       >
                         ← Edit Details
                       </button>
                       <button
                         onClick={handleResendOTP}
                         disabled={countdown > 0 || sendingOtp}
-                        className={`font-bold transition-colors ${countdown > 0 ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-600'}`}
+                        className={`font-bold transition-colors ${countdown > 0 ? 'text-gray-600 cursor-not-allowed' : 'text-blue-500 hover:text-blue-600'}`}
                       >
                         {sendingOtp ? 'Sending...' : countdown > 0 ? `Resend in ${countdown}s` : 'Resend OTP'}
                       </button>
@@ -421,7 +421,7 @@ const Register = () => {
 
               {/* Footer */}
               <div className="mt-4 pt-4 border-t border-gray-100 text-center">
-                <p className="text-gray-500 text-sm">
+                <p className="text-gray-700 text-sm">
                   Already have an account?{' '}
                   <Link to="/login" className="text-blue-500 font-semibold hover:text-blue-600 transition-colors">
                     Log in instead
@@ -429,7 +429,7 @@ const Register = () => {
                 </p>
               </div>
 
-              <div className="mt-3 flex justify-center items-center text-xs text-gray-400">
+              <div className="mt-3 flex justify-center items-center text-xs text-gray-600">
                 <div className="flex items-center gap-1">
                   <ShieldCheck className="w-3 h-3" />
                   <span>Secure Registration</span>
