@@ -4,6 +4,17 @@ const logger = require("../../utils/logger");
 const { cleanUrl } = require("../../utils/urlCleaner");
 const { robustParseJSON } = require("../../utils/jsonParser");
 const axios = require("axios");
+const Bottleneck = require('bottleneck');
+
+const geminiLimiter = new Bottleneck({
+    minTime: 2000, // 2 seconds between calls
+    maxConcurrent: 2
+});
+
+const openaiLimiter = new Bottleneck({
+    minTime: 1000,
+    maxConcurrent: 4
+});
 
 /**
  * PROJECT AUDITOR SERVICE
@@ -79,11 +90,11 @@ Return ONLY a valid JSON array. No markdown formatting (no markdown code blocks)
 `;
 
     logger.info(`🔄 [PROJECT_AUDITOR] GPT Batch Audit for ${prompts.length} prompts...`);
-    const res = await client.responses.create({
+    const res = await openaiLimiter.schedule(() => client.responses.create({
       model: "gpt-4o",
       tools: [{ type: "web_search" }],
       input: prompt
-    });
+    }));
 
     const text = res.output_text || (res.choices && res.choices[0]?.message?.content) || (res.output && res.output.text) || '';
     const results = robustParseJSON(text);
@@ -131,11 +142,11 @@ INSTRUCTIONS:
   "authoritySignals": { "sourceType": "OpenAI Benchmark + Evidence", "citations": [] }
 }`;
 
-    const res = await client.responses.create({
+    const res = await openaiLimiter.schedule(() => client.responses.create({
       model: "gpt-4o",
       tools: [{ type: "web_search" }],
       input: prompt
-    });
+    }));
 
     const text = res.output_text || (res.choices && res.choices[0]?.message?.content) || (res.output && res.output.text) || '';
     const result = robustParseJSON(text);
@@ -192,10 +203,10 @@ STRICT INSTRUCTIONS:
 
     const callGemini = async (retriesLeft) => {
         try {
-            const result = await model.generateContent({
+            const result = await geminiLimiter.schedule(() => model.generateContent({
                 contents: [{ role: "user", parts: [{ text: prompt }] }],
                 generationConfig: { temperature: 0.4 }
-            });
+            }));
             const text = result.response.text();
             finalResult = robustParseJSON(text);
             if (finalResult) {
@@ -318,11 +329,11 @@ Return ONLY a valid JSON array. No markdown formatting (no markdown code blocks)
     let retries = 3;
     while (retries > 0) {
       try {
-        const res = await client.responses.create({
+        const res = await openaiLimiter.schedule(() => client.responses.create({
           model: "gpt-4o",
           tools: [{ type: "web_search" }],
           input: prompt
-        });
+        }));
         text = res.output_text || (res.choices && res.choices[0]?.message?.content) || (res.output && res.output.text) || '';
         break; // Success
       } catch (apiErr) {
@@ -454,10 +465,10 @@ Return ONLY a valid JSON object. No markdown formatting (no markdown code blocks
 
     const callGeminiCompetitive = async (retriesLeft) => {
         try {
-            const result = await model.generateContent({
+            const result = await geminiLimiter.schedule(() => model.generateContent({
                 contents: [{ role: "user", parts: [{ text: prompt }] }],
                 generationConfig: { temperature: 0.4 }
-            });
+            }));
             const text = result.response.text();
             const rawResult = robustParseJSON(text);
             if (rawResult) {
@@ -581,11 +592,11 @@ Rules:
     let retries = 3;
     while (retries > 0) {
       try {
-        const res = await client.responses.create({
+        const res = await openaiLimiter.schedule(() => client.responses.create({
           model: "gpt-4o",
           tools: [{ type: "web_search" }],
           input: prompt
-        });
+        }));
 
         const text = res.output_text || (res.choices && res.choices[0]?.message?.content) || (res.output && res.output.text) || '';
         const discovered = robustParseJSON(text);
@@ -636,10 +647,10 @@ Return ONLY a JSON array:
     let retries = 3;
     while (retries > 0) {
         try {
-            const result = await model.generateContent({
+            const result = await geminiLimiter.schedule(() => model.generateContent({
               contents: [{ role: "user", parts: [{ text: prompt }] }],
               generationConfig: { temperature: 0.5 }
-            });
+            }));
 
             const text = result.response.text();
             const discovered = robustParseJSON(text);
