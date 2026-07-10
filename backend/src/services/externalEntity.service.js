@@ -28,12 +28,14 @@ async function checkWikidata(brandName) {
 // 2. Check Knowledge Graph (Needs Google API Key)
 async function checkKnowledgeGraph(brandName) {
     if (!brandName || !GOOGLE_API_KEY) return false;
-    // Broaden check: Remove 'types=Organization' to detect ANY valid brand entity record
-    const url = `https://kgsearch.googleapis.com/v1/entities:search?query=${encodeURIComponent(brandName)}&key=${GOOGLE_API_KEY}&limit=10`;
+    // Strict check: Require 'types=Organization' to prevent false positives from generic words
+    const url = `https://kgsearch.googleapis.com/v1/entities:search?query=${encodeURIComponent(brandName)}&types=Organization&key=${GOOGLE_API_KEY}&limit=10`;
     
     try {
         const response = await axios.get(url);
-        return response.data.itemListElement && response.data.itemListElement.length > 0;
+        const items = response.data.itemListElement;
+        // Require at least one result AND a decent confidence score (avoid extremely loose matches)
+        return items && items.length > 0 && items[0].resultScore > 1.0;
     } catch (e) {
         return false;
     }
@@ -45,8 +47,8 @@ async function checkKnowledgeGraph(brandName) {
  */
 async function fetchKnowledgeGraphFull(brandName) {
     if (!brandName || !GOOGLE_API_KEY) return null;
-    // Proper Fix: Increase limit to 100 for a more comprehensive audit
-    const url = `https://kgsearch.googleapis.com/v1/entities:search?query=${encodeURIComponent(brandName)}&key=${GOOGLE_API_KEY}&limit=100`;
+    // Proper Fix: Increase limit to 100 and enforce types=Organization for brand accuracy
+    const url = `https://kgsearch.googleapis.com/v1/entities:search?query=${encodeURIComponent(brandName)}&types=Organization&key=${GOOGLE_API_KEY}&limit=100`;
     
     try {
         const response = await axios.get(url);

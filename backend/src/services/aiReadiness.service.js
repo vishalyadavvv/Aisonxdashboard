@@ -562,15 +562,40 @@ function analyzeStructuredData(html, baseUrl) {
 
     try {
         const $ = cheerio.load(html);
-        const scripts = $('script[type="application/ld+json"]');
+        const jsonLdContents = [];
+
+        $('script[type="application/ld+json"]').each((i, el) => {
+            const raw = $(el).html();
+            if (raw) {
+                try {
+                    jsonLdContents.push(JSON.parse(raw));
+                } catch (e) {
+                    results.errors.push('JSON Parse Error');
+                    results.valid = false;
+                }
+            }
+        });
+
+        if (jsonLdContents.length === 0) {
+            $('script').each((i, el) => {
+                const raw = $(el).html() || '';
+                if (raw.includes('application/ld+json') && raw.includes('children')) {
+                    const nextjsMatch = raw.match(/"children"\s*:\s*("(?:\\.|[^"\\])*")/);
+                    if (nextjsMatch && nextjsMatch[1]) {
+                        try {
+                            const unescaped = JSON.parse(nextjsMatch[1]);
+                            jsonLdContents.push(JSON.parse(unescaped));
+                        } catch (e) {}
+                    }
+                }
+            });
+        }
         
-        if (scripts.length > 0) {
+        if (jsonLdContents.length > 0) {
             results.jsonLdPresent = true;
             
-            scripts.each((i, el) => {
+            jsonLdContents.forEach(json => {
                 try {
-                    const raw = $(el).html();
-                    const json = JSON.parse(raw);
                     
                     const processNode = (node) => {
                          if (!node) return;
@@ -690,7 +715,10 @@ function analyzeEntityIdentity(html, sitemapUrls) {
         hasPhone: hasPhone,
         hasOrgSchema: hasOrgSchema,
         orgDescriptionLength: $('meta[name="description"]').attr('content')?.length || 0, // Proxy
-        socialLinks: sitemapUrls.some(u => u.includes('instagram') || u.includes('facebook') || u.includes('twitter') || u.includes('linkedin')),
+        socialLinks: $('a').toArray().some(a => {
+            const href = ($(a).attr('href') || '').toLowerCase();
+            return href.includes('instagram.com') || href.includes('facebook.com') || href.includes('twitter.com') || href.includes('x.com') || href.includes('linkedin.com') || href.includes('youtube.com');
+        }),
         brandConsistencyScore: 0.85 // Heuristic/Mock
     };
 }
